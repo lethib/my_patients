@@ -24,6 +24,18 @@ server:
   host: http://localhost
   # Out of the box middleware configuration. to disable middleware you can changed the `enable` field to `false` of comment the middleware block
   middlewares:
+    cors:
+      enable: true
+      allow_origins:
+        - "*"
+      allow_headers:
+        - "Authorization"
+        - "Content-Type"
+        - "Accept"
+      allow_methods:
+        - "GET"
+        - "POST"
+        - "OPTIONS"
     fallback:
       enable: false
     static:

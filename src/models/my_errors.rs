@@ -24,7 +24,7 @@ impl Serialize for MyErrors {
 impl IntoResponse for MyErrors {
   fn into_response(self) -> axum::response::Response {
     tracing::warn!("Error message: {}", self.msg);
-    axum::Json(self).into_response()
+    (self.code, axum::Json(self)).into_response()
   }
 }
 
