@@ -1,6 +1,8 @@
 use crate::{
     models::{
         _entities::users,
+        my_errors::authentication_error::AuthenticationError,
+        my_errors::{MyErrors, ToErr},
         users::{LoginParams, RegisterParams},
     },
     views::auth::{CurrentResponse, LoginResponse},
@@ -94,19 +96,22 @@ async fn reset(
 
 /// Creates a user login and returns a token
 #[debug_handler]
-async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -> Result<Response> {
+async fn login(
+    State(ctx): State<AppContext>,
+    Json(params): Json<LoginParams>,
+) -> Result<Response, MyErrors> {
     let Ok(user) = users::Model::find_by_email(&ctx.db, &params.email).await else {
         tracing::debug!(
             email = params.email,
             "login attempt with non-existent email"
         );
-        return unauthorized("Invalid credentials!");
+        return AuthenticationError::INVALID_CREDENTIALS.to_err();
     };
 
     let valid = user.verify_password(&params.password);
 
     if !valid {
-        return unauthorized("unauthorized!");
+        return AuthenticationError::INVALID_CREDENTIALS.to_err();
     }
 
     let jwt_secret = ctx.config.get_jwt_config()?;
@@ -115,13 +120,24 @@ async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -
         .generate_jwt(&jwt_secret.secret, jwt_secret.expiration)
         .or_else(|_| unauthorized("unauthorized!"))?;
 
-    format::json(LoginResponse::new(&user, &token))
+    Ok(format::json(LoginResponse::new(&user, &token))?)
+}
+
+async fn test(State(ctx): State<AppContext>) -> Result<Response, MyErrors> {
+    let Ok(user) = users::Model::find_by_email(&ctx.db, "test").await else {
+        return AuthenticationError::INVALID_CREDENTIALS.to_err();
+    };
+
+    Ok(format::json(CurrentResponse::new(&user))?)
 }
 
 #[debug_handler]
-async fn current(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
-    let user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
-    format::json(CurrentResponse::new(&user))
+async fn current(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response, MyErrors> {
+    let Ok(user) = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await else {
+        return AuthenticationError::new("user_not_found".into()).to_err();
+    };
+
+    Ok(format::json(CurrentResponse::new(&user))?)
 }
 
 pub fn routes() -> Routes {
@@ -132,4 +148,5 @@ pub fn routes() -> Routes {
         .add("/forgot", post(forgot))
         .add("/reset", post(reset))
         .add("/current", get(current))
+        .add("/test", get(test))
 }
