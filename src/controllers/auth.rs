@@ -123,14 +123,6 @@ async fn login(
     Ok(format::json(LoginResponse::new(&user, &token))?)
 }
 
-async fn test(State(ctx): State<AppContext>) -> Result<Response, MyErrors> {
-    let Ok(user) = users::Model::find_by_email(&ctx.db, "test").await else {
-        return AuthenticationError::INVALID_CREDENTIALS.to_err();
-    };
-
-    Ok(format::json(CurrentResponse::new(&user))?)
-}
-
 #[debug_handler]
 async fn current(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response, MyErrors> {
     let Ok(user) = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await else {
@@ -148,5 +140,4 @@ pub fn routes() -> Routes {
         .add("/forgot", post(forgot))
         .add("/reset", post(reset))
         .add("/current", get(current))
-        .add("/test", get(test))
 }
