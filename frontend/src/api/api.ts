@@ -26,8 +26,8 @@ class MyPatientsAPI {
     );
   }
 
-  get = async <R>(path: string, params?: AxiosRequestConfig): Promise<R> => {
-    const res = await this.client.get<R>(path, { params });
+  get = async <R>(path: string, config?: AxiosRequestConfig): Promise<R> => {
+    const res = await this.client.get<R>(path, config);
     return res.data;
   };
 

@@ -25,10 +25,6 @@ function createSuspenseQuery<P, R>(endpoint: EndpointConfig<P, R>) {
     return useQuery({
       queryKey: [endpoint.path, params],
       queryFn: async () => {
-        console.log(
-          `Fetching data from: ${endpoint.path} with params:`,
-          params,
-        );
         return await APIClient.get<R>(endpoint.path, { params });
       },
       enabled,
