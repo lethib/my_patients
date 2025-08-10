@@ -4,5 +4,5 @@ use my_patients::app::App;
 
 #[tokio::main]
 async fn main() -> loco_rs::Result<()> {
-    cli::main::<App, Migrator>().await
+  cli::main::<App, Migrator>().await
 }
