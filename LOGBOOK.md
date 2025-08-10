@@ -7,3 +7,8 @@
 - Removed the generated frontend for the CSR (Client-Side Rendering). I prefer to use vite + react rather than rsbuild. 
 - Removed data, fixtures and mailer directories. I don't understand their use in this project. If i'll to implement a mailer, i'll re-write it to better understand how it works.
 - Created this LOGBOOK :) 
+
+## 10/08/2025
+
+- Implemented my own error type in Rust for better error handling. Well understood how enums, strucs and traits are working together in Rust.
+- Implemented my API client with a TanStack Query wrapper for my endpoints. This has been done with generics helpers to avoid code duplication.
