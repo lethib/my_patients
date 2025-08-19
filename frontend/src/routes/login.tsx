@@ -1,8 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { APIClient } from "@/api/api";
+import { FormInput } from "@/components/form/FormInput";
+import { FormProvider } from "@/components/form/FormProvider";
 import { Button, Label } from "@/components/ui";
 import {
   Card,
@@ -11,12 +15,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { APIClient } from "./api/api";
-import { FormInput } from "./components/form/FormInput";
-import { FormProvider } from "./components/form/FormProvider";
-import { RegisterModal } from "./RegisterModal";
+import { RegisterModal } from "@/RegisterModal";
 
-export function Login() {
+export const Route = createFileRoute("/login")({
+  component: Login,
+});
+
+function Login() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
@@ -38,8 +44,8 @@ export function Login() {
   const onSubmit = async (data: z.infer<typeof loginFormSchema>) => {
     loginMutation.mutateAsync(data, {
       onSuccess: (res) => {
-        alert(`Login successful ${res.name}!`);
         localStorage.setItem("accessToken", res.token);
+        navigate({ to: "/" });
       },
       onError: (error) => {
         alert(`Login failed: ${error.message}`);
