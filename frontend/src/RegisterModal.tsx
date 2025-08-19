@@ -202,8 +202,6 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
           </div>
         </FormProvider>
 
-        <form onSubmit={onSubmit} className="space-y-4"></form>
-
         <div className="text-center pt-4 border-t">
           <p className="text-sm text-muted-foreground">
             Already have an account?{" "}

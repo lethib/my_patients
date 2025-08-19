@@ -75,7 +75,6 @@ export function Login() {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  value={loginForm.watch("email")}
                   className="pl-10 h-11"
                   icon={
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -93,7 +92,6 @@ export function Login() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    value={loginForm.watch("password")}
                     className="pl-10 pr-10 h-11"
                     icon={
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
