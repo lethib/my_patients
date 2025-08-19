@@ -63,6 +63,7 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
             "Registration successful! Please check your email to verify your account.",
           );
           onOpenChange(false);
+          registerForm.reset();
         },
         onError: (error) => {
           alert(`Registration failed: ${error.message}`);
