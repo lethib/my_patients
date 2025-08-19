@@ -1,6 +1,9 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
-import { Button, Input, Label } from "@/components/ui";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button, Label } from "@/components/ui";
 import {
   Card,
   CardContent,
@@ -9,26 +12,39 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { APIClient } from "./api/api";
-import { RegisterModal } from "./components/RegisterModal";
+import { FormInput } from "./components/form/FormInput";
+import { FormProvider } from "./components/form/FormProvider";
+import { RegisterModal } from "./RegisterModal";
 
 export function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   const loginMutation = APIClient.hooks.auth.login.useMutation();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    loginMutation
-      .mutateAsync({ email, password })
-      .then((response) => {
-        alert(`Welcome ${response.name}!`);
-      })
-      .catch((error) => {
+  const loginFormSchema = z.object({
+    email: z.email({ error: "Invalid email address" }),
+    password: z.string().nonempty({ error: "Password is required" }),
+  });
+
+  const loginForm = useForm({
+    resolver: zodResolver(loginFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (data: z.infer<typeof loginFormSchema>) => {
+    loginMutation.mutateAsync(data, {
+      onSuccess: (res) => {
+        alert(`Login successful ${res.name}!`);
+        localStorage.setItem("accessToken", res.token);
+      },
+      onError: (error) => {
         alert(`Login failed: ${error.message}`);
-      });
+      },
+    });
   };
 
   return (
@@ -45,23 +61,26 @@ export function Login() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <FormProvider
+              methods={loginForm}
+              onSubmit={loginForm.handleSubmit((data) => onSubmit(data))}
+              className="space-y-4"
+            >
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
                   Email
                 </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-11"
-                    required
-                  />
-                </div>
+                <FormInput
+                  name="email"
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={loginForm.watch("email")}
+                  className="pl-10 h-11"
+                  icon={
+                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  }
+                />
               </div>
 
               <div className="space-y-2">
@@ -69,15 +88,16 @@ export function Login() {
                   Password
                 </Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
+                  <FormInput
+                    name="password"
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={loginForm.watch("password")}
                     className="pl-10 pr-10 h-11"
-                    required
+                    icon={
+                      <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    }
                   />
                   <button
                     type="button"
@@ -107,7 +127,7 @@ export function Login() {
                   "Sign in"
                 )}
               </Button>
-            </form>
+            </FormProvider>
 
             <div className="text-center space-y-2">
               <button className="text-sm text-primary hover:underline">
