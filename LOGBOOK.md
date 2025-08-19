@@ -12,3 +12,9 @@
 
 - Implemented my own error type in Rust for better error handling. Well understood how enums, strucs and traits are working together in Rust.
 - Implemented my API client with a TanStack Query wrapper for my endpoints. This has been done with generics helpers to avoid code duplication.
+
+## 13-19/08/2025
+
+- Added custom colors to the Tailwind CSS configuration.
+- Implemented the login and register forms with validation using Zod and React Hook Form.
+- Implemented the login and register modals with a custom dialog component using AI.
