@@ -1,8 +1,8 @@
 use crate::{
+  middlewares::current_user::{current_user_middleware, CurrentUser},
   models::{
     _entities::users,
-    my_errors::authentication_error::AuthenticationError,
-    my_errors::{MyErrors, ToErr},
+    my_errors::{authentication_error::AuthenticationError, MyErrors, ToErr},
     users::{LoginParams, RegisterParams},
   },
   views::auth::{CurrentResponse, LoginResponse},
@@ -38,19 +38,9 @@ pub struct ResendVerificationParams {
 async fn register(
   State(ctx): State<AppContext>,
   Json(params): Json<RegisterParams>,
-) -> Result<Response> {
-  let _ = users::Model::create_with_password(&ctx.db, &params)
-    .await
-    .or_else(|err| {
-      tracing::info!(
-        message = err.to_string(),
-        user_email = &params.email,
-        "could not register user",
-      );
-      return Err(format::json(()));
-    });
-
-  format::json(())
+) -> Result<Response, MyErrors> {
+  users::Model::create_with_password(&ctx.db, &params).await?;
+  Ok(format::json(())?)
 }
 
 /// In case the user forgot his password  this endpoints generate a forgot token
@@ -124,20 +114,22 @@ async fn login(
 }
 
 #[debug_handler]
-async fn me(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response, MyErrors> {
-  let Ok(user) = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await else {
-    return AuthenticationError::new("user_not_found".into()).to_err();
-  };
-
-  Ok(format::json(CurrentResponse::new(&user))?)
+async fn me(State(ctx): State<AppContext>) -> Result<Response, MyErrors> {
+  Ok(format::json(CurrentResponse::new(&ctx.current_user()))?)
 }
 
-pub fn routes() -> Routes {
+pub fn routes(ctx: &AppContext) -> Routes {
   Routes::new()
     .prefix("/api/auth")
     .add("/register", post(register))
     .add("/login", post(login))
     .add("/forgot", post(forgot))
     .add("/reset", post(reset))
-    .add("/me", get(me))
+    .add(
+      "/me",
+      get(me).layer(axum::middleware::from_fn_with_state(
+        ctx.clone(),
+        current_user_middleware,
+      )),
+    )
 }

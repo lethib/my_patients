@@ -22,3 +22,4 @@
 ## 20/08/2025
 
 - Introduce TanStack Router for the frontend router. A new tool that I am discovering for this project.
+- Add my backend custom error typing to the frontend API client.
