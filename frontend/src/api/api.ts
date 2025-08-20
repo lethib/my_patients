@@ -6,6 +6,11 @@ import axios, {
 } from "axios";
 import { APIHooks } from "./hooks";
 
+export type APIError = {
+  code: number;
+  msg: string;
+};
+
 class MyPatientsAPI {
   client: AxiosInstance;
   hooks: typeof APIHooks;
@@ -24,11 +29,19 @@ class MyPatientsAPI {
       },
       (error: AxiosError) => Promise.reject(error),
     );
+
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error: AxiosError<APIError>) => {
+        throw error;
+      },
+    );
   }
 
   get = async <R>(path: string, config?: AxiosRequestConfig): Promise<R> => {
-    const res = await this.client.get<R>(path, config);
-    return res.data;
+    return this.client.get<R>(path, config).then((res) => {
+      return res.data;
+    });
   };
 
   post = async <P, R>(
@@ -36,8 +49,9 @@ class MyPatientsAPI {
     data: P,
     config?: AxiosRequestConfig,
   ): Promise<R> => {
-    const res = await this.client.post<R>(path, data, config);
-    return res.data;
+    return this.client.post<R>(path, data, config).then((res) => {
+      return res.data;
+    });
   };
 }
 

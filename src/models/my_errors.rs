@@ -28,8 +28,11 @@ impl IntoResponse for MyErrors {
   }
 }
 
-impl From<loco_rs::errors::Error> for MyErrors {
-  fn from(err: loco_rs::errors::Error) -> Self {
+impl<T> From<T> for MyErrors
+where
+  T: std::error::Error,
+{
+  fn from(err: T) -> Self {
     MyErrors {
       code: axum::http::StatusCode::INTERNAL_SERVER_ERROR,
       msg: err.to_string(),
