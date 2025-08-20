@@ -33,7 +33,6 @@ class MyPatientsAPI {
     this.client.interceptors.response.use(
       (response) => response,
       (error: AxiosError<APIError>) => {
-        console.log("API Error:", error.response?.data);
         throw error;
       },
     );
