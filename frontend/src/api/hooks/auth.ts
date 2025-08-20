@@ -1,4 +1,4 @@
-import { mutationEndpoint } from "../endpointGenetator";
+import { mutationEndpoint, queryEndpoint } from "../endpointGenetator";
 
 type LoginParams = {
   email: string;
@@ -18,6 +18,12 @@ type RegisterParams = {
   name: string;
 };
 
+export type MeResponse = {
+  pid: string;
+  email: string;
+  name: string;
+};
+
 export const authSchema = {
   login: mutationEndpoint<LoginParams, AuthResponse>({
     type: "POST",
@@ -26,5 +32,9 @@ export const authSchema = {
   register: mutationEndpoint<RegisterParams, null>({
     type: "POST",
     path: "/auth/register",
+  }),
+  me: queryEndpoint<null, MeResponse>({
+    type: "GET",
+    path: "/auth/me",
   }),
 };
