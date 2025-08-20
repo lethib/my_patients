@@ -18,3 +18,7 @@
 - Added custom colors to the Tailwind CSS configuration.
 - Implemented the login and register forms with validation using Zod and React Hook Form.
 - Implemented the login and register modals with a custom dialog component using AI.
+
+## 20/08/2025
+
+- Introduce TanStack Router for the frontend router. A new tool that I am discovering for this project.
