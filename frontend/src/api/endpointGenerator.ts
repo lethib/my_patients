@@ -4,7 +4,7 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
-import { APIClient } from "./api";
+import { APIClient, type APIError } from "./api";
 
 // Base endpoint configuration type
 export type EndpointConfig<P, R> = {
@@ -17,7 +17,7 @@ export type EndpointConfig<P, R> = {
 // Generic hook generators
 function createMutation<P, R>(endpoint: EndpointConfig<P, R>) {
   return () => {
-    return useMutation<R, Error, P>({
+    return useMutation<R, AxiosError<APIError>, P>({
       mutationFn: async (data: P) => {
         return await APIClient.post<P, R>(endpoint.path, data);
       },
@@ -28,7 +28,10 @@ function createMutation<P, R>(endpoint: EndpointConfig<P, R>) {
 function createQuery<P, R>(endpoint: EndpointConfig<P, R>) {
   return (
     params: P,
-    options?: Omit<UseQueryOptions<R, AxiosError, R>, "queryKey" | "queryFn">,
+    options?: Omit<
+      UseQueryOptions<R, AxiosError<APIError>, R>,
+      "queryKey" | "queryFn"
+    >,
   ) => {
     return useQuery({
       queryKey: [endpoint.path],
