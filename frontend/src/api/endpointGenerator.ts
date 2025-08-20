@@ -1,4 +1,9 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  type UseQueryOptions,
+  useMutation,
+  useQuery,
+} from "@tanstack/react-query";
+import type { AxiosError } from "axios";
 import { APIClient } from "./api";
 
 // Base endpoint configuration type
@@ -20,20 +25,23 @@ function createMutation<P, R>(endpoint: EndpointConfig<P, R>) {
   };
 }
 
-function createSuspenseQuery<P, R>(endpoint: EndpointConfig<P, R>) {
-  return (params: P, enabled: boolean = true) => {
+function createQuery<P, R>(endpoint: EndpointConfig<P, R>) {
+  return (
+    params: P,
+    options?: Omit<UseQueryOptions<R, AxiosError, R>, "queryKey" | "queryFn">,
+  ) => {
     return useQuery({
-      queryKey: [endpoint.path, params],
+      queryKey: [endpoint.path],
       queryFn: async () => {
         return await APIClient.get<R>(endpoint.path, { params });
       },
-      enabled,
+      ...options,
     });
   };
 }
 
 export const queryEndpoint = <P, R>(config: { type: "GET"; path: string }) => {
-  return { useSuspenseQuery: createSuspenseQuery<P, R>(config) };
+  return { useQuery: createQuery<P, R>(config) };
 };
 
 export const mutationEndpoint = <P, R>(config: {
