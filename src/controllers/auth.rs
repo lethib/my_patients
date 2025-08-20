@@ -124,7 +124,7 @@ async fn login(
 }
 
 #[debug_handler]
-async fn current(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response, MyErrors> {
+async fn me(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response, MyErrors> {
   let Ok(user) = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await else {
     return AuthenticationError::new("user_not_found".into()).to_err();
   };
@@ -139,5 +139,5 @@ pub fn routes() -> Routes {
     .add("/login", post(login))
     .add("/forgot", post(forgot))
     .add("/reset", post(reset))
-    .add("/current", get(current))
+    .add("/me", get(me))
 }

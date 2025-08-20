@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { APIClient } from "./api/api";
 import { FormInput } from "./components/form/FormInput";
 import { FormProvider } from "./components/form/FormProvider";
 
@@ -22,6 +23,8 @@ interface RegisterModalProps {
 export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const registerMutation = APIClient.hooks.auth.register.useMutation();
 
   const registerFormSchema = z
     .object({
@@ -48,7 +51,25 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
   });
 
   const onSubmit = registerForm.handleSubmit(async (data) => {
-    console.log("Form submitted with data:", data);
+    registerMutation.mutateAsync(
+      {
+        email: data.email,
+        password: data.password,
+        name: `${data.firstName} ${data.lastName}`,
+      },
+      {
+        onSuccess: () => {
+          alert(
+            "Registration successful! Please check your email to verify your account.",
+          );
+          onOpenChange(false);
+          registerForm.reset();
+        },
+        onError: (error) => {
+          alert(`Registration failed: ${error.message}`);
+        },
+      },
+    );
   });
 
   return (
