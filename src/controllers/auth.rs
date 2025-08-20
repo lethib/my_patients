@@ -1,8 +1,8 @@
 use crate::{
+  middlewares::current_user::{current_user_middleware, CurrentUser},
   models::{
     _entities::users,
-    my_errors::authentication_error::AuthenticationError,
-    my_errors::{MyErrors, ToErr},
+    my_errors::{authentication_error::AuthenticationError, MyErrors, ToErr},
     users::{LoginParams, RegisterParams},
   },
   views::auth::{CurrentResponse, LoginResponse},
@@ -114,17 +114,23 @@ async fn login(
 }
 
 #[debug_handler]
-async fn me(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response, MyErrors> {
-  let user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
+async fn me(State(ctx): State<AppContext>) -> Result<Response, MyErrors> {
+  let user = users::Model::find_by_pid(&ctx.db, &ctx.current_user().pid.to_string()).await?;
   Ok(format::json(CurrentResponse::new(&user))?)
 }
 
-pub fn routes() -> Routes {
+pub fn routes(ctx: &AppContext) -> Routes {
   Routes::new()
     .prefix("/api/auth")
     .add("/register", post(register))
     .add("/login", post(login))
     .add("/forgot", post(forgot))
     .add("/reset", post(reset))
-    .add("/me", get(me))
+    .add(
+      "/me",
+      get(me).layer(axum::middleware::from_fn_with_state(
+        ctx.clone(),
+        current_user_middleware,
+      )),
+    )
 }
