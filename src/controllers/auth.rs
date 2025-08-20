@@ -115,8 +115,7 @@ async fn login(
 
 #[debug_handler]
 async fn me(State(ctx): State<AppContext>) -> Result<Response, MyErrors> {
-  let user = users::Model::find_by_pid(&ctx.db, &ctx.current_user().pid.to_string()).await?;
-  Ok(format::json(CurrentResponse::new(&user))?)
+  Ok(format::json(CurrentResponse::new(&ctx.current_user()))?)
 }
 
 pub fn routes(ctx: &AppContext) -> Routes {
