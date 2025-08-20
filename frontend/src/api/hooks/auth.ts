@@ -1,4 +1,4 @@
-import { mutationEndpoint, queryEndpoint } from "../endpointGenetator";
+import { mutationEndpoint, queryEndpoint } from "../endpointGenerator";
 
 type LoginParams = {
   email: string;
