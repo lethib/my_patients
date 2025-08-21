@@ -4,6 +4,8 @@ pub use sea_orm_migration::prelude::*;
 mod m20220101_000001_users;
 
 mod m20250809_080459_remove_unnecessary_cols_from_users;
+mod m20250820_151249_patients;
+mod m20250820_152922_create_join_table_users_and_patients;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -12,6 +14,8 @@ impl MigratorTrait for Migrator {
     vec![
       Box::new(m20220101_000001_users::Migration),
       Box::new(m20250809_080459_remove_unnecessary_cols_from_users::Migration),
+      Box::new(m20250820_151249_patients::Migration),
+      Box::new(m20250820_152922_create_join_table_users_and_patients::Migration),
       // inject-above (do not remove this comment)
     ]
   }
