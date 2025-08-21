@@ -4,17 +4,17 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "users")]
+#[sea_orm(table_name = "patients")]
 pub struct Model {
   pub created_at: DateTimeWithTimeZone,
   pub updated_at: DateTimeWithTimeZone,
   #[sea_orm(primary_key)]
   pub id: i32,
-  pub pid: Uuid,
-  #[sea_orm(unique)]
-  pub email: String,
-  pub password: String,
   pub name: String,
+  #[sea_orm(unique)]
+  pub ssn: String,
+  #[sea_orm(unique)]
+  pub pid: Uuid,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
@@ -29,11 +29,11 @@ impl Related<super::patient_users::Entity> for Entity {
   }
 }
 
-impl Related<super::patients::Entity> for Entity {
+impl Related<super::users::Entity> for Entity {
   fn to() -> RelationDef {
-    super::patient_users::Relation::Patients.def()
+    super::patient_users::Relation::Users.def()
   }
   fn via() -> Option<RelationDef> {
-    Some(super::patient_users::Relation::Users.def().rev())
+    Some(super::patient_users::Relation::Patients.def().rev())
   }
 }

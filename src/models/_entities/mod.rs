@@ -2,4 +2,6 @@
 
 pub mod prelude;
 
+pub mod patient_users;
+pub mod patients;
 pub mod users;
