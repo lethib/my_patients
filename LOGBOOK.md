@@ -24,3 +24,7 @@
 - Introduce TanStack Router for the frontend router. A new tool that I am discovering for this project.
 - Add my backend custom error typing to the frontend API client.
 - Implemented the current user middleware to extract the authenticated user from the request context.
+
+## 21/08/2025
+
+- Implemented the encryption service using AES-GCM for secure data handling. I am completely new to cryptography, thus Claude Code helped me a lot to understand how it works.

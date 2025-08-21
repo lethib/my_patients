@@ -1,4 +1,5 @@
 pub mod authentication_error;
+pub mod unexpected_error;
 
 use axum::response::IntoResponse;
 use serde::ser::SerializeStruct;
