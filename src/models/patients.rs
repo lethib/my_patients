@@ -33,13 +33,12 @@ impl ActiveModelBehavior for ActiveModel {
     C: ConnectionTrait,
   {
     let mut this = self;
-    if !insert && this.updated_at.is_unchanged() {
-      this.updated_at = sea_orm::ActiveValue::Set(chrono::Utc::now().into());
-      Ok(this)
-    } else {
+    if insert {
       this.pid = ActiveValue::Set(Uuid::new_v4());
-      Ok(this)
+    } else if this.updated_at.is_unchanged() {
+      this.updated_at = ActiveValue::Set(chrono::Utc::now().into())
     }
+    Ok(this)
   }
 }
 
@@ -54,15 +53,15 @@ impl ActiveModel {
   ) -> ModelResult<Model, MyErrors> {
     let ssn_encrypted = Model::encrypt_ssn(&params.ssn)?;
 
-    let patient = patients::ActiveModel {
-      name: ActiveValue::Set(params.name.clone()),
-      ssn: ActiveValue::Set(ssn_encrypted),
-      ..Default::default()
-    }
-    .insert(db)
-    .await?;
-
-    return Ok(patient);
+    return Ok(
+      patients::ActiveModel {
+        name: ActiveValue::Set(params.name.clone()),
+        ssn: ActiveValue::Set(ssn_encrypted),
+        ..Default::default()
+      }
+      .insert(db)
+      .await?,
+    );
   }
 }
 
