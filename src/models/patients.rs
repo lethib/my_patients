@@ -47,8 +47,8 @@ impl Model {}
 
 // implement your write-oriented logic here
 impl ActiveModel {
-  pub async fn create(
-    db: &DatabaseConnection,
+  pub async fn create<T: ConnectionTrait>(
+    db: &T,
     params: &CreatePatientParams,
   ) -> ModelResult<Model, MyErrors> {
     let ssn_encrypted = Model::encrypt_ssn(&params.ssn)?;
