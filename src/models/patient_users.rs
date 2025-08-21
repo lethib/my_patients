@@ -1,6 +1,14 @@
+use crate::models::my_errors::MyErrors;
+
 pub use super::_entities::patient_users::{ActiveModel, Entity, Model};
-use sea_orm::entity::prelude::*;
+use loco_rs::model::ModelResult;
+use sea_orm::{entity::prelude::*, ActiveValue};
 pub type PatientUsers = Entity;
+
+pub struct CreateLinkParams {
+  pub user_id: i32,
+  pub patient_id: i32,
+}
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for ActiveModel {
@@ -22,7 +30,22 @@ impl ActiveModelBehavior for ActiveModel {
 impl Model {}
 
 // implement your write-oriented logic here
-impl ActiveModel {}
+impl ActiveModel {
+  pub async fn create<T: ConnectionTrait>(
+    db: &T,
+    params: &CreateLinkParams,
+  ) -> ModelResult<Model, MyErrors> {
+    return Ok(
+      self::ActiveModel {
+        user_id: ActiveValue::Set(params.user_id),
+        patient_id: ActiveValue::Set(params.patient_id),
+        ..Default::default()
+      }
+      .insert(db)
+      .await?,
+    );
+  }
+}
 
 // implement your custom finders, selectors oriented logic here
 impl Entity {}

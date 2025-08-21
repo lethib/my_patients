@@ -14,7 +14,9 @@ use migration::Migrator;
 use std::path::Path;
 
 #[allow(unused_imports)]
-use crate::{controllers, models::_entities::users, tasks, workers::downloader::DownloadWorker};
+use crate::{
+  controllers, initializers, models::_entities::users, tasks, workers::downloader::DownloadWorker,
+};
 
 pub struct App;
 #[async_trait]
@@ -37,13 +39,16 @@ impl Hooks for App {
     create_app::<Self, Migrator>(mode, environment, config).await
   }
 
-  async fn initializers(_ctx: &AppContext) -> Result<Vec<Box<dyn Initializer>>> {
+  async fn initializers(ctx: &AppContext) -> Result<Vec<Box<dyn Initializer>>> {
+    // Initialize app services with database connection
+    initializers::init_services(ctx).map_err(|e| loco_rs::Error::string(&e))?;
     Ok(vec![])
   }
 
   fn routes(ctx: &AppContext) -> AppRoutes {
     AppRoutes::with_default_routes() // controller routes below
       .add_route(controllers::auth::routes(ctx))
+      .add_route(controllers::patient::routes(ctx))
   }
   async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {
     queue.register(DownloadWorker::build(ctx)).await?;
