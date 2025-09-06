@@ -2,6 +2,10 @@ use aes_gcm::{
   aead::{Aead, OsRng},
   AeadCore, Aes256Gcm, Key, KeyInit, Nonce,
 };
+use argon2::{
+  password_hash::{PasswordHasher, SaltString},
+  Argon2, Params,
+};
 use base64::{engine::general_purpose as Base64Engine, Engine};
 
 use crate::models::my_errors::{unexpected_error::UnexpectedError, MyErrors, ToErr};
@@ -12,6 +16,8 @@ pub struct Crypto {
 
 impl Crypto {
   fn new() -> Result<Self, MyErrors> {
+    // Explicitly load .env file
+    dotenv::dotenv().ok();
     let key_string = std::env::var("SSN_ENCRYPTION_KEY")?;
 
     if key_string.len() != 32 {
@@ -59,5 +65,23 @@ impl Crypto {
 
     String::from_utf8(decrypted_bytes)
       .map_err(|err| UnexpectedError::new(err.to_string().into()).to_my_error())
+  }
+
+  pub fn hash(value: &str, salt: &String) -> Result<String, MyErrors> {
+    let arg2 = Argon2::new(
+      argon2::Algorithm::Argon2id,
+      argon2::Version::V0x13,
+      Params::default(),
+    );
+
+    let salt_string = SaltString::encode_b64(salt.as_bytes())
+      .map_err(|err| UnexpectedError::new(err.to_string().into()).to_my_error())?;
+
+    Ok(
+      arg2
+        .hash_password(value.as_bytes(), &salt_string)
+        .map_err(|err| UnexpectedError::new(err.to_string().into()).to_my_error())?
+        .to_string(),
+    )
   }
 }

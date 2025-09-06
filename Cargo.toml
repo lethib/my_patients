@@ -37,6 +37,8 @@ include_dir = { version = "0.7" }
 axum-extra = { version = "0.10", features = ["form"] }
 aes-gcm = "0.10.3"
 base64 = "0.22.1"
+argon2 = "0.5"
+dotenv = "0.15"
 
 [[bin]]
 name = "my_patients-cli"
