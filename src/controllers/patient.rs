@@ -17,7 +17,7 @@ async fn save(
 ) -> Result<Response, MyErrors> {
   services::patients::create(&create_patient_params, &ctx.current_user()).await?;
 
-  Ok(format::json(serde_json::json!({ "success": true}))?)
+  Ok(format::json(serde_json::json!({ "success": true }))?)
 }
 
 pub fn routes(ctx: &AppContext) -> Routes {

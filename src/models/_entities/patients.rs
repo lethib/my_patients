@@ -15,6 +15,8 @@ pub struct Model {
   pub ssn: String,
   #[sea_orm(unique)]
   pub pid: Uuid,
+  #[sea_orm(unique)]
+  pub hashed_ssn: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
