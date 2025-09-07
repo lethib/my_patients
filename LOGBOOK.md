@@ -28,3 +28,9 @@
 ## 21/08/2025
 
 - Implemented the encryption service using AES-GCM for secure data handling. I am completely new to cryptography, thus Claude Code helped me a lot to understand how it works.
+
+## 07/09/2025
+
+- Implemented the DB modelisation of the relation Patient <> User.
+- Created the UX to add a new patient.
+- Added the **hashed_ssn** column to have a performant and secured way to find a patient with its SSN.
