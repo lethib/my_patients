@@ -47,7 +47,8 @@ export const AddPatientModal = ({ open, onOpenChange }: Props) => {
   const onSubmit = addPatientForm.handleSubmit(async (values) => {
     addPatientMutation
       .mutateAsync({
-        name: `${values.firstName} ${values.lastName}`,
+        first_name: values.firstName,
+        last_name: values.lastName,
         ssn: values.ssn,
       })
       .catch((error) => alert(error.message));
