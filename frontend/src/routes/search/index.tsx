@@ -21,7 +21,7 @@ function Search() {
 
       <AddPatientModal
         open={isAddPatientModalOpened}
-        onOpenChange={() => setIsAddPatientModalOpened(false)}
+        setIsOpen={() => setIsAddPatientModalOpened(false)}
       />
     </>
   );

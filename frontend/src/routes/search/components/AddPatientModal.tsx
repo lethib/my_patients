@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IdCard, User } from "lucide-react";
-import { type ChangeEvent } from "react";
+import { type ChangeEvent, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { APIHooks } from "@/api/hooks";
@@ -15,16 +15,17 @@ import {
   DialogTitle,
   Label,
 } from "@/components/ui";
+import { CenteredSpineer } from "@/components/ui/spinner";
 
 interface Props {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  setIsOpen: (open: boolean) => void;
 }
 
 const FR_SSN_REGEX =
   /([12])([0-9]{2})(0[1-9]|1[0-2])(2[AB]|[0-9]{2})[0-9]{3}[0-9]{3}([0-9]{2})/;
 
-export const AddPatientModal = ({ open, onOpenChange }: Props) => {
+export const AddPatientModal = ({ open, setIsOpen }: Props) => {
   const addPatientMutation = APIHooks.patient.savePatient.useMutation();
 
   const addPatientFormSchema = z.object({
@@ -44,6 +45,27 @@ export const AddPatientModal = ({ open, onOpenChange }: Props) => {
     },
   });
 
+  const canSearchPatient = addPatientForm.getValues("ssn").length === 15;
+
+  const findPatientBySSNQuery = APIHooks.patient.searchBySSN.useQuery(
+    { ssn: addPatientForm.getValues("ssn") },
+    { enabled: canSearchPatient },
+  );
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: not needed
+  useEffect(() => {
+    if (!findPatientBySSNQuery.data) return;
+
+    addPatientForm.setValue(
+      "firstName",
+      findPatientBySSNQuery.data.first_name || "",
+    );
+    addPatientForm.setValue(
+      "lastName",
+      findPatientBySSNQuery.data.last_name || "",
+    );
+  }, [findPatientBySSNQuery.data?.ssn]);
+
   const onSubmit = addPatientForm.handleSubmit(async (values) => {
     addPatientMutation
       .mutateAsync({
@@ -51,6 +73,7 @@ export const AddPatientModal = ({ open, onOpenChange }: Props) => {
         last_name: values.lastName,
         ssn: values.ssn,
       })
+      .then(() => setIsOpen(false))
       .catch((error) => alert(error.message));
   });
 
@@ -77,7 +100,7 @@ export const AddPatientModal = ({ open, onOpenChange }: Props) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setIsOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add a patient</DialogTitle>
@@ -99,46 +122,51 @@ export const AddPatientModal = ({ open, onOpenChange }: Props) => {
               type="text"
               onChange={handleSSNChange}
               value={formatSSN(addPatientForm.watch("ssn") || "")}
-              placeholder="Enter the SSN"
+              placeholder="15-digits long"
               className="pl-10 h-11"
               icon={
                 <IdCard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               }
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName" className="text-sm font-medium">
-                First Name
-              </Label>
-              <FormInput
-                id="firstName"
-                name="firstName"
-                type="text"
-                placeholder="First name"
-                className="pl-10 h-11"
-                icon={
-                  <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                }
-              />
-            </div>
+          {findPatientBySSNQuery.isFetching && (
+            <CenteredSpineer className="text-secondary" />
+          )}
+          {findPatientBySSNQuery.data && canSearchPatient && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName" className="text-sm font-medium">
+                  First Name
+                </Label>
+                <FormInput
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  placeholder="First name"
+                  className="pl-10 h-11"
+                  icon={
+                    <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  }
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="lastName" className="text-sm font-medium">
-                Last Name
-              </Label>
-              <FormInput
-                id="lastName"
-                name="lastName"
-                type="text"
-                placeholder="Last name"
-                className="pl-10 h-11"
-                icon={
-                  <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                }
-              />
+              <div className="space-y-2">
+                <Label htmlFor="lastName" className="text-sm font-medium">
+                  Last Name
+                </Label>
+                <FormInput
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  placeholder="Last name"
+                  className="pl-10 h-11"
+                  icon={
+                    <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  }
+                />
+              </div>
             </div>
-          </div>
+          )}
           <Button type="submit" className="w-full">
             Add patient
           </Button>
