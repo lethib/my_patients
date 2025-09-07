@@ -10,13 +10,14 @@ pub struct Model {
   pub updated_at: DateTimeWithTimeZone,
   #[sea_orm(primary_key)]
   pub id: i32,
-  pub name: String,
   #[sea_orm(unique)]
   pub ssn: String,
   #[sea_orm(unique)]
   pub pid: Uuid,
   #[sea_orm(unique)]
   pub hashed_ssn: String,
+  pub first_name: String,
+  pub last_name: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

@@ -14,7 +14,8 @@ pub type Patients = Entity;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CreatePatientParams {
-  name: String,
+  first_name: String,
+  last_name: String,
   ssn: String,
 }
 
@@ -80,7 +81,8 @@ impl ActiveModel {
 
     return Ok(
       patients::ActiveModel {
-        name: ActiveValue::Set(params.name.clone()),
+        first_name: ActiveValue::Set(params.first_name.clone()),
+        last_name: ActiveValue::Set(params.last_name.clone()),
         ssn: ActiveValue::Set(ssn_encrypted),
         hashed_ssn: ActiveValue::Set(ssn_hashed),
         ..Default::default()
