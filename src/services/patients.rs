@@ -14,9 +14,14 @@ pub async fn create(
 ) -> Result<PatientModel, MyErrors> {
   let services = get_services();
 
+  let existing_patient = PatientModel::search_by_ssn(&services.db, &patient_params.ssn).await?;
+
   let db_transaction = services.db.begin().await?;
 
-  let created_patient = patients::ActiveModel::create(&db_transaction, patient_params).await?;
+  let created_patient = match existing_patient {
+    Some(patient) => patient,
+    None => patients::ActiveModel::create(&db_transaction, patient_params).await?,
+  };
 
   patient_users::ActiveModel::create(
     &db_transaction,

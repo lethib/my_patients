@@ -16,7 +16,7 @@ pub type Patients = Entity;
 pub struct CreatePatientParams {
   first_name: String,
   last_name: String,
-  ssn: String,
+  pub ssn: String,
 }
 
 // Encryption utilities for SSN
