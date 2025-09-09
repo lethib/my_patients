@@ -45,11 +45,16 @@ pub async fn search_paginated(
 ) -> Result<(Vec<PatientModel>, u64), MyErrors> {
   let db = &get_services().db;
 
-  // Build search condition for first_name and last_name
-  let search_condition = Condition::any().add(sea_orm::sea_query::Expr::cust(&format!(
-    "LOWER(CONCAT(first_name, ' ', last_name)) LIKE '%{}%'",
-    query.to_lowercase().replace("'", "''")
-  )));
+  // Build search condition for first_name and last_name (case-insensitive)
+  let search_condition = Condition::any()
+    .add(sea_orm::sea_query::Expr::cust_with_values(
+      "LOWER(first_name) LIKE LOWER($1)",
+      [format!("%{}%", query)],
+    ))
+    .add(sea_orm::sea_query::Expr::cust_with_values(
+      "LOWER(last_name) LIKE LOWER($1)",
+      [format!("%{}%", query)],
+    ));
 
   // Query patients that belong to the current user and match the search
   let paginator = patients::Entity::find()
