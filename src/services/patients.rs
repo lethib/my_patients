@@ -1,12 +1,13 @@
-use sea_orm::TransactionTrait;
-
 use crate::initializers::get_services;
-use crate::models::patient_users::{self, CreateLinkParams};
+use crate::models::_entities::{patient_users, patients};
+use crate::models::patient_users::CreateLinkParams;
 use crate::models::{
   my_errors::MyErrors,
-  patients::{self, CreatePatientParams, Model as PatientModel},
+  patients::{CreatePatientParams, Model as PatientModel},
   users,
 };
+use sea_orm::{ColumnTrait, Condition, QueryFilter};
+use sea_orm::{EntityTrait, PaginatorTrait, QueryOrder, TransactionTrait};
 
 pub async fn create(
   patient_params: &CreatePatientParams,
@@ -35,4 +36,32 @@ pub async fn create(
   db_transaction.commit().await?;
 
   Ok(created_patient)
+}
+
+pub async fn search_paginated(
+  query: &str,
+  page: u64,
+  user: &users::Model,
+) -> Result<(Vec<PatientModel>, u64), MyErrors> {
+  let db = &get_services().db;
+
+  // Build search condition for first_name and last_name
+  let search_condition = Condition::any().add(sea_orm::sea_query::Expr::cust(&format!(
+    "LOWER(CONCAT(first_name, ' ', last_name)) LIKE '%{}%'",
+    query.to_lowercase().replace("'", "''")
+  )));
+
+  // Query patients that belong to the current user and match the search
+  let paginator = patients::Entity::find()
+    .inner_join(patient_users::Entity)
+    .filter(patient_users::Column::UserId.eq(user.id))
+    .filter(search_condition)
+    .order_by_asc(patients::Column::FirstName)
+    .order_by_asc(patients::Column::LastName)
+    .paginate(db, 10);
+
+  let total_pages = paginator.num_pages().await?;
+  let patients = paginator.fetch_page(page - 1).await?; // SeaORM uses 0-based pagination
+
+  Ok((patients, total_pages))
 }
