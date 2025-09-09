@@ -1,6 +1,5 @@
-use serde::{Deserialize, Serialize};
-
 use crate::models::patients;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct PatientResponse {
@@ -23,6 +22,15 @@ impl PatientResponse {
         last_name: None,
         ssn: None,
       },
+    }
+  }
+
+  #[must_use]
+  pub fn from_model(patient: &patients::Model) -> Self {
+    Self {
+      first_name: Some(patient.first_name.clone()),
+      last_name: Some(patient.last_name.clone()),
+      ssn: patient.decrypt_ssn().ok(),
     }
   }
 }
