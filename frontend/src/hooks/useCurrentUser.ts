@@ -6,5 +6,9 @@ export const useCurrentUser = () => {
     enabled: !!accessToken,
   });
 
-  return currentUserQuery.data;
+  return {
+    user: currentUserQuery.data,
+    isLoading: currentUserQuery.isLoading,
+    hasToken: !!accessToken,
+  };
 };
