@@ -1,6 +1,6 @@
 import { APIHooks } from "@/api/hooks";
 import { CenteredSpineer } from "@/components/ui/spinner";
-import { TableBody } from "@/components/ui/table";
+import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { PatientRow } from "./PatientRow";
 
 interface Props {
@@ -19,7 +19,15 @@ export const PatientList = ({ searchQuery, page }: Props) => {
   }
 
   if (searchPatientsQuery.isFetching) {
-    return <CenteredSpineer />;
+    return (
+      <TableBody>
+        <TableRow>
+          <TableCell colSpan={6} className="h-32 text-center">
+            <CenteredSpineer />
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    );
   }
 
   return (
