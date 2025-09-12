@@ -33,7 +33,7 @@ export const PatientList = ({ searchQuery, page }: Props) => {
   return (
     <TableBody>
       {searchPatientsQuery.data?.paginated_data.map((patient, index) => (
-        <PatientRow patient={patient} index={index} />
+        <PatientRow patient={patient} index={index} key={patient.id} />
       ))}
     </TableBody>
   );
