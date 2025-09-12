@@ -8,13 +8,20 @@ type SavePatientParams = {
   first_name: string;
   last_name: string;
   ssn: string;
+  address_line_1: string;
+  address_zip_code: string;
+  address_city: string;
 };
 
 type SearchBySSNPatientResponse = {
-  first_name: string | null;
-  last_name: string | null;
-  ssn: string | null;
-};
+  first_name: string;
+  last_name: string;
+  ssn: string;
+  address_line_1: string;
+  address_zip_code: string;
+  address_city: string;
+  address_country: string;
+} | null;
 
 interface SearchPatientParams {
   q: string;
@@ -22,9 +29,14 @@ interface SearchPatientParams {
 }
 
 export type SearchPatientResponse = {
+  id: number;
   first_name: string;
   last_name: string;
   ssn: string;
+  address_line_1: string;
+  address_zip_code: string;
+  address_city: string;
+  address_country: string;
 };
 
 export const patientSchema = {

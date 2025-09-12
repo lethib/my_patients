@@ -18,6 +18,10 @@ pub struct Model {
   pub hashed_ssn: String,
   pub first_name: String,
   pub last_name: String,
+  pub address_line_1: String,
+  pub address_zip_code: String,
+  pub address_city: String,
+  pub address_country: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

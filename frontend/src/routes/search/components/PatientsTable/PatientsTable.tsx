@@ -22,16 +22,16 @@ export const PatientsTable = ({ searchQuery }: Props) => {
                 SSN
               </TableHead>
               <TableHead className="h-12 px-4 font-semibold text-foreground">
-                Date of Birth
+                Address
               </TableHead>
               <TableHead className="h-12 px-4 font-semibold text-foreground">
-                Phone
+                Zip Code
               </TableHead>
               <TableHead className="h-12 px-4 font-semibold text-foreground">
-                Email
+                City
               </TableHead>
               <TableHead className="h-12 px-4 font-semibold text-foreground text-right">
-                Last Visit
+                Last Visited
               </TableHead>
             </TableRow>
           </TableHeader>

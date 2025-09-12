@@ -1,9 +1,12 @@
 use crate::{
   models::{
     _entities::patients,
-    my_errors::{unexpected_error::UnexpectedError, MyErrors},
+    my_errors::{
+      application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors, ToErr,
+    },
   },
   services::crypto::Crypto,
+  validators::address::is_address_valid,
 };
 
 pub use super::_entities::patients::{ActiveModel, Entity, Model};
@@ -17,6 +20,9 @@ pub struct CreatePatientParams {
   first_name: String,
   last_name: String,
   pub ssn: String,
+  address_line_1: String,
+  address_zip_code: String,
+  address_city: String,
 }
 
 // Encryption utilities for SSN
@@ -76,6 +82,10 @@ impl ActiveModel {
     db: &T,
     params: &CreatePatientParams,
   ) -> ModelResult<Model, MyErrors> {
+    if !is_address_valid(&params.address_line_1, &params.address_zip_code) {
+      return ApplicationError::UNPROCESSABLE_ENTITY.to_err();
+    }
+
     let ssn_encrypted = Model::encrypt_ssn(&params.ssn)?;
     let ssn_hashed = Model::hash_ssn(&params.ssn)?;
 
@@ -85,6 +95,10 @@ impl ActiveModel {
         last_name: ActiveValue::Set(params.last_name.clone()),
         ssn: ActiveValue::Set(ssn_encrypted),
         hashed_ssn: ActiveValue::Set(ssn_hashed),
+        address_line_1: ActiveValue::Set(params.address_line_1.clone()),
+        address_zip_code: ActiveValue::Set(params.address_zip_code.clone()),
+        address_city: ActiveValue::Set(params.address_city.clone()),
+        address_country: ActiveValue::Set("FRANCE".to_string()),
         ..Default::default()
       }
       .insert(db)

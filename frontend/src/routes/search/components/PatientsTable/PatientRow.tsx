@@ -12,7 +12,6 @@ export const PatientRow = ({ patient, index }: Props) => {
 
   return (
     <TableRow
-      key={index}
       className={`cursor-pointer transition-colors hover:bg-muted/30 ${
         index % 2 === 0 ? "bg-background" : "bg-muted/10"
       }`}
@@ -26,7 +25,9 @@ export const PatientRow = ({ patient, index }: Props) => {
             <span className="font-semibold text-foreground">
               {patient.first_name} {patient.last_name}
             </span>
-            <span className="text-xs text-muted-foreground">ID: {index}</span>
+            <span className="text-xs text-muted-foreground">
+              ID: {patient.id}
+            </span>
           </div>
         </div>
       </TableCell>
@@ -34,17 +35,13 @@ export const PatientRow = ({ patient, index }: Props) => {
         <span className="font-mono text-sm font-medium">{formattedSSN}</span>
       </TableCell>
       <TableCell className="px-4 py-4 text-muted-foreground">
-        {new Date("2000-03-28").toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        })}
+        {patient.address_line_1}
       </TableCell>
       <TableCell className="px-4 py-4 text-muted-foreground">
-        <span className="font-mono text-sm">No phone</span>
+        <span className="font-mono text-sm">{patient.address_zip_code}</span>
       </TableCell>
       <TableCell className="px-4 py-4 text-muted-foreground">
-        <span className="text-sm">No email</span>
+        <span className="text-sm">{patient.address_city}</span>
       </TableCell>
       <TableCell className="px-4 py-4 text-right">
         <div className="flex flex-col items-end">
