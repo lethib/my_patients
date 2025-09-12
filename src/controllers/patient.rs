@@ -48,9 +48,9 @@ async fn search_by_ssn(
   State(ctx): State<AppContext>,
   Query(params): Query<SearchBySSNParams>,
 ) -> Result<Response, MyErrors> {
-  let found_user = Model::search_by_ssn(&ctx.db, &params.ssn).await?;
+  let found_patient = Model::search_by_ssn(&ctx.db, &params.ssn).await?;
 
-  Ok(format::json(PatientResponse::new(&found_user))?)
+  Ok(format::json(PatientResponse::new(&found_patient))?)
 }
 
 #[debug_handler]

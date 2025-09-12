@@ -17,6 +17,9 @@ pub struct CreatePatientParams {
   first_name: String,
   last_name: String,
   pub ssn: String,
+  address_line_1: String,
+  address_zip_code: String,
+  address_city: String,
 }
 
 // Encryption utilities for SSN
@@ -85,6 +88,10 @@ impl ActiveModel {
         last_name: ActiveValue::Set(params.last_name.clone()),
         ssn: ActiveValue::Set(ssn_encrypted),
         hashed_ssn: ActiveValue::Set(ssn_hashed),
+        address_line_1: ActiveValue::Set(params.address_line_1.clone()),
+        address_zip_code: ActiveValue::Set(params.address_zip_code.clone()),
+        address_city: ActiveValue::Set(params.address_city.clone()),
+        address_country: ActiveValue::Set("FRANCE".to_string().clone()),
         ..Default::default()
       }
       .insert(db)

@@ -3,34 +3,46 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct PatientResponse {
-  pub first_name: Option<String>,
-  pub last_name: Option<String>,
-  pub ssn: Option<String>,
+  id: i32,
+  pub first_name: String,
+  pub last_name: String,
+  pub ssn: String,
+  pub address_line_1: String,
+  pub address_zip_code: String,
+  pub address_city: String,
+  pub address_country: String,
 }
 
 impl PatientResponse {
   #[must_use]
-  pub fn new(patient: &Option<patients::Model>) -> Self {
-    match patient {
-      Some(patients) => Self {
-        first_name: Some(patients.first_name.clone()),
-        last_name: Some(patients.last_name.clone()),
-        ssn: patients.decrypt_ssn().ok(),
-      },
-      None => Self {
-        first_name: None,
-        last_name: None,
-        ssn: None,
-      },
-    }
+  pub fn new(patient: &Option<patients::Model>) -> Option<Self> {
+    patient.as_ref().map(|patients| Self {
+      id: patients.id.clone(),
+      first_name: patients.first_name.clone(),
+      last_name: patients.last_name.clone(),
+      ssn: patients
+        .decrypt_ssn()
+        .unwrap_or_else(|_| "Unable to decrypt".to_string()),
+      address_line_1: patients.address_line_1.clone(),
+      address_zip_code: patients.address_zip_code.clone(),
+      address_city: patients.address_city.clone(),
+      address_country: patients.address_country.clone(),
+    })
   }
 
   #[must_use]
   pub fn from_model(patient: &patients::Model) -> Self {
     Self {
-      first_name: Some(patient.first_name.clone()),
-      last_name: Some(patient.last_name.clone()),
-      ssn: patient.decrypt_ssn().ok(),
+      id: patient.id.clone(),
+      first_name: patient.first_name.clone(),
+      last_name: patient.last_name.clone(),
+      ssn: patient
+        .decrypt_ssn()
+        .unwrap_or_else(|_| "Unable to decrypt".to_string()),
+      address_line_1: patient.address_line_1.clone(),
+      address_zip_code: patient.address_zip_code.clone(),
+      address_city: patient.address_city.clone(),
+      address_country: patient.address_country.clone(),
     }
   }
 }
