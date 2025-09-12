@@ -2360,6 +2360,8 @@ dependencies = [
  "insta",
  "loco-rs",
  "migration",
+ "once_cell",
+ "regex",
  "rstest",
  "sea-orm",
  "serde",

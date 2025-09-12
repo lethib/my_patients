@@ -1,3 +1,4 @@
+pub mod application_error;
 pub mod authentication_error;
 pub mod unexpected_error;
 

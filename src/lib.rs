@@ -6,5 +6,6 @@ pub mod middlewares;
 pub mod models;
 pub mod services;
 pub mod tasks;
+pub mod validators;
 pub mod views;
 pub mod workers;
