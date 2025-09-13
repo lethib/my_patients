@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { LogOut, Plus, Search as SearchIcon, UserCog } from "lucide-react";
 import { useState } from "react";
+import { queryClient } from "@/api/api";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,6 +29,7 @@ function Search() {
 
   const logout = () => {
     localStorage.removeItem("accessToken");
+    queryClient.clear();
     navigate({ to: "/" });
   };
 

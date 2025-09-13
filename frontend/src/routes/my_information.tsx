@@ -16,7 +16,6 @@ import {
   CardTitle,
   Label,
 } from "@/components/ui";
-import { CenteredSpineer } from "@/components/ui/spinner";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export const Route = createFileRoute("/my_information")({
