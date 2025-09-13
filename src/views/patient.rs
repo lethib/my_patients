@@ -1,4 +1,5 @@
 use crate::models::patients;
+use sea_orm::ActiveEnum;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -11,6 +12,7 @@ pub struct PatientResponse {
   pub address_zip_code: String,
   pub address_city: String,
   pub address_country: String,
+  pub office: String,
 }
 
 impl PatientResponse {
@@ -27,6 +29,7 @@ impl PatientResponse {
       address_zip_code: patients.address_zip_code.clone(),
       address_city: patients.address_city.clone(),
       address_country: patients.address_country.clone(),
+      office: patients.office.to_value().to_string().clone(),
     })
   }
 
@@ -43,6 +46,7 @@ impl PatientResponse {
       address_zip_code: patient.address_zip_code.clone(),
       address_city: patient.address_city.clone(),
       address_country: patient.address_country.clone(),
+      office: patient.office.clone().to_value().to_string().clone(),
     }
   }
 }

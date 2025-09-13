@@ -3,7 +3,9 @@ import { IdCard, User } from "lucide-react";
 import { type ChangeEvent, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
+import { queryClient } from "@/api/api";
 import { APIHooks } from "@/api/hooks";
+import { POSSIBLE_OFFICES } from "@/api/hooks/patient";
 import { FormInput } from "@/components/form/FormInput";
 import { FormProvider } from "@/components/form/FormProvider";
 import {
@@ -15,6 +17,15 @@ import {
   DialogTitle,
   Label,
 } from "@/components/ui";
+import { FormControl, FormField, FormItem } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CenteredSpineer } from "@/components/ui/spinner";
 
 interface Props {
@@ -40,6 +51,9 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
       error: "Zip code does not match the expected format",
     }),
     address_city: z.string().trim().nonempty("City is required"),
+    office: z.enum(POSSIBLE_OFFICES, {
+      error: "Select a valid office location",
+    }),
   });
 
   const addPatientForm = useForm({
@@ -86,7 +100,10 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
   const onSubmit = addPatientForm.handleSubmit(async (values) => {
     addPatientMutation
       .mutateAsync(values)
-      .then(() => setIsOpen(false))
+      .then(() => {
+        setIsOpen(false);
+        queryClient.invalidateQueries({ queryKey: ["/patient/_search"] });
+      })
       .catch((error) => alert(error.message));
   });
 
@@ -221,6 +238,39 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
                     className="h-11"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="office" className="text-sm font-medium">
+                  Office
+                </Label>
+                <FormField
+                  name="office"
+                  control={addPatientForm.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select an office" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectGroup>
+                            {POSSIBLE_OFFICES.map((office) => (
+                              <SelectItem value={office} key={office}>
+                                {office}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
               </div>
             </>
           )}

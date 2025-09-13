@@ -44,22 +44,9 @@ export const PatientRow = ({ patient, index }: Props) => {
         <span className="text-sm">{patient.address_city}</span>
       </TableCell>
       <TableCell className="px-4 py-4 text-right">
-        <div className="flex flex-col items-end">
-          <span className="text-sm font-semibold text-primary">
-            {new Date("2025-06-25").toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
-          </span>
-          <span className="text-xs text-muted-foreground">
-            {Math.floor(
-              (new Date().getTime() - new Date("2025-06-25").getTime()) /
-                (1000 * 60 * 60 * 24),
-            )}{" "}
-            days ago
-          </span>
-        </div>
+        <span className="text-sm font-semibold text-primary">
+          {patient.office}
+        </span>
       </TableCell>
     </TableRow>
   );

@@ -31,7 +31,7 @@ export const PatientsTable = ({ searchQuery }: Props) => {
                 City
               </TableHead>
               <TableHead className="h-12 px-4 font-semibold text-foreground text-right">
-                Last Visited
+                Office
               </TableHead>
             </TableRow>
           </TableHeader>
