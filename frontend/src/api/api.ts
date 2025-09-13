@@ -34,8 +34,9 @@ class MyPatientsAPI {
     this.client.interceptors.response.use(
       (response) => response,
       (error: AxiosError<APIError>) => {
-        console.log(error.response?.data.code);
-        if (error.response?.data.code === 401) logout();
+        if (error.response?.status === 401) {
+          logout();
+        }
 
         throw error;
       },
