@@ -4,6 +4,7 @@ import axios, {
   type AxiosInstance,
   type AxiosRequestConfig,
 } from "axios";
+import { logout } from "@/lib/authUtils";
 import { APIHooks } from "./hooks";
 
 export type APIError = {
@@ -33,6 +34,10 @@ class MyPatientsAPI {
     this.client.interceptors.response.use(
       (response) => response,
       (error: AxiosError<APIError>) => {
+        if (error.response?.status === 401) {
+          logout();
+        }
+
         throw error;
       },
     );
