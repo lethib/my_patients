@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Plus, Search as SearchIcon, UserCog } from "lucide-react";
+import { LogOut, Plus, Search as SearchIcon, UserCog } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +25,11 @@ function Search() {
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 700);
   const navigate = useNavigate();
+
+  const logout = () => {
+    localStorage.removeItem("accessToken");
+    navigate({ to: "/" });
+  };
 
   return (
     <>
@@ -59,6 +64,9 @@ function Search() {
                     onClick={() => navigate({ to: "/my_information" })}
                   >
                     My information
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout} variant="destructive">
+                    Logout <LogOut />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
