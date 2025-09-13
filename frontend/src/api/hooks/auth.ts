@@ -22,6 +22,11 @@ export type MeResponse = {
   pid: string;
   email: string;
   name: string;
+  business_information: {
+    rpps_number: string;
+    siret_number: string;
+    adeli_number: string | null;
+  } | null;
 };
 
 export const authSchema = {

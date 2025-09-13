@@ -6,7 +6,7 @@ export const Route = createFileRoute("/")({
 });
 
 function RootNavigate() {
-  const { user, isLoading, hasToken } = useCurrentUser();
+  const { currentUser, isLoading, hasToken } = useCurrentUser();
 
   // No token in localStorage, go to login
   if (!hasToken) {
@@ -19,7 +19,7 @@ function RootNavigate() {
   }
 
   // Token exists and loading complete - check if user data is valid
-  if (!user) {
+  if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
 

@@ -1,7 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Search as SearchIcon } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Plus, Search as SearchIcon, UserCog } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { H2 } from "@/components/ui/typography/h2";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -16,6 +24,7 @@ function Search() {
   const [isAddPatientModalOpened, setIsAddPatientModalOpened] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 700);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -29,14 +38,31 @@ function Search() {
                 Manage and search through your patient records
               </p>
             </div>
-            <Button
-              onClick={() => setIsAddPatientModalOpened(true)}
-              className="flex items-center gap-2"
-              size="lg"
-            >
-              <Plus className="h-4 w-4" />
-              Add Patient
-            </Button>
+            <div className="flex gap-4">
+              <Button
+                onClick={() => setIsAddPatientModalOpened(true)}
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add Patient
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost">
+                    <UserCog className="size-6 text-primary" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="bottom" align="end">
+                  <DropdownMenuLabel>Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => navigate({ to: "/my_information" })}
+                  >
+                    My information
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
           {/* Search Bar */}

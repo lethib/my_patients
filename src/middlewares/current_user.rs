@@ -1,5 +1,5 @@
 use crate::models::{
-  _entities::users,
+  _entities::{user_business_informations, users},
   my_errors::{authentication_error::AuthenticationError, MyErrors},
 };
 use axum::{
@@ -46,26 +46,30 @@ pub async fn current_user_middleware(
 pub trait CurrentUser {
   /// Get a reference to the current authenticated user from the shared store.
   /// Returns None if no user is authenticated or stored in the context.
-  fn current_user(&self) -> loco_rs::app::RefGuard<'_, users::Model>;
+  fn current_user(
+    &self,
+  ) -> loco_rs::app::RefGuard<'_, (users::Model, Option<user_business_informations::Model>)>;
 
   /// Get a clone of the current authenticated user from the shared store.
   /// Returns None if no user is authenticated or stored in the context.
   /// Note: This requires the User model to implement Clone.
-  fn current_user_cloned(&self) -> users::Model;
+  fn current_user_cloned(&self) -> (users::Model, Option<user_business_informations::Model>);
 }
 
 impl CurrentUser for AppContext {
-  fn current_user(&self) -> loco_rs::app::RefGuard<'_, users::Model> {
+  fn current_user(
+    &self,
+  ) -> loco_rs::app::RefGuard<'_, (users::Model, Option<user_business_informations::Model>)> {
     self
       .shared_store
-      .get_ref::<users::Model>()
+      .get_ref::<(users::Model, Option<user_business_informations::Model>)>()
       .expect("Current user not found in shared store")
   }
 
-  fn current_user_cloned(&self) -> users::Model {
+  fn current_user_cloned(&self) -> (users::Model, Option<user_business_informations::Model>) {
     self
       .shared_store
-      .get::<users::Model>()
+      .get::<(users::Model, Option<user_business_informations::Model>)>()
       .expect("Current user not found in shared store")
   }
 }

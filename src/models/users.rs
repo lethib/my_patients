@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::Map;
 use uuid::Uuid;
 
+use crate::models::_entities::{prelude::UserBusinessInformations, user_business_informations};
+
 pub use super::_entities::users::{self, ActiveModel, Entity, Model};
 
 pub const MAGIC_LINK_LENGTH: i8 = 32;
@@ -63,7 +65,9 @@ impl Authenticable for Model {
   }
 
   async fn find_by_claims_key(db: &DatabaseConnection, claims_key: &str) -> ModelResult<Self> {
-    Self::find_by_pid(db, claims_key).await
+    Self::find_by_pid(db, claims_key)
+      .await
+      .map(|(user, _)| user)
   }
 }
 
@@ -90,7 +94,10 @@ impl Model {
   /// # Errors
   ///
   /// When could not find user  or DB query error
-  pub async fn find_by_pid(db: &DatabaseConnection, pid: &str) -> ModelResult<Self> {
+  pub async fn find_by_pid(
+    db: &DatabaseConnection,
+    pid: &str,
+  ) -> ModelResult<(Self, Option<user_business_informations::Model>)> {
     let parse_uuid = Uuid::parse_str(pid).map_err(|e| ModelError::Any(e.into()))?;
     let user = users::Entity::find()
       .filter(
@@ -98,6 +105,7 @@ impl Model {
           .eq(users::Column::Pid, parse_uuid)
           .build(),
       )
+      .find_also_related(UserBusinessInformations)
       .one(db)
       .await?;
     user.ok_or_else(|| ModelError::EntityNotFound)
