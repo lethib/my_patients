@@ -2,4 +2,5 @@
 
 pub use super::patient_users::Entity as PatientUsers;
 pub use super::patients::Entity as Patients;
+pub use super::user_business_informations::Entity as UserBusinessInformations;
 pub use super::users::Entity as Users;

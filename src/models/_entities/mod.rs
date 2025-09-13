@@ -4,4 +4,5 @@ pub mod prelude;
 
 pub mod patient_users;
 pub mod patients;
+pub mod user_business_informations;
 pub mod users;
