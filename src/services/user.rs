@@ -31,7 +31,7 @@ pub async fn save_business_information(
       Ok(())
     }
     None => {
-      ActiveModel::create(&services.db, params).await?;
+      ActiveModel::create(&services.db, params, &concerned_user.id).await?;
       Ok(())
     }
   }

@@ -14,7 +14,7 @@ async fn save_business_information(
   State(ctx): State<AppContext>,
   Json(business_information): Json<CreateBusinessInfomation>,
 ) -> Result<Response, MyErrors> {
-  services::user::save_business_information(&business_information, &ctx.current_user()).await?;
+  services::user::save_business_information(&business_information, &ctx.current_user().0).await?;
 
   Ok(format::json(serde_json::json!({ "success": true }))?)
 }

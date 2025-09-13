@@ -38,7 +38,7 @@ async fn save(
   State(ctx): State<AppContext>,
   Json(create_patient_params): Json<CreatePatientParams>,
 ) -> Result<Response, MyErrors> {
-  services::patients::create(&create_patient_params, &ctx.current_user()).await?;
+  services::patients::create(&create_patient_params, &ctx.current_user().0).await?;
 
   Ok(format::json(serde_json::json!({ "success": true }))?)
 }
@@ -67,7 +67,7 @@ async fn search(
   };
 
   let (patients, total_pages) =
-    services::patients::search_paginated(query, page, &ctx.current_user()).await?;
+    services::patients::search_paginated(query, page, &ctx.current_user().0).await?;
 
   let patient_responses: Vec<PatientResponse> =
     patients.iter().map(PatientResponse::from_model).collect();

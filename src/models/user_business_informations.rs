@@ -9,7 +9,6 @@ pub type UserBusinessInformations = Entity;
 
 #[derive(Deserialize)]
 pub struct CreateBusinessInfomation {
-  pub user_id: i32,
   pub rpps_number: String,
   pub adeli_number: Option<String>,
   pub siret_number: String,
@@ -53,10 +52,11 @@ impl ActiveModel {
   pub async fn create<T: ConnectionTrait>(
     db: &T,
     params: &CreateBusinessInfomation,
+    concerned_user_id: &i32,
   ) -> ModelResult<Model, DbErr> {
     Ok(
       user_business_informations::ActiveModel {
-        user_id: ActiveValue::Set(params.user_id),
+        user_id: ActiveValue::Set(*concerned_user_id),
         rpps_number: ActiveValue::Set(params.rpps_number.clone()),
         siret_number: ActiveValue::Set(params.siret_number.clone()),
         adeli_number: ActiveValue::Set(params.adeli_number.clone()),

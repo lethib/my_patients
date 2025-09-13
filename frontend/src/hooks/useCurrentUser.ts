@@ -7,7 +7,7 @@ export const useCurrentUser = () => {
   });
 
   return {
-    user: currentUserQuery.data,
+    currentUser: currentUserQuery.data,
     isLoading: currentUserQuery.isLoading,
     hasToken: !!accessToken,
   };
