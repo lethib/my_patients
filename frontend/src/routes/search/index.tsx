@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { LogOut, Plus, Search as SearchIcon, UserCog } from "lucide-react";
 import { useState } from "react";
-import { queryClient } from "@/api/api";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { H2 } from "@/components/ui/typography/h2";
 import { useDebounce } from "@/hooks/useDebounce";
+import { logout } from "@/lib/authUtils";
 import { AddPatientModal } from "./components/AddPatientModal";
 import { PatientsTable } from "./components/PatientsTable/PatientsTable";
 
@@ -26,12 +26,6 @@ function Search() {
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 700);
   const navigate = useNavigate();
-
-  const logout = () => {
-    localStorage.removeItem("accessToken");
-    queryClient.clear();
-    navigate({ to: "/" });
-  };
 
   return (
     <>

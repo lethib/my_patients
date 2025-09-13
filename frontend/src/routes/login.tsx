@@ -1,12 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { APIClient } from "@/api/api";
-import type { MeResponse } from "@/api/hooks/auth";
 import { FormInput } from "@/components/form/FormInput";
 import { FormProvider } from "@/components/form/FormProvider";
 import { Button, Label } from "@/components/ui";
@@ -17,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { RegisterModal } from "@/RegisterModal";
 
 export const Route = createFileRoute("/login")({
@@ -25,7 +24,7 @@ export const Route = createFileRoute("/login")({
 
 function Login() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { currentUser } = useCurrentUser();
   const [showPassword, setShowPassword] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
@@ -48,10 +47,6 @@ function Login() {
     loginMutation.mutateAsync(data, {
       onSuccess: (res) => {
         localStorage.setItem("accessToken", res.token);
-        queryClient.setQueryData<MeResponse>(["/auth/me"], {
-          email: data.email,
-          ...res,
-        });
         navigate({ to: "/", replace: true });
       },
       onError: (error) => {
@@ -59,6 +54,8 @@ function Login() {
       },
     });
   };
+
+  if (currentUser) return <Navigate to="/" />;
 
   return (
     <>
