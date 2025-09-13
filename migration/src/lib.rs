@@ -11,6 +11,7 @@ mod m20250907_000001_split_patient_name;
 mod m20250910_203200_add_address_to_patients;
 mod m20250912_161133_user_business_informations;
 mod m20250912_195210_add_unique_constraint_user_business_info;
+mod m20250913_125707_add_office_to_patient;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -25,7 +26,8 @@ impl MigratorTrait for Migrator {
       Box::new(m20250907_000001_split_patient_name::Migration),
       Box::new(m20250910_203200_add_address_to_patients::Migration),
       Box::new(m20250912_161133_user_business_informations::Migration),
-            Box::new(m20250912_195210_add_unique_constraint_user_business_info::Migration),
+      Box::new(m20250912_195210_add_unique_constraint_user_business_info::Migration),
+      Box::new(m20250913_125707_add_office_to_patient::Migration),
       // inject-above (do not remove this comment)
     ]
   }
