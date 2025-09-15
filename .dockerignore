@@ -1,0 +1,63 @@
+# Rust build artifacts
+target/
+# Note: Cargo.lock is needed for reproducible builds - DO NOT ignore it
+
+# Docker files
+dockerfile
+dockerfile.*
+.dockerignore
+
+# Version control
+.git/
+.gitignore
+
+# Development files
+.env
+.env.local
+.env.development
+.env.development.local
+.claude/
+README*.md
+*.md
+
+# Frontend development artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.development.local
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+
+# Test and coverage files
+coverage/
+*.lcov
+
+# Documentation
+docs/
+
+# CI/CD files (if not needed in container)
+.github/
+.gitlab-ci.yml
+
+# Package manager files that shouldn't be copied
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun-debug.log*
+bun-error.log*
