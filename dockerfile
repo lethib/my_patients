@@ -89,7 +89,6 @@ COPY --from=planner /app/recipe.json recipe.json
 # This layer will be cached unless dependencies change
 RUN cargo chef cook --release --target x86_64-unknown-linux-gnu --recipe-path recipe.json && \
     # Clean up cargo cache and build artifacts to reduce layer size
-    cargo clean --release --target-dir target && \
     rm -rf ~/.cargo/registry/cache/* ~/.cargo/git/checkouts/* /tmp/* /var/tmp/*
 
 # ------------------------------------------------------------------------------
