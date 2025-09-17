@@ -1,0 +1,146 @@
+{
+  "auth": {
+    "login": {
+      "title": "Bienvenue",
+      "description": "Connectez-vous à votre compte pour continuer",
+      "email": "Email",
+      "password": "Mot de passe",
+      "emailPlaceholder": "Saisissez votre email",
+      "passwordPlaceholder": "Saisissez votre mot de passe",
+      "signingIn": "Connexion...",
+      "signIn": "Se connecter",
+      "forgotPassword": "Mot de passe oublié ?",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "signUp": "S'inscrire",
+      "error": "Connexion échouée",
+      "validation": {
+        "invalidEmail": "Adresse email invalide",
+        "passwordRequired": "Le mot de passe est requis"
+      }
+    },
+    "register": {
+      "title": "Créer un compte",
+      "description": "Remplissez vos informations pour commencer",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "firstNamePlaceholder": "Prénom",
+      "lastNamePlaceholder": "Nom",
+      "emailPlaceholder": "Saisissez votre email",
+      "passwordPlaceholder": "Créez un mot de passe",
+      "confirmPasswordPlaceholder": "Confirmez votre mot de passe",
+      "cancel": "Annuler",
+      "creating": "Création...",
+      "createAccount": "Créer un compte",
+      "hasAccount": "Vous avez déjà un compte ?",
+      "signInInstead": "Se connecter",
+      "successMessage": "Inscription réussie ! Vérifiez votre email pour valider votre compte.",
+      "error": "Échec de l'inscription",
+      "validation": {
+        "firstNameRequired": "Le prénom est requis",
+        "lastNameRequired": "Le nom est requis",
+        "invalidEmail": "Adresse email invalide",
+        "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
+        "passwordsDontMatch": "Les mots de passe ne correspondent pas"
+      }
+    },
+    "logout": "Déconnexion"
+  },
+  "navigation": {
+    "patients": "Patients",
+    "myInformation": "Mes informations",
+    "account": "Compte"
+  },
+  "patients": {
+    "title": "Patients",
+    "subtitle": "Gérez et recherchez vos dossiers patients",
+    "addPatient": "Ajouter un patient",
+    "searchPlaceholder": "Rechercher des patients par nom ou numéro de sécurité sociale...",
+    "noPatients": "Aucun patient trouvé",
+    "loading": "Chargement...",
+    "error": "Erreur lors du chargement des patients",
+    "form": {
+      "title": "Ajouter un patient",
+      "description": "Remplissez le numéro de sécurité sociale pour commencer",
+      "ssn": "Numéro de sécurité sociale",
+      "ssnPlaceholder": "15 chiffres",
+      "firstName": "Prénom",
+      "firstNamePlaceholder": "Prénom",
+      "lastName": "Nom",
+      "lastNamePlaceholder": "Nom",
+      "address": "Adresse",
+      "addressPlaceholder": "Adresse rue",
+      "zipCode": "Code postal",
+      "zipCodePlaceholder": "Code postal",
+      "city": "Ville",
+      "cityPlaceholder": "Ville",
+      "office": "Cabinet",
+      "officePlaceholder": "Sélectionnez un cabinet",
+      "offices": {
+        "RueilMalmaison": "Rueil-Malmaison",
+        "VitrySurSeine": "Vitry-sur-Seine"
+      },
+      "submit": "Ajouter le patient",
+      "validation": {
+        "firstNameRequired": "Le prénom est requis",
+        "lastNameRequired": "Le nom est requis",
+        "ssnInvalid": "Le numéro de sécurité sociale ne correspond pas au format attendu",
+        "addressRequired": "L'adresse est requise",
+        "zipCodeInvalid": "Le code postal ne correspond pas au format attendu",
+        "cityRequired": "La ville est requise",
+        "officeRequired": "Sélectionnez un bureau valide"
+      }
+    },
+    "table": {
+      "name": "Nom",
+      "ssn": "Numéro de sécurité sociale",
+      "address": "Adresse",
+      "zip_code": "Code postal",
+      "city": "Ville",
+      "office": "Cabinet"
+    }
+  },
+  "businessInfo": {
+    "title": "Informations professionnelles",
+    "subtitle": "Saisissez vos numéros d'identification professionnels",
+    "rppsNumber": "Numéro RPPS",
+    "rppsPlaceholder": "Saisissez votre numéro RPPS",
+    "siretNumber": "Numéro SIRET",
+    "siretPlaceholder": "Saisissez votre numéro SIRET",
+    "adeliNumber": "Numéro ADELI",
+    "adeliPlaceholder": "Saisissez votre numéro ADELI (optionnel)",
+    "save": "Enregistrer les informations professionnelles",
+    "successMessage": "Informations professionnelles enregistrées avec succès !",
+    "required": "obligatoire"
+  },
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "add": "Ajouter",
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "confirm": "Confirmer",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Soumettre",
+    "reset": "Réinitialiser",
+    "optional": "optionnel",
+    "required": "requis"
+  },
+  "errors": {
+    "generic": "Une erreur s'est produite",
+    "network": "Erreur de réseau",
+    "unauthorized": "Non autorisé",
+    "forbidden": "Accès interdit",
+    "notFound": "Non trouvé",
+    "serverError": "Erreur du serveur"
+  }
+}

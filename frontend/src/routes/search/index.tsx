@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { LogOut, Plus, Search as SearchIcon, UserCog } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/search/")({
 });
 
 function Search() {
+  const { t } = useTranslation();
   const [isAddPatientModalOpened, setIsAddPatientModalOpened] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 700);
@@ -34,9 +36,9 @@ function Search() {
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
-              <H2 className="text-3xl font-bold mb-2">Patients</H2>
+              <H2 className="text-3xl font-bold mb-2">{t('patients.title')}</H2>
               <p className="text-muted-foreground">
-                Manage and search through your patient records
+                {t('patients.subtitle')}
               </p>
             </div>
             <div className="flex gap-4">
@@ -45,7 +47,7 @@ function Search() {
                 className="flex items-center gap-2"
               >
                 <Plus className="h-4 w-4" />
-                Add Patient
+                {t('patients.addPatient')}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -54,15 +56,15 @@ function Search() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="end">
-                  <DropdownMenuLabel>Account</DropdownMenuLabel>
+                  <DropdownMenuLabel>{t('navigation.account')}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => navigate({ to: "/my_information" })}
                   >
-                    My information
+                    {t('navigation.myInformation')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={logout} variant="destructive">
-                    Logout <LogOut />
+                    {t('auth.logout')} <LogOut />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -73,7 +75,7 @@ function Search() {
           <div className="relative mb-8">
             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search patients by name or SSN..."
+              placeholder={t('patients.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 h-12 text-base"

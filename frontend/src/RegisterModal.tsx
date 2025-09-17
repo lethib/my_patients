@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import z from "zod";
 import { Button, Label } from "@/components/ui";
 import {
@@ -21,6 +22,7 @@ interface RegisterModalProps {
 }
 
 export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -28,14 +30,14 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
 
   const registerFormSchema = z
     .object({
-      firstName: z.string().trim().nonempty("First name is required"),
-      lastName: z.string().trim().nonempty("Last name is required"),
-      email: z.email("Invalid email address"),
-      password: z.string().min(6, "Password must be at least 6 characters"),
+      firstName: z.string().trim().min(1, t('auth.register.validation.firstNameRequired')),
+      lastName: z.string().trim().min(1, t('auth.register.validation.lastNameRequired')),
+      email: z.string().email(t('auth.register.validation.invalidEmail')),
+      password: z.string().min(6, t('auth.register.validation.passwordMinLength')),
       confirmPassword: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {
-      error: "Passwords don't match",
+      message: t('auth.register.validation.passwordsDontMatch'),
       path: ["confirmPassword"],
     });
 
@@ -59,14 +61,12 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
       },
       {
         onSuccess: () => {
-          alert(
-            "Registration successful! Please check your email to verify your account.",
-          );
+          alert(t('auth.register.successMessage'));
           onOpenChange(false);
           registerForm.reset();
         },
         onError: (error) => {
-          alert(`Registration failed: ${error.message}`);
+          alert(`${t('auth.register.error')}: ${error.message}`);
         },
       },
     );
@@ -77,10 +77,10 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
       <DialogContent className="sm:max-w-md bg-white dark:bg-gray-900 shadow-lg border-0 backdrop-blur-sm">
         <DialogHeader className="space-y-2 text-center pb-4">
           <DialogTitle className="text-2xl font-bold tracking-tight text-foreground">
-            Create Account
+            {t('auth.register.title')}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Fill in your information to get started
+            {t('auth.register.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -92,13 +92,13 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName" className="text-sm font-medium">
-                First Name
+                {t('auth.register.firstName')}
               </Label>
               <FormInput
                 id="firstName"
                 name="firstName"
                 type="text"
-                placeholder="First name"
+                placeholder={t('auth.register.firstNamePlaceholder')}
                 className="pl-10 h-11"
                 icon={
                   <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -108,13 +108,13 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
 
             <div className="space-y-2">
               <Label htmlFor="lastName" className="text-sm font-medium">
-                Last Name
+                {t('auth.register.lastName')}
               </Label>
               <FormInput
                 id="lastName"
                 name="lastName"
                 type="text"
-                placeholder="Last name"
+                placeholder={t('auth.register.lastNamePlaceholder')}
                 className="pl-10 h-11"
                 icon={
                   <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -125,13 +125,13 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
 
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium">
-              Email
+              {t('auth.register.email')}
             </Label>
             <FormInput
               id="email"
               name="email"
               type="email"
-              placeholder="Enter your email"
+              placeholder={t('auth.register.emailPlaceholder')}
               className="pl-10 h-11"
               icon={
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -141,14 +141,14 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
 
           <div className="space-y-2">
             <Label htmlFor="password" className="text-sm font-medium">
-              Password
+              {t('auth.register.password')}
             </Label>
             <div className="relative">
               <FormInput
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Create a password"
+                placeholder={t('auth.register.passwordPlaceholder')}
                 className="pl-10 pr-10 h-11"
                 icon={
                   <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -170,14 +170,14 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
 
           <div className="space-y-2">
             <Label htmlFor="confirmPassword" className="text-sm font-medium">
-              Confirm Password
+              {t('auth.register.confirmPassword')}
             </Label>
             <div className="relative">
               <FormInput
                 id="confirmPassword"
                 name="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm your password"
+                placeholder={t('auth.register.confirmPasswordPlaceholder')}
                 className="pl-10 pr-10 h-11"
                 icon={
                   <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -204,7 +204,7 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
               className="flex-1 h-11"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t('auth.register.cancel')}
             </Button>
             <Button
               type="submit"
@@ -214,10 +214,10 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
               {registerForm.formState.isLoading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                  Creating...
+                  {t('auth.register.creating')}
                 </div>
               ) : (
-                "Create Account"
+                t('auth.register.createAccount')
               )}
             </Button>
           </div>
@@ -225,12 +225,12 @@ export function RegisterModal({ open, onOpenChange }: RegisterModalProps) {
 
         <div className="text-center pt-4 border-t">
           <p className="text-sm text-muted-foreground">
-            Already have an account?{" "}
+            {t('auth.register.hasAccount')}{" "}
             <button
               className="text-primary hover:underline font-medium"
               onClick={() => onOpenChange(false)}
             >
-              Sign in instead
+              {t('auth.register.signInInstead')}
             </button>
           </p>
         </div>
