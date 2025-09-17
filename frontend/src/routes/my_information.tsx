@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Building2, FileText, Users } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import z from "zod";
 import { APIHooks } from "@/api/hooks";
 import { FormInput } from "@/components/form/FormInput";
@@ -29,6 +30,7 @@ const businessInfoSchema = z.object({
 });
 
 function MyInformation() {
+  const { t } = useTranslation();
   const { currentUser } = useCurrentUser();
 
   const saveBusinessInformationMutation =
@@ -56,7 +58,7 @@ function MyInformation() {
   const onSubmit = businessForm.handleSubmit(async (values) => {
     saveBusinessInformationMutation
       .mutateAsync(values)
-      .then(() => alert("Business information saved successfully!"));
+      .then(() => alert(t("businessInfo.successMessage")));
   });
 
   return (
@@ -65,11 +67,9 @@ function MyInformation() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5" />
-            Business Information
+            {t("businessInfo.title")}
           </CardTitle>
-          <CardDescription>
-            Enter your professional identification numbers
-          </CardDescription>
+          <CardDescription>{t("businessInfo.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <FormProvider
@@ -79,13 +79,13 @@ function MyInformation() {
           >
             <div className="space-y-2">
               <Label htmlFor="rpps_number" className="text-sm font-medium">
-                RPPS Number *
+                {t("businessInfo.rppsNumber")} *
               </Label>
               <FormInput
                 id="rpps_number"
                 name="rpps_number"
                 type="text"
-                placeholder="Enter your RPPS number"
+                placeholder={t("businessInfo.rppsPlaceholder")}
                 className="pl-10 h-11"
                 icon={
                   <Users className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -95,13 +95,13 @@ function MyInformation() {
 
             <div className="space-y-2">
               <Label htmlFor="siret_number" className="text-sm font-medium">
-                SIRET Number *
+                {t("businessInfo.siretNumber")} *
               </Label>
               <FormInput
                 id="siret_number"
                 name="siret_number"
                 type="text"
-                placeholder="Enter your SIRET number"
+                placeholder={t("businessInfo.siretPlaceholder")}
                 className="pl-10 h-11"
                 icon={
                   <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -111,13 +111,13 @@ function MyInformation() {
 
             <div className="space-y-2">
               <Label htmlFor="adeli_number" className="text-sm font-medium">
-                ADELI Number
+                {t("businessInfo.adeliNumber")}
               </Label>
               <FormInput
                 id="adeli_number"
                 name="adeli_number"
                 type="text"
-                placeholder="Enter your ADELI number (optional)"
+                placeholder={t("businessInfo.adeliPlaceholder")}
                 className="pl-10 h-11"
                 icon={
                   <FileText className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -126,7 +126,7 @@ function MyInformation() {
             </div>
 
             <Button type="submit" className="w-full">
-              Save Business Information
+              {t("businessInfo.save")}
             </Button>
           </FormProvider>
         </CardContent>

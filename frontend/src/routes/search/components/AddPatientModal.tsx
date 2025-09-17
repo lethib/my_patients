@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { IdCard, User } from "lucide-react";
 import { type ChangeEvent, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import z from "zod";
 import { queryClient } from "@/api/api";
 import { APIHooks } from "@/api/hooks";
@@ -38,21 +39,41 @@ const FR_SSN_REGEX =
 const FR_ZIP_CODE_REGEX = /^(?:0[1-9]|[1-8]\d|9[0-8])\d{3}$/;
 
 export const AddPatientModal = ({ open, setIsOpen }: Props) => {
+  const { t } = useTranslation();
   const addPatientMutation = APIHooks.patient.savePatient.useMutation();
 
   const addPatientFormSchema = z.object({
-    first_name: z.string().trim().nonempty("First name is required"),
-    last_name: z.string().trim().nonempty("Last name is required"),
-    ssn: z.string().length(15).regex(FR_SSN_REGEX, {
-      error: "SSN number does not match the expected format",
-    }),
-    address_line_1: z.string().trim().nonempty("Address is required"),
-    address_zip_code: z.string().trim().length(5).regex(FR_ZIP_CODE_REGEX, {
-      error: "Zip code does not match the expected format",
-    }),
-    address_city: z.string().trim().nonempty("City is required"),
+    first_name: z
+      .string()
+      .trim()
+      .min(1, t("patients.form.validation.firstNameRequired")),
+    last_name: z
+      .string()
+      .trim()
+      .min(1, t("patients.form.validation.lastNameRequired")),
+    ssn: z
+      .string()
+      .length(15)
+      .regex(FR_SSN_REGEX, {
+        message: t("patients.form.validation.ssnInvalid"),
+      }),
+    address_line_1: z
+      .string()
+      .trim()
+      .min(1, t("patients.form.validation.addressRequired")),
+    address_zip_code: z
+      .string()
+      .trim()
+      .length(5)
+      .regex(FR_ZIP_CODE_REGEX, {
+        message: t("patients.form.validation.zipCodeInvalid"),
+      }),
+    address_city: z
+      .string()
+      .trim()
+      .min(1, t("patients.form.validation.cityRequired")),
     office: z.enum(POSSIBLE_OFFICES, {
-      error: "Select a valid office location",
+      message: t("patients.form.validation.officeRequired"),
     }),
   });
 
@@ -133,8 +154,10 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
     <Dialog open={open} onOpenChange={setIsOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add a patient</DialogTitle>
-          <DialogDescription>Fill the SSN to get started</DialogDescription>
+          <DialogTitle>{t("patients.form.title")}</DialogTitle>
+          <DialogDescription>
+            {t("patients.form.description")}
+          </DialogDescription>
         </DialogHeader>
 
         <FormProvider
@@ -144,7 +167,7 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
         >
           <div className="space-y-2">
             <Label htmlFor="ssn" className="text-sm font-medium">
-              Social Security Number
+              {t("patients.form.ssn")}
             </Label>
             <FormInput
               id="ssn"
@@ -152,7 +175,7 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
               type="text"
               onChange={handleSSNChange}
               value={formatSSN(addPatientForm.watch("ssn") || "")}
-              placeholder="15-digits long"
+              placeholder={t("patients.form.ssnPlaceholder")}
               className="pl-10 h-11"
               icon={
                 <IdCard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -167,13 +190,13 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="first_name" className="text-sm font-medium">
-                    First Name
+                    {t("patients.form.firstName")}
                   </Label>
                   <FormInput
                     id="first_name"
                     name="first_name"
                     type="text"
-                    placeholder="First name"
+                    placeholder={t("patients.form.firstNamePlaceholder")}
                     className="pl-10 h-11"
                     icon={
                       <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -183,13 +206,13 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
 
                 <div className="space-y-2">
                   <Label htmlFor="last_name" className="text-sm font-medium">
-                    Last Name
+                    {t("patients.form.lastName")}
                   </Label>
                   <FormInput
                     id="last_name"
                     name="last_name"
                     type="text"
-                    placeholder="Last name"
+                    placeholder={t("patients.form.lastNamePlaceholder")}
                     className="pl-10 h-11"
                     icon={
                       <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -199,13 +222,13 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="address_line_1" className="text-sm font-medium">
-                  Address
+                  {t("patients.form.address")}
                 </Label>
                 <FormInput
                   id="address_line_1"
                   name="address_line_1"
                   type="text"
-                  placeholder="Street address"
+                  placeholder={t("patients.form.addressPlaceholder")}
                   className="h-11"
                 />
               </div>
@@ -215,26 +238,26 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
                     htmlFor="address_zip_code"
                     className="text-sm font-medium"
                   >
-                    Zip Code
+                    {t("patients.form.zipCode")}
                   </Label>
                   <FormInput
                     id="address_zip_code"
                     name="address_zip_code"
                     type="text"
-                    placeholder="Zip code"
+                    placeholder={t("patients.form.zipCodePlaceholder")}
                     className="h-11"
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="address_city" className="text-sm font-medium">
-                    City
+                    {t("patients.form.city")}
                   </Label>
                   <FormInput
                     id="address_city"
                     name="address_city"
                     type="text"
-                    placeholder="City"
+                    placeholder={t("patients.form.cityPlaceholder")}
                     className="h-11"
                   />
                 </div>
@@ -242,7 +265,7 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
 
               <div className="space-y-2">
                 <Label htmlFor="office" className="text-sm font-medium">
-                  Office
+                  {t("patients.form.office")}
                 </Label>
                 <FormField
                   name="office"
@@ -255,14 +278,16 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select an office" />
+                            <SelectValue
+                              placeholder={t("patients.form.officePlaceholder")}
+                            />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           <SelectGroup>
                             {POSSIBLE_OFFICES.map((office) => (
                               <SelectItem value={office} key={office}>
-                                {office}
+                                {t(`patients.form.offices.${office}`)}
                               </SelectItem>
                             ))}
                           </SelectGroup>
@@ -275,7 +300,7 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
             </>
           )}
           <Button type="submit" className="w-full">
-            Add patient
+            {t("patients.form.submit")}
           </Button>
         </FormProvider>
       </DialogContent>

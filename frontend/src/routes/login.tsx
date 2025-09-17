@@ -3,6 +3,7 @@ import { createFileRoute, Navigate, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import * as z from "zod";
 import { APIClient } from "@/api/api";
 import { FormInput } from "@/components/form/FormInput";
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/login")({
 });
 
 function Login() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { currentUser } = useCurrentUser();
   const [showPassword, setShowPassword] = useState(false);
@@ -31,8 +33,8 @@ function Login() {
   const loginMutation = APIClient.hooks.auth.login.useMutation();
 
   const loginFormSchema = z.object({
-    email: z.email({ error: "Invalid email address" }),
-    password: z.string().nonempty({ error: "Password is required" }),
+    email: z.string().email(t('auth.login.validation.invalidEmail')),
+    password: z.string().min(1, t('auth.login.validation.passwordRequired')),
   });
 
   const loginForm = useForm({
@@ -50,7 +52,7 @@ function Login() {
         navigate({ to: "/", replace: true });
       },
       onError: (error) => {
-        alert(`Login failed: ${error.message}`);
+        alert(`${t('auth.login.error')}: ${error.message}`);
       },
     });
   };
@@ -63,10 +65,10 @@ function Login() {
         <Card className="w-full max-w-md shadow-lg border-0 bg-card/50 backdrop-blur-sm">
           <CardHeader className="space-y-2 text-center pb-8">
             <CardTitle className="text-3xl font-bold tracking-tight">
-              Welcome back
+              {t('auth.login.title')}
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              Sign in to your account to continue
+              {t('auth.login.description')}
             </CardDescription>
           </CardHeader>
 
@@ -78,13 +80,13 @@ function Login() {
             >
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  Email
+                  {t('auth.login.email')}
                 </Label>
                 <FormInput
                   name="email"
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('auth.login.emailPlaceholder')}
                   className="pl-10 h-11"
                   icon={
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -94,14 +96,14 @@ function Login() {
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium">
-                  Password
+                  {t('auth.login.password')}
                 </Label>
                 <div className="relative">
                   <FormInput
                     name="password"
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder={t('auth.login.passwordPlaceholder')}
                     className="pl-10 pr-10 h-11"
                     icon={
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -129,25 +131,25 @@ function Login() {
                 {loginMutation.isPending ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    Signing in...
+                    {t('auth.login.signingIn')}
                   </div>
                 ) : (
-                  "Sign in"
+                  t('auth.login.signIn')
                 )}
               </Button>
             </FormProvider>
 
             <div className="text-center space-y-2">
               <button className="text-sm text-primary hover:underline">
-                Forgot your password?
+                {t('auth.login.forgotPassword')}
               </button>
               <p className="text-sm text-muted-foreground">
-                Don't have an account?{" "}
+                {t('auth.login.noAccount')}{" "}
                 <button
                   className="text-primary hover:underline font-medium"
                   onClick={() => setIsRegisterModalOpen(true)}
                 >
-                  Sign up
+                  {t('auth.login.signUp')}
                 </button>
               </p>
             </div>
