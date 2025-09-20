@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { APIHooks } from "@/api/hooks";
 import { CenteredSpineer } from "@/components/ui/spinner";
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { PatientRow } from "./PatientRow";
+import { InvoiceModal } from "@/components/patients/InvoiceModal";
+import type { SearchPatientResponse } from "@/api/hooks/patient";
 
 interface Props {
   searchQuery: string;
@@ -9,10 +12,23 @@ interface Props {
 }
 
 export const PatientList = ({ searchQuery, page }: Props) => {
+  const [selectedPatient, setSelectedPatient] = useState<SearchPatientResponse | null>(null);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+
   const searchPatientsQuery = APIHooks.patient.search.useQuery({
     q: searchQuery,
     page,
   });
+
+  const handleGenerateInvoice = (patient: SearchPatientResponse) => {
+    setSelectedPatient(patient);
+    setIsInvoiceModalOpen(true);
+  };
+
+  const handleCloseInvoiceModal = () => {
+    setIsInvoiceModalOpen(false);
+    setSelectedPatient(null);
+  };
 
   if (searchPatientsQuery.data?.paginated_data.length === 0) {
     return null; // Let parent handle empty state
@@ -22,7 +38,7 @@ export const PatientList = ({ searchQuery, page }: Props) => {
     return (
       <TableBody>
         <TableRow>
-          <TableCell colSpan={6} className="h-32 text-center">
+          <TableCell colSpan={7} className="h-32 text-center">
             <CenteredSpineer />
           </TableCell>
         </TableRow>
@@ -31,10 +47,23 @@ export const PatientList = ({ searchQuery, page }: Props) => {
   }
 
   return (
-    <TableBody>
-      {searchPatientsQuery.data?.paginated_data.map((patient, index) => (
-        <PatientRow patient={patient} index={index} key={patient.id} />
-      ))}
-    </TableBody>
+    <>
+      <TableBody>
+        {searchPatientsQuery.data?.paginated_data.map((patient, index) => (
+          <PatientRow
+            patient={patient}
+            index={index}
+            key={patient.id}
+            onGenerateInvoice={handleGenerateInvoice}
+          />
+        ))}
+      </TableBody>
+
+      <InvoiceModal
+        isOpen={isInvoiceModalOpen}
+        onClose={handleCloseInvoiceModal}
+        patient={selectedPatient}
+      />
+    </>
   );
 };
