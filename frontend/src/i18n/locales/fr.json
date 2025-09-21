@@ -110,7 +110,9 @@
       "id": "ID",
       "amount": "Montant de la facture",
       "generating": "Génération...",
-      "generate": "Générer la facture"
+      "generate": "Générer la facture",
+      "completeInformation": "Compléter mes informations",
+      "missingInformationAlert": "Vous devez compléter vos informations professionnelles avant de pouvoir générer une facture"
     },
     "errors": {
       "invalidAmount": "Veuillez entrer un montant valide supérieur à 0"
