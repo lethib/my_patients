@@ -1,13 +1,15 @@
-import { User } from "lucide-react";
+import { User, FileText } from "lucide-react";
 import type { SearchPatientResponse } from "@/api/hooks/patient";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   patient: SearchPatientResponse;
   index: number;
+  onGenerateInvoice?: (patient: SearchPatientResponse) => void;
 }
 
-export const PatientRow = ({ patient, index }: Props) => {
+export const PatientRow = ({ patient, index, onGenerateInvoice }: Props) => {
   const formattedSSN = `${patient.ssn[0]} ${patient.ssn.slice(1, 3)} ${patient.ssn.slice(3, 5)} ${patient.ssn.slice(5, 7)} ${patient.ssn.slice(7, 10)} ${patient.ssn.slice(10, 13)} ${patient.ssn.slice(13, 15)}`;
 
   return (
@@ -47,6 +49,22 @@ export const PatientRow = ({ patient, index }: Props) => {
         <span className="text-sm font-semibold text-primary">
           {patient.office}
         </span>
+      </TableCell>
+      <TableCell className="px-4 py-4 text-right">
+        {onGenerateInvoice && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onGenerateInvoice(patient);
+            }}
+            className="h-8 w-8 p-0"
+            title="Generate Invoice"
+          >
+            <FileText className="h-4 w-4" />
+          </Button>
+        )}
       </TableCell>
     </TableRow>
   );

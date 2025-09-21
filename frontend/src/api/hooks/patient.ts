@@ -1,3 +1,5 @@
+import { useMutation } from "@tanstack/react-query";
+import { APIClient } from "../api";
 import {
   mutationEndpoint,
   type Paginated,
@@ -57,4 +59,29 @@ export const patientSchema = {
     type: "GET",
     path: "/patient/_search",
   }),
+  generateInvoice: {
+    useMutation: () => {
+      return useMutation({
+        mutationFn: async ({
+          patientId,
+          amount,
+        }: {
+          patientId: number;
+          amount: string;
+        }) => {
+          const response = await APIClient.client.post(
+            `/patient/${patientId}/_generate_invoice`,
+            { amount },
+            {
+              responseType: "blob",
+              headers: {
+                Accept: "application/pdf",
+              },
+            },
+          );
+          return response.data as Blob;
+        },
+      });
+    },
+  },
 };

@@ -1,8 +1,9 @@
 use axum::{
   debug_handler,
-  extract::{Query, State},
+  extract::{Path, Query, State},
+  http::{header, StatusCode},
   middleware,
-  response::Response,
+  response::{IntoResponse, Response},
   routing::{get, post},
   Json,
 };
@@ -29,7 +30,7 @@ use crate::{
     my_errors::MyErrors,
     patients::{CreatePatientParams, Model},
   },
-  services,
+  services::{self, invoice::GenerateInvoiceParams},
   views::patient::PatientResponse,
 };
 
@@ -83,12 +84,37 @@ async fn search(
   }))?)
 }
 
+#[debug_handler]
+async fn generate_invoice(
+  State(ctx): State<AppContext>,
+  Path(patient_id): Path<i32>,
+  Json(params): Json<GenerateInvoiceParams>,
+) -> Result<impl IntoResponse, MyErrors> {
+  let invoice_generated =
+    services::invoice::generate_patient_invoice(patient_id, &params, &ctx.current_user().0).await?;
+
+  let headers = [
+    (header::CONTENT_TYPE, "application/pdf".to_string()),
+    (
+      header::CONTENT_DISPOSITION,
+      format!("attachment; filename=\"{}\"", &invoice_generated.filename),
+    ),
+    (
+      header::CACHE_CONTROL,
+      "no-cache, no-store, must-revalidate".to_string(),
+    ),
+  ];
+
+  Ok((StatusCode::OK, headers, invoice_generated.pdf_data))
+}
+
 pub fn routes(ctx: &AppContext) -> Routes {
   Routes::new()
     .prefix("/api/patient")
     .add("/save", post(save))
     .add("/_search_by_ssn", get(search_by_ssn))
     .add("/_search", get(search))
+    .add("/{patient_id}/_generate_invoice", post(generate_invoice))
     .layer(middleware::from_fn_with_state(
       ctx.clone(),
       current_user_middleware,

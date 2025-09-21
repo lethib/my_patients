@@ -26,10 +26,18 @@ export type Paginated<D> = {
 
 // Generic hook generators
 function createMutation<P, R>(endpoint: EndpointConfig<P, R>) {
-  return () => {
+  return (pathParams?: Record<string, number>) => {
+    let finalRoute = endpoint.path;
+
+    if (pathParams) {
+      Object.entries(pathParams).forEach(([key, value]) => {
+        finalRoute = finalRoute.replace(`{${key}}`, value.toString());
+      });
+    }
+
     return useMutation<R, AxiosError<APIError>, P>({
       mutationFn: async (data: P) => {
-        return await APIClient.post<P, R>(endpoint.path, data);
+        return await APIClient.post<P, R>(finalRoute, data);
       },
     });
   };
