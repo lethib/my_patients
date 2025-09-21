@@ -1,4 +1,5 @@
-import { FileText, Loader2 } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { CircleAlert, FileText, Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { patientSchema, type SearchPatientResponse } from "@/api/hooks/patient";
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface InvoiceModalProps {
   isOpen: boolean;
@@ -26,8 +28,10 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
   patient,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [amount, setAmount] = useState("");
   const [error, setError] = useState("");
+  const { currentUser } = useCurrentUser();
 
   const generateInvoiceMutation = patientSchema.generateInvoice.useMutation();
 
@@ -93,6 +97,17 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
             </div>
           )}
 
+          {!currentUser?.business_information && (
+            <div className="rounded-lg border-destructive border-2 bg-muted/50 p-3">
+              <div className="flex gap-2">
+                <CircleAlert className="text-destructive size-8" />
+                <p className="text-sm font-medium text-foreground">
+                  {t("invoice.modal.missingInformationAlert")}
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="amount">{t("invoice.modal.amount")} (€)</Label>
             <div className="relative">
@@ -129,23 +144,32 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
             >
               {t("common.cancel")}
             </Button>
-            <Button
-              type="submit"
-              disabled={generateInvoiceMutation.isPending || !amount}
-              className="w-full sm:w-auto"
-            >
-              {generateInvoiceMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  {t("invoice.modal.generating")}
-                </>
-              ) : (
-                <>
-                  <FileText className="h-4 w-4" />
-                  {t("invoice.modal.generate")}
-                </>
-              )}
-            </Button>
+            {currentUser?.business_information ? (
+              <Button
+                type="submit"
+                disabled={generateInvoiceMutation.isPending || !amount}
+                className="w-full sm:w-auto"
+              >
+                {generateInvoiceMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t("invoice.modal.generating")}
+                  </>
+                ) : (
+                  <>
+                    <FileText className="h-4 w-4" />
+                    {t("invoice.modal.generate")}
+                  </>
+                )}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={() => navigate({ to: "/my_information" })}
+              >
+                {t("invoice.modal.completeInformation")}
+              </Button>
+            )}
           </DialogFooter>
         </form>
       </DialogContent>

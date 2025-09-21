@@ -1,10 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Building2, FileText, Users } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
+import { queryClient } from "@/api/api";
 import { APIHooks } from "@/api/hooks";
 import { FormInput } from "@/components/form/FormInput";
 import { FormProvider } from "@/components/form/FormProvider";
@@ -31,6 +32,7 @@ const businessInfoSchema = z.object({
 
 function MyInformation() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { currentUser } = useCurrentUser();
 
   const saveBusinessInformationMutation =
@@ -56,9 +58,11 @@ function MyInformation() {
   }, [currentUser, businessForm]);
 
   const onSubmit = businessForm.handleSubmit(async (values) => {
-    saveBusinessInformationMutation
-      .mutateAsync(values)
-      .then(() => alert(t("businessInfo.successMessage")));
+    saveBusinessInformationMutation.mutateAsync(values).then(() => {
+      queryClient.invalidateQueries({ queryKey: ["/auth/me"] });
+      alert(t("businessInfo.successMessage"));
+      navigate({ to: "/search" });
+    });
   });
 
   return (
