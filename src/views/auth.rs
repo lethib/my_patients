@@ -9,7 +9,8 @@ use crate::{
 pub struct LoginResponse {
   pub token: String,
   pub pid: String,
-  pub name: String,
+  pub first_name: String,
+  pub last_name: String,
 }
 
 impl LoginResponse {
@@ -18,7 +19,8 @@ impl LoginResponse {
     Self {
       token: token.to_string(),
       pid: user.pid.to_string(),
-      name: user.name.clone(),
+      first_name: user.first_name.clone(),
+      last_name: user.last_name.clone(),
     }
   }
 }
@@ -26,7 +28,8 @@ impl LoginResponse {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CurrentResponse {
   pub pid: String,
-  pub name: String,
+  pub first_name: String,
+  pub last_name: String,
   pub email: String,
   pub business_information: Option<BusinessInformation>,
 }
@@ -36,7 +39,8 @@ impl CurrentResponse {
   pub fn new(user: &(users::Model, Option<user_business_informations::Model>)) -> Self {
     Self {
       pid: user.0.pid.to_string(),
-      name: user.0.name.clone(),
+      first_name: user.0.first_name.clone(),
+      last_name: user.0.last_name.clone(),
       email: user.0.email.clone(),
       business_information: user
         .1

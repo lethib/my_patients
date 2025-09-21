@@ -118,7 +118,7 @@ fn create_modern_invoice_pdf(
   current_layer.set_fill_color(black.clone());
 
   // Practitioner name with title on same line, separated by dash
-  let full_name = format!("{} – OSTEOPATHE D.O", user.name);
+  let full_name = format!("{} – OSTEOPATHE D.O", &user.full_name());
   current_layer.use_text(&full_name, 14.0, margin, y_position, &font_bold);
   y_position -= Mm(12.0);
 
@@ -155,7 +155,6 @@ fn create_modern_invoice_pdf(
   // Office address - Temporary data
   let address_line_1 = "Adress line 1";
   let address_line_2 = "ZIP_CODE City";
-  let phone_number = "user's phone number";
 
   current_layer.use_text(address_line_1, 10.0, margin, y_position, &font_regular);
   y_position -= Mm(5.0);
@@ -164,7 +163,7 @@ fn create_modern_invoice_pdf(
 
   // Contact info
   current_layer.use_text(
-    &format!("Tel : {}", phone_number),
+    &format!("Tel : {}", &user.phone_number),
     10.0,
     margin,
     y_position,
@@ -288,7 +287,7 @@ fn create_modern_invoice_pdf(
 
   // Signature placeholder - right aligned
   let sig_x = Mm(210.0) - margin - Mm(50.0);
-  current_layer.use_text(&user.name, 11.0, sig_x, y_position, &font_regular);
+  current_layer.use_text(&user.full_name(), 11.0, sig_x, y_position, &font_regular);
 
   // Convert to bytes
   let mut buf = Vec::new();
