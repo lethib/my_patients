@@ -13,9 +13,11 @@ type AuthResponse = {
 };
 
 type RegisterParams = {
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
-  name: string;
+  phone_number: string;
 };
 
 export type MeResponse = {

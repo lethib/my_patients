@@ -21,13 +21,13 @@ pub struct LoginParams {
 pub struct RegisterParams {
   pub email: String,
   pub password: String,
-  pub name: String,
+  pub first_name: String,
+  pub last_name: String,
+  pub phone_number: String,
 }
 
 #[derive(Debug, Validate, Deserialize)]
 pub struct Validator {
-  #[validate(length(min = 2, message = "Name must be at least 2 characters long."))]
-  pub name: String,
   #[validate(email(message = "invalid email"))]
   pub email: String,
 }
@@ -35,7 +35,6 @@ pub struct Validator {
 impl Validatable for ActiveModel {
   fn validator(&self) -> Box<dyn Validate> {
     Box::new(Validator {
-      name: self.name.as_ref().to_owned(),
       email: self.email.as_ref().to_owned(),
     })
   }
@@ -72,6 +71,10 @@ impl Authenticable for Model {
 }
 
 impl Model {
+  pub fn full_name(&self) -> String {
+    format!("{} {}", &self.first_name, &self.last_name)
+  }
+
   /// finds a user by the provided email
   ///
   /// # Errors
@@ -151,7 +154,9 @@ impl Model {
     let user = users::ActiveModel {
       email: ActiveValue::set(params.email.to_string()),
       password: ActiveValue::set(password_hash),
-      name: ActiveValue::set(params.name.to_string()),
+      first_name: ActiveValue::set(params.first_name.clone()),
+      last_name: ActiveValue::set(params.last_name.clone()),
+      phone_number: ActiveValue::set(params.phone_number.clone()),
       ..Default::default()
     }
     .insert(&txn)
