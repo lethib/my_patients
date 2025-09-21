@@ -38,12 +38,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
     // Validate amount
     const numericAmount = parseFloat(amount);
     if (!amount || isNaN(numericAmount) || numericAmount <= 0) {
-      setError(
-        t(
-          "invoice.errors.invalidAmount",
-          "Please enter a valid amount greater than 0",
-        ),
-      );
+      setError(t("invoice.errors.invalidAmount"));
       return;
     }
 
@@ -78,13 +73,10 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            {t("invoice.modal.title", "Generate Invoice")}
+            {t("invoice.modal.title")}
           </DialogTitle>
           <DialogDescription>
-            {t(
-              "invoice.modal.description",
-              "Create a PDF invoice for this patient",
-            )}
+            {t("invoice.modal.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -92,19 +84,17 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
           {patient && (
             <div className="rounded-lg border bg-muted/50 p-3">
               <p className="text-sm font-medium text-foreground">
-                {t("invoice.modal.patient", "Patient")}: {patient.first_name}{" "}
+                {t("invoice.modal.patient")}: {patient.first_name}{" "}
                 {patient.last_name}
               </p>
               <p className="text-xs text-muted-foreground">
-                {t("invoice.modal.id", "ID")}: {patient.id}
+                {t("invoice.modal.id")}: {patient.id}
               </p>
             </div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="amount">
-              {t("invoice.modal.amount", "Invoice Amount")} (€)
-            </Label>
+            <Label htmlFor="amount">{t("invoice.modal.amount")} (€)</Label>
             <div className="relative">
               <Input
                 id="amount"
@@ -137,7 +127,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
               onClick={handleClose}
               disabled={generateInvoiceMutation.isPending}
             >
-              {t("common.cancel", "Cancel")}
+              {t("common.cancel")}
             </Button>
             <Button
               type="submit"
@@ -147,12 +137,12 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
               {generateInvoiceMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  {t("invoice.modal.generating", "Generating...")}
+                  {t("invoice.modal.generating")}
                 </>
               ) : (
                 <>
                   <FileText className="h-4 w-4" />
-                  {t("invoice.modal.generate", "Generate Invoice")}
+                  {t("invoice.modal.generate")}
                 </>
               )}
             </Button>
