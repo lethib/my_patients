@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 interface InvoiceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  patient: SearchPatientResponse | null;
+  patient: SearchPatientResponse;
 }
 
 export const InvoiceModal: React.FC<InvoiceModalProps> = ({
@@ -47,41 +47,21 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
       return;
     }
 
-    if (!patient) {
-      setError(t("invoice.errors.noPatient", "Patient information is missing"));
-      return;
-    }
-
-    try {
-      const blob = await generateInvoiceMutation.mutateAsync({
+    generateInvoiceMutation
+      .mutateAsync({
         patientId: patient.id,
         amount: `${numericAmount}€`,
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `invoice-${patient.first_name}-${patient.last_name}-${new Date().toISOString().split("T")[0]}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
       });
-
-      // Create blob URL and trigger download
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `invoice-${patient.first_name}-${patient.last_name}-${new Date().toISOString().split("T")[0]}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      // Reset form and close modal
-      setAmount("");
-      setError("");
-      onClose();
-    } catch (error: any) {
-      console.error("Invoice generation failed:", error);
-      setError(
-        error.response?.data?.msg ||
-          t(
-            "invoice.errors.generation",
-            "Failed to generate invoice. Please try again.",
-          ),
-      );
-    }
   };
 
   const handleClose = () => {

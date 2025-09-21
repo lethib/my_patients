@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { APIHooks } from "@/api/hooks";
+import type { SearchPatientResponse } from "@/api/hooks/patient";
+import { InvoiceModal } from "@/components/patients/InvoiceModal";
 import { CenteredSpineer } from "@/components/ui/spinner";
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { PatientRow } from "./PatientRow";
-import { InvoiceModal } from "@/components/patients/InvoiceModal";
-import type { SearchPatientResponse } from "@/api/hooks/patient";
 
 interface Props {
   searchQuery: string;
@@ -12,7 +12,8 @@ interface Props {
 }
 
 export const PatientList = ({ searchQuery, page }: Props) => {
-  const [selectedPatient, setSelectedPatient] = useState<SearchPatientResponse | null>(null);
+  const [selectedPatient, setSelectedPatient] =
+    useState<SearchPatientResponse | null>(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   const searchPatientsQuery = APIHooks.patient.search.useQuery({
@@ -59,11 +60,13 @@ export const PatientList = ({ searchQuery, page }: Props) => {
         ))}
       </TableBody>
 
-      <InvoiceModal
-        isOpen={isInvoiceModalOpen}
-        onClose={handleCloseInvoiceModal}
-        patient={selectedPatient}
-      />
+      {selectedPatient && (
+        <InvoiceModal
+          isOpen={isInvoiceModalOpen}
+          onClose={handleCloseInvoiceModal}
+          patient={selectedPatient}
+        />
+      )}
     </>
   );
 };

@@ -102,6 +102,20 @@
       "office": "Cabinet"
     }
   },
+  "invoice": {
+    "modal": {
+      "title": "Générer une facture",
+      "description": "Créer une facture PDF pour ce patient",
+      "patient": "Patient",
+      "id": "ID",
+      "amount": "Montant de la facture",
+      "generating": "Génération...",
+      "generate": "Générer la facture"
+    },
+    "errors": {
+      "invalidAmount": "Veuillez entrer un montant valide supérieur à 0"
+    }
+  },
   "businessInfo": {
     "title": "Informations professionnelles",
     "subtitle": "Saisissez vos numéros d'identification professionnels",

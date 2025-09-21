@@ -8,7 +8,7 @@ use crate::models::{
   _entities::{patients, user_business_informations, users},
   my_errors::MyErrors,
 };
-use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{ActiveEnum, ColumnTrait, EntityTrait, QueryFilter};
 
 pub struct InvoiceGeneratorWorker {
   pub ctx: AppContext,
@@ -152,10 +152,10 @@ fn create_modern_invoice_pdf(
   );
   y_position -= Mm(12.0);
 
-  // Office address
-  let address_line_1 = "52 avenue Paul Vaillant Couturier";
-  let address_line_2 = "94440 Vitry sur Seine";
-  let phone_number = "06.65.96.64.24";
+  // Office address - Temporary data
+  let address_line_1 = "Adress line 1";
+  let address_line_2 = "ZIP_CODE City";
+  let phone_number = "user's phone number";
 
   current_layer.use_text(address_line_1, 10.0, margin, y_position, &font_regular);
   y_position -= Mm(5.0);
@@ -279,7 +279,7 @@ fn create_modern_invoice_pdf(
 
   // === DATE AND SIGNATURE ===
   let current_date = chrono::Utc::now().format("%d/%m/%Y").to_string();
-  let date_location = format!("Fait à Vitry-sur-Seine, le {}", current_date);
+  let date_location = format!("Fait à {}, le {}", patient.office.to_value(), current_date);
 
   // Right align date
   let date_x = Mm(210.0) - margin - Mm(85.0);

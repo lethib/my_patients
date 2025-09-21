@@ -2,7 +2,7 @@ use crate::{
   initializers::get_services,
   models::{
     _entities::{patient_users, patients, users},
-    my_errors::MyErrors,
+    my_errors::{application_error::ApplicationError, MyErrors},
   },
   workers::{self, invoice_generator::InvoiceGeneratorArgs},
 };
@@ -31,7 +31,7 @@ pub async fn generate_patient_invoice(
     .filter(patient_users::Column::UserId.eq(current_user.id))
     .one(&services.db)
     .await?
-    .unwrap();
+    .ok_or_else(|| ApplicationError::UNPROCESSABLE_ENTITY.to_my_error())?;
 
   let args = InvoiceGeneratorArgs {
     patient,
