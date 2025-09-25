@@ -4,7 +4,12 @@ use serde::{Deserialize, Serialize};
 use serde_json::Map;
 use uuid::Uuid;
 
-use crate::models::_entities::{prelude::UserBusinessInformations, user_business_informations};
+use crate::models::{
+  _entities::{
+    prelude::UserBusinessInformations, user_business_informations, user_practitioner_offices,
+  },
+  practitioner_offices,
+};
 
 pub use super::_entities::users::{self, ActiveModel, Entity, Model};
 
@@ -73,6 +78,19 @@ impl Authenticable for Model {
 impl Model {
   pub fn full_name(&self) -> String {
     format!("{} {}", &self.first_name, &self.last_name)
+  }
+
+  pub async fn get_my_offices(
+    &self,
+    db: &DatabaseConnection,
+  ) -> ModelResult<Vec<practitioner_offices::Model>> {
+    let offices = practitioner_offices::Entity::find()
+      .inner_join(user_practitioner_offices::Entity)
+      .filter(user_practitioner_offices::Column::UserId.eq(self.id))
+      .all(db)
+      .await?;
+
+    Ok(offices)
   }
 
   /// finds a user by the provided email

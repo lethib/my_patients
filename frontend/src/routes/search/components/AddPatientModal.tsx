@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import z from "zod";
 import { queryClient } from "@/api/api";
 import { APIHooks } from "@/api/hooks";
-import { POSSIBLE_OFFICES } from "@/api/hooks/patient";
 import { FormInput } from "@/components/form/FormInput";
 import { FormProvider } from "@/components/form/FormProvider";
 import {
@@ -96,6 +95,10 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
     { ssn: addPatientForm.getValues("ssn") },
     { enabled: canSearchPatient },
   );
+
+  const myOfficesQuery = APIHooks.user.getMyOffices.useQuery(null, {
+    enabled: canSearchPatient,
+  });
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: not needed
   useEffect(() => {
@@ -289,9 +292,12 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
                         </FormControl>
                         <SelectContent>
                           <SelectGroup>
-                            {POSSIBLE_OFFICES.map((office, index) => (
-                              <SelectItem value={index.toString()} key={office}>
-                                {t(`patients.form.offices.${office}`)}
+                            {myOfficesQuery.data?.map((office) => (
+                              <SelectItem
+                                value={office.id.toString()}
+                                key={office.id}
+                              >
+                                {office.name}
                               </SelectItem>
                             ))}
                           </SelectGroup>
