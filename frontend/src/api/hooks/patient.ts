@@ -6,8 +6,6 @@ import {
   queryEndpoint,
 } from "../endpointGenerator";
 
-export const POSSIBLE_OFFICES = ["RueilMalmaison", "VitrySurSeine"] as const;
-
 type SavePatientParams = {
   first_name: string;
   last_name: string;
