@@ -17,9 +17,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { RegisterModal } from "@/RegisterModal";
+import { RegisterModal } from "./components/RegisterModal";
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/login/")({
   component: Login,
 });
 
@@ -33,8 +33,8 @@ function Login() {
   const loginMutation = APIClient.hooks.auth.login.useMutation();
 
   const loginFormSchema = z.object({
-    email: z.string().email(t('auth.login.validation.invalidEmail')),
-    password: z.string().min(1, t('auth.login.validation.passwordRequired')),
+    email: z.string().email(t("auth.login.validation.invalidEmail")),
+    password: z.string().min(1, t("auth.login.validation.passwordRequired")),
   });
 
   const loginForm = useForm({
@@ -52,7 +52,7 @@ function Login() {
         navigate({ to: "/", replace: true });
       },
       onError: (error) => {
-        alert(`${t('auth.login.error')}: ${error.message}`);
+        alert(`${t("auth.login.error")}: ${error.message}`);
       },
     });
   };
@@ -63,12 +63,18 @@ function Login() {
     <>
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 px-4">
         <Card className="w-full max-w-md shadow-lg border-0 bg-card/50 backdrop-blur-sm">
-          <CardHeader className="space-y-2 text-center pb-8">
+          <CardHeader className="flex flex-col items-center space-y-2 pb-6">
+            <img
+              src="/favicon/favicon.svg"
+              height={100}
+              width={100}
+              className="-mb-1"
+            />
             <CardTitle className="text-3xl font-bold tracking-tight">
-              {t('auth.login.title')}
+              {t("auth.login.title")}
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              {t('auth.login.description')}
+              {t("auth.login.description")}
             </CardDescription>
           </CardHeader>
 
@@ -80,13 +86,13 @@ function Login() {
             >
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  {t('auth.login.email')}
+                  {t("auth.login.email")}
                 </Label>
                 <FormInput
                   name="email"
                   id="email"
                   type="email"
-                  placeholder={t('auth.login.emailPlaceholder')}
+                  placeholder={t("auth.login.emailPlaceholder")}
                   className="pl-10 h-11"
                   icon={
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -96,14 +102,14 @@ function Login() {
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium">
-                  {t('auth.login.password')}
+                  {t("auth.login.password")}
                 </Label>
                 <div className="relative">
                   <FormInput
                     name="password"
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder={t('auth.login.passwordPlaceholder')}
+                    placeholder={t("auth.login.passwordPlaceholder")}
                     className="pl-10 pr-10 h-11"
                     icon={
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -131,25 +137,25 @@ function Login() {
                 {loginMutation.isPending ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    {t('auth.login.signingIn')}
+                    {t("auth.login.signingIn")}
                   </div>
                 ) : (
-                  t('auth.login.signIn')
+                  t("auth.login.signIn")
                 )}
               </Button>
             </FormProvider>
 
             <div className="text-center space-y-2">
-              <button className="text-sm text-primary hover:underline">
+              {/* <button className="text-sm text-primary hover:underline">
                 {t('auth.login.forgotPassword')}
-              </button>
+              </button> */}
               <p className="text-sm text-muted-foreground">
-                {t('auth.login.noAccount')}{" "}
+                {t("auth.login.noAccount")}{" "}
                 <button
                   className="text-primary hover:underline font-medium"
                   onClick={() => setIsRegisterModalOpen(true)}
                 >
-                  {t('auth.login.signUp')}
+                  {t("auth.login.signUp")}
                 </button>
               </p>
             </div>

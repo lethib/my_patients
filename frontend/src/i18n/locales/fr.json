@@ -38,7 +38,7 @@
       "createAccount": "Créer un compte",
       "hasAccount": "Vous avez déjà un compte ?",
       "signInInstead": "Se connecter",
-      "successMessage": "Inscription réussie ! Vérifiez votre email pour valider votre compte.",
+      "successMessage": "Inscription réussie ! Vous pouvez maintenant vous connecter.",
       "error": "Échec de l'inscription",
       "validation": {
         "firstNameRequired": "Le prénom est requis",

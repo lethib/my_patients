@@ -4,6 +4,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
+import { APIClient } from "@/api/api";
+import { FormInput } from "@/components/form/FormInput";
+import { FormPhoneInput } from "@/components/form/FormPhoneInput";
+import { FormProvider } from "@/components/form/FormProvider";
 import { Button, Label } from "@/components/ui";
 import {
   Dialog,
@@ -12,10 +16,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { APIClient } from "./api/api";
-import { FormInput } from "./components/form/FormInput";
-import { FormPhoneInput } from "./components/form/FormPhoneInput";
-import { FormProvider } from "./components/form/FormProvider";
 
 interface RegisterModalProps {
   open: boolean;
