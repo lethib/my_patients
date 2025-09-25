@@ -155,13 +155,24 @@ fn create_modern_invoice_pdf(
   );
   y_position -= Mm(12.0);
 
-  // Office address - Temporary data
-  let address_line_1 = "Adress line 1";
-  let address_line_2 = "ZIP_CODE City";
-
-  current_layer.use_text(address_line_1, 10.0, margin, y_position, &font_regular);
+  current_layer.use_text(
+    practitioner_office.address_line_1.clone(),
+    10.0,
+    margin,
+    y_position,
+    &font_regular,
+  );
   y_position -= Mm(5.0);
-  current_layer.use_text(address_line_2, 10.0, margin, y_position, &font_regular);
+  current_layer.use_text(
+    format!(
+      "{} {}",
+      practitioner_office.address_zip_code, practitioner_office.address_city,
+    ),
+    10.0,
+    margin,
+    y_position,
+    &font_regular,
+  );
   y_position -= Mm(8.0);
 
   // Contact info
