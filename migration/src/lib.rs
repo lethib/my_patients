@@ -14,6 +14,7 @@ mod m20250912_195210_add_unique_constraint_user_business_info;
 mod m20250913_125707_add_office_to_patient;
 mod m20250921_200853_add_phone_number_to_user;
 mod m20250921_201555_change_user_name_to_first_and_last_name;
+mod m20250922_074830_create_practitioner_office_table;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -31,7 +32,8 @@ impl MigratorTrait for Migrator {
       Box::new(m20250912_195210_add_unique_constraint_user_business_info::Migration),
       Box::new(m20250913_125707_add_office_to_patient::Migration),
       Box::new(m20250921_200853_add_phone_number_to_user::Migration),
-            Box::new(m20250921_201555_change_user_name_to_first_and_last_name::Migration),
+      Box::new(m20250921_201555_change_user_name_to_first_and_last_name::Migration),
+      Box::new(m20250922_074830_create_practitioner_office_table::Migration),
       // inject-above (do not remove this comment)
     ]
   }

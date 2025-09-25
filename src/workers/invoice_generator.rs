@@ -5,10 +5,10 @@ use serde::Serialize;
 use std::io::BufWriter;
 
 use crate::models::{
-  _entities::{patients, user_business_informations, users},
+  _entities::{patients, practitioner_offices, user_business_informations, users},
   my_errors::MyErrors,
 };
-use sea_orm::{ActiveEnum, ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 
 pub struct InvoiceGeneratorWorker {
   pub ctx: AppContext,
@@ -19,6 +19,7 @@ pub struct InvoiceGeneratorArgs {
   pub patient: patients::Model,
   pub user: users::Model,
   pub amount: String,
+  pub practitioner_office: practitioner_offices::Model,
 }
 
 #[derive(Debug, Serialize)]
@@ -72,6 +73,7 @@ pub async fn generate_invoice_pdf<C: ConnectionTrait>(
     &args.patient,
     &patient_ssn,
     &args.amount,
+    &args.practitioner_office,
   )
   .map_err(|e| MyErrors {
     code: StatusCode::INTERNAL_SERVER_ERROR,
@@ -88,6 +90,7 @@ fn create_modern_invoice_pdf(
   patient: &patients::Model,
   patient_ssn: &str,
   amount: &str,
+  practitioner_office: &practitioner_offices::Model,
 ) -> std::result::Result<Vec<u8>, String> {
   // Create A4 PDF document
   let (doc, page1, layer1) = PdfDocument::new(
@@ -278,7 +281,10 @@ fn create_modern_invoice_pdf(
 
   // === DATE AND SIGNATURE ===
   let current_date = chrono::Utc::now().format("%d/%m/%Y").to_string();
-  let date_location = format!("Fait à {}, le {}", patient.office.to_value(), current_date);
+  let date_location = format!(
+    "Fait à {}, le {}",
+    practitioner_office.address_city, current_date
+  );
 
   // Right align date
   let date_x = Mm(210.0) - margin - Mm(85.0);

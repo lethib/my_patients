@@ -4,27 +4,18 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "patient_users")]
+#[sea_orm(table_name = "user_practitioner_offices")]
 pub struct Model {
   pub created_at: DateTimeWithTimeZone,
   pub updated_at: DateTimeWithTimeZone,
   #[sea_orm(primary_key, auto_increment = false)]
   pub user_id: i32,
   #[sea_orm(primary_key, auto_increment = false)]
-  pub patient_id: i32,
   pub practitioner_office_id: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-  #[sea_orm(
-    belongs_to = "super::patients::Entity",
-    from = "Column::PatientId",
-    to = "super::patients::Column::Id",
-    on_update = "Cascade",
-    on_delete = "Cascade"
-  )]
-  Patients,
   #[sea_orm(
     belongs_to = "super::practitioner_offices::Entity",
     from = "Column::PractitionerOfficeId",
@@ -41,12 +32,6 @@ pub enum Relation {
     on_delete = "Cascade"
   )]
   Users,
-}
-
-impl Related<super::patients::Entity> for Entity {
-  fn to() -> RelationDef {
-    Relation::Patients.def()
-  }
 }
 
 impl Related<super::practitioner_offices::Entity> for Entity {
