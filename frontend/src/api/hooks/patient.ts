@@ -7,7 +7,6 @@ import {
 } from "../endpointGenerator";
 
 export const POSSIBLE_OFFICES = ["RueilMalmaison", "VitrySurSeine"] as const;
-type Office = (typeof POSSIBLE_OFFICES)[number];
 
 type SavePatientParams = {
   first_name: string;
@@ -16,7 +15,7 @@ type SavePatientParams = {
   address_line_1: string;
   address_zip_code: string;
   address_city: string;
-  office: Office;
+  practitioner_office_id: number;
 };
 
 type SearchBySSNPatientResponse = {

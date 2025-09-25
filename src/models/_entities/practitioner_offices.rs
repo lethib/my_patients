@@ -4,27 +4,23 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "users")]
+#[sea_orm(table_name = "practitioner_offices")]
 pub struct Model {
   pub created_at: DateTimeWithTimeZone,
   pub updated_at: DateTimeWithTimeZone,
   #[sea_orm(primary_key)]
   pub id: i32,
-  pub pid: Uuid,
-  #[sea_orm(unique)]
-  pub email: String,
-  pub password: String,
-  pub phone_number: String,
-  pub first_name: String,
-  pub last_name: String,
+  pub name: String,
+  pub address_line_1: String,
+  pub address_zip_code: String,
+  pub address_city: String,
+  pub address_country: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
   #[sea_orm(has_many = "super::patient_users::Entity")]
   PatientUsers,
-  #[sea_orm(has_one = "super::user_business_informations::Entity")]
-  UserBusinessInformations,
   #[sea_orm(has_many = "super::user_practitioner_offices::Entity")]
   UserPractitionerOffices,
 }
@@ -35,25 +31,19 @@ impl Related<super::patient_users::Entity> for Entity {
   }
 }
 
-impl Related<super::user_business_informations::Entity> for Entity {
-  fn to() -> RelationDef {
-    Relation::UserBusinessInformations.def()
-  }
-}
-
 impl Related<super::user_practitioner_offices::Entity> for Entity {
   fn to() -> RelationDef {
     Relation::UserPractitionerOffices.def()
   }
 }
 
-impl Related<super::practitioner_offices::Entity> for Entity {
+impl Related<super::users::Entity> for Entity {
   fn to() -> RelationDef {
-    super::user_practitioner_offices::Relation::PractitionerOffices.def()
+    super::user_practitioner_offices::Relation::Users.def()
   }
   fn via() -> Option<RelationDef> {
     Some(
-      super::user_practitioner_offices::Relation::Users
+      super::user_practitioner_offices::Relation::PractitionerOffices
         .def()
         .rev(),
     )

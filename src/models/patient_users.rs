@@ -8,6 +8,7 @@ pub type PatientUsers = Entity;
 pub struct CreateLinkParams {
   pub user_id: i32,
   pub patient_id: i32,
+  pub practitioner_office_id: i32,
 }
 
 #[async_trait::async_trait]
@@ -39,6 +40,7 @@ impl ActiveModel {
       self::ActiveModel {
         user_id: ActiveValue::Set(params.user_id),
         patient_id: ActiveValue::Set(params.patient_id),
+        practitioner_office_id: ActiveValue::Set(params.practitioner_office_id),
         ..Default::default()
       }
       .insert(db)

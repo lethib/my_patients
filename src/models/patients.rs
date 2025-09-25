@@ -1,6 +1,6 @@
 use crate::{
   models::{
-    _entities::{patients, sea_orm_active_enums::Office},
+    _entities::patients,
     my_errors::{
       application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors, ToErr,
     },
@@ -23,7 +23,7 @@ pub struct CreatePatientParams {
   address_line_1: String,
   address_zip_code: String,
   address_city: String,
-  office: Office,
+  pub practitioner_office_id: i32,
 }
 
 // Encryption utilities for SSN
@@ -100,7 +100,6 @@ impl ActiveModel {
         address_zip_code: ActiveValue::Set(params.address_zip_code.clone()),
         address_city: ActiveValue::Set(params.address_city.clone()),
         address_country: ActiveValue::Set("FRANCE".to_string()),
-        office: ActiveValue::Set(params.office.clone()),
         ..Default::default()
       }
       .insert(db)

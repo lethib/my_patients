@@ -72,9 +72,9 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
       .string()
       .trim()
       .min(1, t("patients.form.validation.cityRequired")),
-    office: z.enum(POSSIBLE_OFFICES, {
-      message: t("patients.form.validation.officeRequired"),
-    }),
+    practitioner_office_id: z.string(
+      t("patients.form.validation.officeRequired"),
+    ),
   });
 
   const addPatientForm = useForm({
@@ -86,6 +86,7 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
       address_line_1: "",
       address_zip_code: "",
       address_city: "",
+      practitioner_office_id: "",
     },
   });
 
@@ -120,7 +121,10 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
 
   const onSubmit = addPatientForm.handleSubmit(async (values) => {
     addPatientMutation
-      .mutateAsync(values)
+      .mutateAsync({
+        ...values,
+        practitioner_office_id: +values.practitioner_office_id,
+      })
       .then(() => {
         setIsOpen(false);
         queryClient.invalidateQueries({ queryKey: ["/patient/_search"] });
@@ -268,7 +272,7 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
                   {t("patients.form.office")}
                 </Label>
                 <FormField
-                  name="office"
+                  name="practitioner_office_id"
                   control={addPatientForm.control}
                   render={({ field }) => (
                     <FormItem>
@@ -285,8 +289,8 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
                         </FormControl>
                         <SelectContent>
                           <SelectGroup>
-                            {POSSIBLE_OFFICES.map((office) => (
-                              <SelectItem value={office} key={office}>
+                            {POSSIBLE_OFFICES.map((office, index) => (
+                              <SelectItem value={index.toString()} key={office}>
                                 {t(`patients.form.offices.${office}`)}
                               </SelectItem>
                             ))}

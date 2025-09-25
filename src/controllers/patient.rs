@@ -51,7 +51,7 @@ async fn search_by_ssn(
 ) -> Result<Response, MyErrors> {
   let found_patient = Model::search_by_ssn(&ctx.db, &params.ssn).await?;
 
-  Ok(format::json(PatientResponse::new(&found_patient))?)
+  Ok(format::json(PatientResponse::new(&found_patient, None))?)
 }
 
 #[debug_handler]
@@ -70,8 +70,10 @@ async fn search(
   let (patients, total_pages) =
     services::patients::search_paginated(query, page, &ctx.current_user().0).await?;
 
-  let patient_responses: Vec<PatientResponse> =
-    patients.iter().map(PatientResponse::from_model).collect();
+  let patient_responses: Vec<PatientResponse> = patients
+    .iter()
+    .map(|p| PatientResponse::from_model(&p.0, &p.1.name))
+    .collect();
 
   Ok(format::json(serde_json::json!({
     "paginated_data": patient_responses,
