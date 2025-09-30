@@ -76,7 +76,13 @@ export const patientSchema = {
               },
             },
           );
-          return response.data as Blob;
+
+          // Extract filename from content-disposition header
+          const contentDisposition = response.headers["content-disposition"];
+          const filenameMatch = contentDisposition?.match(/filename="([^"]+)"/);
+          const filename = filenameMatch ? filenameMatch[1] : "invoice.pdf";
+
+          return { blob: response.data as Blob, filename };
         },
       });
     },
