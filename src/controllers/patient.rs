@@ -1,12 +1,12 @@
 use axum::{
   debug_handler,
   extract::{Path, Query, State},
-  http::{header, StatusCode},
   middleware,
-  response::{IntoResponse, Response},
+  response::Response,
   routing::{get, post},
   Json,
 };
+use base64::Engine;
 use loco_rs::{
   app::AppContext,
   prelude::{format, Routes},
@@ -91,27 +91,14 @@ async fn generate_invoice(
   State(ctx): State<AppContext>,
   Path(patient_id): Path<i32>,
   Json(params): Json<GenerateInvoiceParams>,
-) -> Result<impl IntoResponse, MyErrors> {
+) -> Result<Response, MyErrors> {
   let invoice_generated =
     services::invoice::generate_patient_invoice(patient_id, &params, &ctx.current_user().0).await?;
 
-  let headers = [
-    (header::CONTENT_TYPE, "application/pdf".to_string()),
-    (
-      header::CONTENT_DISPOSITION,
-      format!("attachment; filename=\"{}\"", &invoice_generated.filename),
-    ),
-    (
-      header::CACHE_CONTROL,
-      "no-cache, no-store, must-revalidate".to_string(),
-    ),
-    (
-      header::ACCESS_CONTROL_EXPOSE_HEADERS,
-      "Content-Disposition".to_string(),
-    ),
-  ];
-
-  Ok((StatusCode::OK, headers, invoice_generated.pdf_data))
+  Ok(format::json(serde_json::json!({
+    "pdf_data": base64::prelude::BASE64_STANDARD.encode(&invoice_generated.pdf_data),
+    "filename": invoice_generated.filename
+  }))?)
 }
 
 pub fn routes(ctx: &AppContext) -> Routes {
