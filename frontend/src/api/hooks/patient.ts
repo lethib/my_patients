@@ -66,23 +66,21 @@ export const patientSchema = {
           patientId: number;
           amount: string;
         }) => {
-          const response = await APIClient.client.post(
-            `/patient/${patientId}/_generate_invoice`,
-            { amount },
-            {
-              responseType: "blob",
-              headers: {
-                Accept: "application/pdf",
-              },
-            },
-          );
+          const response = await APIClient.client.post<{
+            pdf_data: string;
+            filename: string;
+          }>(`/patient/${patientId}/_generate_invoice`, { amount });
 
-          // Extract filename from content-disposition header
-          const contentDisposition = response.headers["content-disposition"];
-          const filenameMatch = contentDisposition?.match(/filename="([^"]+)"/);
-          const filename = filenameMatch ? filenameMatch[1] : "invoice.pdf";
+          // Decode base64 PDF data to blob
+          const pdfData = response.data.pdf_data;
+          const binaryString = atob(pdfData);
+          const bytes = new Uint8Array(binaryString.length);
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+          const blob = new Blob([bytes], { type: "application/pdf" });
 
-          return { blob: response.data as Blob, filename };
+          return { blob, filename: response.data.filename };
         },
       });
     },
