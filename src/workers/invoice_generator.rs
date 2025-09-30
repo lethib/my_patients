@@ -461,32 +461,38 @@ fn create_modern_invoice_pdf(
   // Right align date
   let date_x = Mm(230.0) - margin - Mm(85.0);
   current_layer.use_text(&date_location, 11.0, date_x, y_position, &font_regular);
-  y_position += Mm(70.0);
 
   // Signature section - left aligned
   let sig_x = Mm(30.0);
 
   // Try to embed signature image if available
   if let Some(sig_bytes) = signature_data {
+    y_position += Mm(70.0);
+
     match embed_signature_image(&doc, &current_layer, sig_bytes, sig_x, y_position) {
       Ok(_) => {
         tracing::info!("Successfully embedded signature image");
         // Move down to avoid overlap with signature image
-        y_position -= Mm(25.0);
+        y_position -= Mm(100.0);
       }
       Err(e) => {
         tracing::warn!(
           "Failed to embed signature image: {}. Using text fallback.",
           e
         );
-        // Fallback to text signature
-        current_layer.use_text(&user.full_name(), 11.0, sig_x, y_position, &font_regular);
       }
     }
   } else {
-    // No signature data available, use text signature
-    current_layer.use_text(&user.full_name(), 11.0, sig_x, y_position, &font_regular);
+    y_position -= Mm(30.0)
   }
+
+  current_layer.use_text(
+    &user.full_name(),
+    11.0,
+    date_x + Mm(20.0),
+    y_position,
+    &font_regular,
+  );
 
   // Convert to bytes
   let mut buf = Vec::new();
