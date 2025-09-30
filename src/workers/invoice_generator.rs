@@ -8,6 +8,7 @@ use crate::models::{
   _entities::{patients, practitioner_offices, user_business_informations, users},
   my_errors::MyErrors,
 };
+use crate::services::storage::StorageService;
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 
 pub struct InvoiceGeneratorWorker {
@@ -53,6 +54,18 @@ pub async fn generate_invoice_pdf<C: ConnectionTrait>(
   db: &C,
   args: &InvoiceGeneratorArgs,
 ) -> std::result::Result<Vec<u8>, MyErrors> {
+  // Initialize storage service for signature fetching
+  let storage_service = match StorageService::new() {
+    Ok(service) => Some(service),
+    Err(e) => {
+      tracing::warn!(
+        "Storage service unavailable: {}. Continuing without signature.",
+        e
+      );
+      None
+    }
+  };
+
   // Fetch business information separately
   let business_info = user_business_informations::Entity::find()
     .filter(user_business_informations::Column::UserId.eq(args.user.id))
@@ -62,6 +75,28 @@ pub async fn generate_invoice_pdf<C: ConnectionTrait>(
       code: StatusCode::BAD_REQUEST,
       msg: "User business information not found".to_string(),
     })?;
+
+  // Try to fetch signature if storage service is available
+  let signature_data = match &storage_service {
+    Some(service) => match service
+      .fetch_signature(&business_info.signature_file_name)
+      .await
+    {
+      Ok(data) => {
+        tracing::info!("Successfully fetched signature for user {}", args.user.id);
+        Some(data)
+      }
+      Err(e) => {
+        tracing::warn!(
+          "Failed to fetch signature for user {}: {}. Continuing without signature.",
+          args.user.id,
+          e
+        );
+        None
+      }
+    },
+    None => None,
+  };
 
   // Decrypt patient SSN
   let patient_ssn = args.patient.decrypt_ssn()?;
@@ -74,6 +109,7 @@ pub async fn generate_invoice_pdf<C: ConnectionTrait>(
     &patient_ssn,
     &args.amount,
     &args.practitioner_office,
+    signature_data.as_deref(),
   )
   .map_err(|e| MyErrors {
     code: StatusCode::INTERNAL_SERVER_ERROR,
@@ -81,6 +117,130 @@ pub async fn generate_invoice_pdf<C: ConnectionTrait>(
   })?;
 
   Ok(pdf_data)
+}
+
+/// Embed a signature image into the PDF
+///
+/// # Arguments
+/// * `doc` - The PDF document
+/// * `layer` - The current layer to draw on
+/// * `image_bytes` - The image bytes (JPG/PNG)
+/// * `x` - X position for the image
+/// * `y` - Y position for the image
+///
+/// # Returns
+/// * `Result<(), String>` - Success or error message
+fn embed_signature_image(
+  _doc: &PdfDocumentReference,
+  layer: &PdfLayerReference,
+  image_bytes: &[u8],
+  x: Mm,
+  y: Mm,
+) -> std::result::Result<(), String> {
+  // Load and decode the image (auto-detect format)
+  let img =
+    ::image::load_from_memory(image_bytes).map_err(|e| format!("Failed to decode image: {}", e))?;
+
+  // Convert to RGB if needed
+  let rgb_img = img.to_rgb8();
+  let (width, height) = rgb_img.dimensions();
+
+  tracing::info!("Loaded signature image: {}x{} pixels", width, height);
+
+  // Calculate aspect ratio and target dimensions
+  let max_width = Mm(200.0); // Maximum width for signature
+  let max_height = Mm(100.0); // Maximum height for signature
+
+  let aspect_ratio = width as f32 / height as f32;
+  let (target_width, target_height) = if aspect_ratio > max_width.0 / max_height.0 {
+    // Width-constrained
+    (max_width, Mm(max_width.0 / aspect_ratio))
+  } else {
+    // Height-constrained
+    (Mm(max_height.0 * aspect_ratio), max_height)
+  };
+
+  tracing::info!(
+    "Target signature dimensions: {}x{} mm",
+    target_width.0,
+    target_height.0
+  );
+
+  // Get raw RGB image data
+  let raw_image_data = rgb_img.into_raw();
+
+  // Create ImageXObject with proper structure for printpdf 0.7
+  let image_xobject = ImageXObject {
+    width: Px(width as usize),
+    height: Px(height as usize),
+    color_space: ColorSpace::Rgb,
+    bits_per_component: ColorBits::Bit8,
+    interpolate: true,
+    image_data: raw_image_data,
+    image_filter: None, // Use no compression for better compatibility
+    smask: None,
+    clipping_bbox: None,
+  };
+
+  tracing::info!(
+    "Created ImageXObject with {} bytes of RGB data",
+    image_xobject.image_data.len()
+  );
+
+  // Convert to Image wrapper
+  let image = Image::from(image_xobject);
+
+  // Calculate scaling factors based on target size in mm
+  // printpdf assumes 72 DPI by default for images
+  let pixels_per_mm = 72.0 / 25.4; // ~2.834 pixels per mm at 72 DPI
+
+  // Calculate what the image size would be in mm at 72 DPI
+  let original_width_mm = width as f32 / pixels_per_mm;
+  let original_height_mm = height as f32 / pixels_per_mm;
+
+  // Calculate scale factors to achieve target size
+  let scale_x = target_width.0 / original_width_mm;
+  let scale_y = target_height.0 / original_height_mm;
+
+  tracing::info!(
+    "Image scaling: original {}x{} pixels ({:.2}x{:.2} mm at 72 DPI), target {}x{} mm, scale {:.3}x{:.3}",
+    width,
+    height,
+    original_width_mm,
+    original_height_mm,
+    target_width.0,
+    target_height.0,
+    scale_x,
+    scale_y
+  );
+
+  // Calculate position for image (printpdf coordinate system uses bottom-left origin)
+  // Keep coordinates in Mm since ImageTransform expects Mm
+  let pdf_x = x;
+  let pdf_y = y - target_height; // Adjust for image height
+
+  // Create transform to position and scale the image
+  let transform = ImageTransform {
+    translate_x: Some(pdf_x),
+    translate_y: Some(pdf_y),
+    rotate: None,
+    scale_x: Some(scale_x),
+    scale_y: Some(scale_y),
+    dpi: None, // Don't use DPI when we're manually scaling
+  };
+
+  // Add the image to the layer
+  image.add_to_layer(layer.clone(), transform);
+
+  tracing::info!(
+    "Successfully embedded signature image at position ({:.2}, {:.2}) mm with scale ({:.3}, {:.3})",
+    pdf_x.0,
+    pdf_y.0,
+    scale_x,
+    scale_y
+  );
+
+  Ok(())
 }
 
 /// Create a simple invoice PDF matching the provided template
@@ -91,6 +251,7 @@ fn create_modern_invoice_pdf(
   patient_ssn: &str,
   amount: &str,
   practitioner_office: &practitioner_offices::Model,
+  signature_data: Option<&[u8]>,
 ) -> std::result::Result<Vec<u8>, String> {
   // Create A4 PDF document
   let (doc, page1, layer1) = PdfDocument::new(
@@ -298,13 +459,34 @@ fn create_modern_invoice_pdf(
   );
 
   // Right align date
-  let date_x = Mm(210.0) - margin - Mm(85.0);
+  let date_x = Mm(230.0) - margin - Mm(85.0);
   current_layer.use_text(&date_location, 11.0, date_x, y_position, &font_regular);
-  y_position -= Mm(40.0);
+  y_position += Mm(70.0);
 
-  // Signature placeholder - right aligned
-  let sig_x = Mm(210.0) - margin - Mm(50.0);
-  current_layer.use_text(&user.full_name(), 11.0, sig_x, y_position, &font_regular);
+  // Signature section - left aligned
+  let sig_x = Mm(30.0);
+
+  // Try to embed signature image if available
+  if let Some(sig_bytes) = signature_data {
+    match embed_signature_image(&doc, &current_layer, sig_bytes, sig_x, y_position) {
+      Ok(_) => {
+        tracing::info!("Successfully embedded signature image");
+        // Move down to avoid overlap with signature image
+        y_position -= Mm(25.0);
+      }
+      Err(e) => {
+        tracing::warn!(
+          "Failed to embed signature image: {}. Using text fallback.",
+          e
+        );
+        // Fallback to text signature
+        current_layer.use_text(&user.full_name(), 11.0, sig_x, y_position, &font_regular);
+      }
+    }
+  } else {
+    // No signature data available, use text signature
+    current_layer.use_text(&user.full_name(), 11.0, sig_x, y_position, &font_regular);
+  }
 
   // Convert to bytes
   let mut buf = Vec::new();
