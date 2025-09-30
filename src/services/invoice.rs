@@ -42,6 +42,15 @@ pub async fn generate_patient_invoice(
   let practitioner_office =
     practitioner_office.ok_or_else(|| ApplicationError::UNPROCESSABLE_ENTITY.to_my_error())?;
 
+  let filename = format!(
+    "{} {} Note d'honoraires - {} {} {}.pdf",
+    current_user.first_name,
+    current_user.last_name.to_uppercase(),
+    &patient.last_name,
+    &patient.first_name,
+    chrono::Utc::now().format("%d_%m_%Y")
+  );
+
   let args = InvoiceGeneratorArgs {
     patient,
     user: current_user.clone(),
@@ -50,13 +59,6 @@ pub async fn generate_patient_invoice(
   };
 
   let pdf_data = workers::invoice_generator::generate_invoice_pdf(&services.db, &args).await?;
-
-  // Return PDF as binary response with appropriate headers
-  let filename = format!(
-    "invoice_patient_{}_{}.pdf",
-    patient_id,
-    chrono::Utc::now().format("%Y%m%d_%H%M%S")
-  );
 
   Ok(GenerateInvoiceResponse { pdf_data, filename })
 }

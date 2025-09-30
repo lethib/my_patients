@@ -51,11 +51,11 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
         patientId: patient.id,
         amount: `${numericAmount}€`,
       })
-      .then((blob) => {
+      .then(({ blob, filename }) => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `invoice-${patient.first_name}-${patient.last_name}-${new Date().toISOString().split("T")[0]}.pdf`;
+        link.download = filename;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

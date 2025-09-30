@@ -105,6 +105,10 @@ async fn generate_invoice(
       header::CACHE_CONTROL,
       "no-cache, no-store, must-revalidate".to_string(),
     ),
+    (
+      header::ACCESS_CONTROL_EXPOSE_HEADERS,
+      "Content-Disposition".to_string(),
+    ),
   ];
 
   Ok((StatusCode::OK, headers, invoice_generated.pdf_data))
