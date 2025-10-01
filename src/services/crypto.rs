@@ -16,8 +16,6 @@ pub struct Crypto {
 
 impl Crypto {
   fn new() -> Result<Self, MyErrors> {
-    // Explicitly load .env file
-    dotenv::dotenv().ok();
     let key_string = std::env::var("SSN_ENCRYPTION_KEY")?;
 
     if key_string.len() != 32 {

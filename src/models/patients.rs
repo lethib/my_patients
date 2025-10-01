@@ -34,8 +34,6 @@ impl Model {
   }
 
   fn hash_ssn(ssn: &str) -> Result<String, MyErrors> {
-    // Explicitly load .env file
-    dotenv::dotenv().ok();
     let salt = std::env::var("SSN_SALT_KEY")
       .map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?;
     Crypto::hash(ssn, &salt)
