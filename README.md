@@ -1,58 +1,265 @@
-# Welcome to Loco :train:
+<div align="center">
+  <img src="frontend/public/favicon/web-app-manifest-192x192.png" alt="My Patients Logo" width="120" height="120">
 
-[Loco](https://loco.rs) is a web and API framework running on Rust.
+  # My Patients
 
-This is the **SaaS starter** which includes a `User` model and authentication based on JWT.
-It also include configuration sections that help you pick either a frontend or a server-side template set up for your fullstack server.
+  **A secure patient management system for healthcare practitioners**
 
+  Modern, privacy-focused application for managing patient records and generating professional invoices.
 
-## Quick Start
+  [Features](#-features) • [Tech Stack](#️-tech-stack) • [Getting Started](#-getting-started) • [Development](#-development) • [Deployment](#-deployment)
 
-```sh
+</div>
+
+---
+
+## 📖 About
+
+My Patients is a full-stack web application designed to help healthcare practitioners manage their patient records securely. Built with a focus on data privacy and security, it provides encrypted storage for sensitive patient information including social security numbers, along with automated invoice generation capabilities.
+
+This is a personal project built to explore modern web technologies including Rust backend development and secure cryptographic practices.
+
+## ✨ Features
+
+### Patient Management
+- **Secure Patient Records** - Store patient information with AES-GCM encryption for sensitive data
+- **SSN Protection** - Double-layer security with encrypted storage and hashed indexing for fast, secure lookups
+- **Multi-Office Support** - Manage patients across multiple practitioner offices
+
+### Invoice Generation
+- **PDF Invoices** - Generate professional PDF invoices with native Rust PDF generation
+- **Digital Signatures** - Add practitioner signatures to invoices
+- **Business Information** - Complete practitioner business details integration
+
+## 🛠️ Tech Stack
+
+### Backend
+- **[Rust](https://www.rust-lang.org/)** - Systems programming language for performance and safety
+- **[Loco](https://loco.rs/)** - Rails-inspired web framework for Rust
+- **[SeaORM](https://www.sea-ql.org/SeaORM/)** - Async ORM for database operations
+- **PostgreSQL** - Primary database (SQLite supported for development)
+
+### Frontend
+- **[TypeScript](https://www.typescriptlang.org/)** - Type-safe JavaScript
+- **[Vite](https://vite.dev/)** - Fast build tool
+- **[Bun](https://bun.sh/)** - JavaScript runtime and package manager
+- **[React 19](https://react.dev/)** - UI library
+- **[TanStack](https://tanstack.com)** - Type-safe routing
+- **[Tailwind CSS 4](https://tailwindcss.com/)** - Utility-first CSS framework
+- **[ShadCN](https://ui.shadcn.com/)** - Accessible UI components
+- **[React Hook Form](https://react-hook-form.com/)** - Form management with Zod validation
+
+### Security & Encryption
+- **AES-GCM** - Symmetric encryption for sensitive data
+- **Argon2** - Password hashing
+- **Base64** - Encoding for encrypted data
+
+### DevOps
+- **Docker** - Multi-stage optimized builds
+- **Google Cloud Run** - Serverless container deployment
+- **Distroless Images** - Minimal attack surface for production
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Rust 1.88+ ([Install](https://rustup.rs/))
+- Bun ([Install](https://bun.sh/docs/installation))
+- PostgreSQL 15+ or SQLite for development
+- Docker (optional, for containerized deployment)
+
+### Environment Setup
+
+Create a `.env` file in the root directory:
+
+```env
+# Database
+DATABASE_URL=postgres://user:password@localhost:5432/my_patients
+
+# Encryption Keys (generate secure random keys)
+ENCRYPTION_KEY=your-32-byte-base64-encoded-key
+SSN_SALT_KEY=your-secure-salt-key
+
+# JWT
+JWT_SECRET=your-jwt-secret-key
+
+# Supabase Storage (optional, for invoice storage)
+SUPABASE_URL=your-supabase-url
+SUPABASE_KEY=your-supabase-key
+SUPABASE_BUCKET=your-bucket-name
+```
+
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/yourusername/my_patients.git
+cd my_patients
+```
+
+2. **Install backend dependencies**
+```bash
+cargo build
+```
+
+3. **Install frontend dependencies**
+```bash
+cd frontend
+bun install
+```
+
+4. **Run database migrations**
+```bash
+cargo loco db migrate
+```
+
+5. **Start the development servers**
+
+In one terminal (backend):
+```bash
 cargo loco start
 ```
 
-```sh
-$ cargo loco start
-Finished dev [unoptimized + debuginfo] target(s) in 21.63s
-    Running `target/debug/myapp start`
-
-    :
-    :
-    :
-
-controller/app_routes.rs:203: [Middleware] Adding log trace id
-
-                      ▄     ▀
-                                 ▀  ▄
-                  ▄       ▀     ▄  ▄ ▄▀
-                                    ▄ ▀▄▄
-                        ▄     ▀    ▀  ▀▄▀█▄
-                                          ▀█▄
-▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄   ▄▄▄▄▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄▄▄ ▀▀█
- ██████  █████   ███ █████   ███ █████   ███ ▀█
- ██████  █████   ███ █████   ▀▀▀ █████   ███ ▄█▄
- ██████  █████   ███ █████       █████   ███ ████▄
- ██████  █████   ███ █████   ▄▄▄ █████   ███ █████
- ██████  █████   ███  ████   ███ █████   ███ ████▀
-   ▀▀▀██▄ ▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀ ██▀
-       ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-                https://loco.rs
-
-environment: development
-   database: automigrate
-     logger: debug
-compilation: debug
-      modes: server
-
-listening on http://localhost:5150
+In another terminal (frontend):
+```bash
+cd frontend
+bun run dev
 ```
 
-## Full Stack Serving
+The application will be available at `http://localhost:5173` (frontend) with API at `http://localhost:5150` (backend).
 
-You can check your [configuration](config/development.yaml) to pick either frontend setup or server-side rendered template, and activate the relevant configuration sections.
+## 💻 Development
 
+### Project Structure
+```
+my_patients/
+├── src/
+│   ├── app.rs              # Application setup & routing
+│   ├── controllers/        # HTTP request handlers
+│   ├── models/             # Database models & business logic
+│   ├── services/           # Business services (crypto, invoice, etc.)
+│   ├── validators/         # Request validation logic
+│   ├── workers/            # Background job workers
+│   └── middlewares/        # Custom middleware
+├── frontend/
+│   ├── src/
+│   │   ├── routes/         # TanStack Router routes
+│   │   ├── components/     # React components
+│   │   ├── api/            # API client & types
+│   │   ├── hooks/          # Custom React hooks
+│   │   └── i18n/           # Translations
+│   └── public/             # Static assets
+├── migration/              # Database migrations
+├── config/                 # Environment configurations
+└── dockerfile              # Multi-stage production build
+```
 
-## Getting help
+### Database Migrations
 
-Check out [a quick tour](https://loco.rs/docs/getting-started/tour/) or [the complete guide](https://loco.rs/docs/getting-started/guide/).
+Create a new migration:
+```bash
+cargo loco db generate migration_name
+```
+
+Run migrations:
+```bash
+cargo loco db migrate
+```
+
+Rollback last migration:
+```bash
+cargo loco db down
+```
+
+### Code Quality
+
+Backend linting:
+```bash
+cargo clippy
+cargo fmt
+```
+
+Frontend linting:
+```bash
+cd frontend
+bun run lint
+```
+
+### Testing
+
+Run Rust tests:
+```bash
+cargo test
+```
+
+## 🚢 Deployment
+
+### Docker Build
+
+The project includes an optimized multi-stage Dockerfile:
+
+```bash
+# Build the image
+docker build -t my-patients .
+
+# Run the container
+docker run -p 5150:5150 --env-file .env my-patients
+```
+
+The Dockerfile uses:
+- **cargo-chef** for faster Rust dependency caching
+- **Bun** for fast frontend builds
+- **Distroless** base image for minimal attack surface
+- **Multi-stage builds** for optimal layer caching
+
+## Building the Docker Image
+
+Using the `dockerfile` file, you can build your Docker container image.
+
+From the `oven/bun` image, build the frontend. **→ Apple users:** disable the _Use Rosetta for x86_64/amd64 emulation on Apple Silicon_ from the Docker Desktop settings. We will build a `linux/amd64` image and its seems that [tailwind has issues with Apple Rosetta to build our CSS](https://github.com/tailwindlabs/tailwindcss/issues/18315#issuecomment-2984442515).
+
+From the `rust` image, build the backend.
+Then copy all the files from the frontend and backend builds into a new `distroless/cc-debian12` image.
+
+⚠️ **Backend configuration**:
+
+- `localhost` won't work for the host in production as you will access the service from outside the container (with a ping on the domain name that will point to the container). Thus the host must be `0.0.0.0`.
+- For the CORS configuration, you can set the `Access-Control-Allow-Origin` header to `*` or to your Google Cloud Run domain (as it is Client Side Rendering).
+
+⚠️ **Backend build**:
+
+- When running a simple `cargo run --release`, the binary is built for the host architecture. If you want to build it for a specific target, you can use `cargo build --release --target x86_64-unknown-linux-gnu` (or any other target). Google Cloud Run uses `x86_64-unknown-linux-gnu` as the target architecture, so you should build your binary for that target.
+- The docker image architecture must be a `linux/amd64` image. When running a simple `docker build . -t test`, it will build the image for the host architecture. If you want to build it for a specific target, you can use `docker build . -t test --platform linux/amd64` (or any other target).
+
+## Deploying on Google Cloud Run
+
+**Prerequisites**: your docker image must be pulled on a public or private registry accessible by Google Cloud Run. For instance, you can use Docker Hub (just push your built image to your Docker Hub account).
+
+To deploy your application on Google Cloud Run, visit the [Google Cloud Console](https://console.cloud.google.com/run) and follow these steps:
+
+- Create a global project if you don't have one.
+- Enable the Cloud Run API.
+- Visit the Cloud Run page and click on "Deploy a container".
+
+**Service Configuration**:
+
+- **Container image URL**: the URL of your Docker image (e.g., `your-id/your-image-name`).
+- **Service name**: the name of your service (e.g., `my-app`).
+- **Region**: select the region where you want to deploy your service (e.g., `europe-west9`).
+- **Authentication**: If you want to use JWT authentication, you can allow unauthenticated invocations.
+- **Billing**: First option, serverless, is the best option for small applications.
+
+Then proceed to the container configuration.
+
+**Container Configuration**:
+
+- **Container port**: set it to the port you configured in your application.
+- **Environment variables**: you can set environment variables for your application (e.g., `DATABASE_URL`, `JWT_SECRET`, `LOCO_ENV` etc.).
+- **Health checks**: you can enable health checks to ensure your service is running correctly. In our case, select HTTP and the path to your health check endpoint. Don't forget to **add a small delay** because your application might take some time to start up (e.g., 10 seconds).
+
+Then proceed to the last steps.
+
+- **Revision scaling**: reduce the number of instances to 3 (can be changed later to upgrade)
+
+## 🔒 Security Considerations
+
+This project is provided as-is for educational and personal use.
