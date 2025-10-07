@@ -252,7 +252,7 @@ Then proceed to the container configuration.
 
 **Container Configuration**:
 
-- **Container port**: set it to the port you configured in your application.
+- **Container port**: set the Google Cloud Run default port (8080). **⚠️ The `server.port` value must be read from the PORT Google Cloud Run env variable**. Otherwise, you app would not be able to restart properly after a cold start. To do that change the hardcoded from to `{{ get_env(name="PORT", default="5150") }}`. 
 - **Environment variables**: you can set environment variables for your application (e.g., `DATABASE_URL`, `JWT_SECRET`, `LOCO_ENV` etc.).
 - **Health checks**: you can enable health checks to ensure your service is running correctly. In our case, select HTTP and the path to your health check endpoint. Don't forget to **add a small delay** because your application might take some time to start up (e.g., 10 seconds).
 
