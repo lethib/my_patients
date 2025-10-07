@@ -68,7 +68,7 @@ function Login() {
               src="/favicon/favicon.svg"
               height={100}
               width={100}
-              className="-mb-1"
+              className="mb-4"
             />
             <CardTitle className="text-3xl font-bold tracking-tight">
               {t("auth.login.title")}
