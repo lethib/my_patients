@@ -1,5 +1,3 @@
-"use client";
-
 import { ChevronDownIcon } from "lucide-react";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
@@ -26,7 +24,7 @@ export function DatePicker({ label, value, onChange, disabled }: Props) {
   const [open, setOpen] = React.useState(false);
 
   const startMonth = new Date(now.getFullYear() - 1, now.getMonth());
-  const endMonth = new Date(now.getFullYear() + 1, now.getMonth());
+  const endMonth = new Date(now.getFullYear(), now.getMonth());
 
   return (
     <div className="flex flex-col gap-3">
@@ -54,6 +52,7 @@ export function DatePicker({ label, value, onChange, disabled }: Props) {
             captionLayout="dropdown"
             startMonth={startMonth}
             endMonth={endMonth}
+            disabled={{ after: now }}
             onSelect={(date) => {
               onChange(date);
               setOpen(false);
