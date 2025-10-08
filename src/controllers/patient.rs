@@ -92,7 +92,6 @@ async fn generate_invoice(
   Path(patient_id): Path<i32>,
   Json(params): Json<GenerateInvoiceParams>,
 ) -> Result<Response, MyErrors> {
-  tracing::info!("{:?}", params);
   let invoice_generated =
     services::invoice::generate_patient_invoice(patient_id, &params, &ctx.current_user().0).await?;
 
