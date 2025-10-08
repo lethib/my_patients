@@ -56,10 +56,9 @@
     "account": "Compte"
   },
   "patients": {
-    "title": "Patients",
     "subtitle": "Gérez et recherchez vos dossiers patients",
     "addPatient": "Ajouter un patient",
-    "searchPlaceholder": "Rechercher des patients par nom ou numéro de sécurité sociale...",
+    "searchPlaceholder": "Rechercher des patients par nom...",
     "noPatients": "Aucun patient trouvé",
     "loading": "Chargement...",
     "error": "Erreur lors du chargement des patients",
