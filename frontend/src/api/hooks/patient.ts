@@ -62,14 +62,19 @@ export const patientSchema = {
         mutationFn: async ({
           patientId,
           amount,
+          invoice_date,
         }: {
           patientId: number;
           amount: string;
+          invoice_date: string;
         }) => {
           const response = await APIClient.client.post<{
             pdf_data: string;
             filename: string;
-          }>(`/patient/${patientId}/_generate_invoice`, { amount });
+          }>(`/patient/${patientId}/_generate_invoice`, {
+            amount,
+            invoice_date,
+          });
 
           // Decode base64 PDF data to blob
           const pdfData = response.data.pdf_data;

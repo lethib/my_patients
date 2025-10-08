@@ -20,6 +20,7 @@ pub struct InvoiceGeneratorArgs {
   pub patient: patients::Model,
   pub user: users::Model,
   pub amount: String,
+  pub invoice_date: Date,
   pub practitioner_office: practitioner_offices::Model,
 }
 
@@ -108,6 +109,7 @@ pub async fn generate_invoice_pdf<C: ConnectionTrait>(
     &args.patient,
     &patient_ssn,
     &args.amount,
+    &args.invoice_date,
     &args.practitioner_office,
     signature_data.as_deref(),
   )
@@ -250,6 +252,7 @@ fn create_modern_invoice_pdf(
   patient: &patients::Model,
   patient_ssn: &str,
   amount: &str,
+  invoice_date: &Date,
   practitioner_office: &practitioner_offices::Model,
   signature_data: Option<&[u8]>,
 ) -> std::result::Result<Vec<u8>, String> {
@@ -452,10 +455,10 @@ fn create_modern_invoice_pdf(
   y_position -= Mm(35.0);
 
   // === DATE AND SIGNATURE ===
-  let current_date = chrono::Utc::now().format("%d/%m/%Y").to_string();
+  let invoice_date = invoice_date.format("%d/%m/%Y").to_string();
   let date_location = format!(
     "Fait à {}, le {}",
-    practitioner_office.address_city, current_date
+    practitioner_office.address_city, invoice_date
   );
 
   // Right align date

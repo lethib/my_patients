@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Deserialize, Serialize)]
 pub struct GenerateInvoiceParams {
   pub amount: String,
+  pub invoice_date: String,
 }
 
 pub struct GenerateInvoiceResponse {
@@ -55,6 +56,7 @@ pub async fn generate_patient_invoice(
     patient,
     user: current_user.clone(),
     amount: params.amount.clone(),
+    invoice_date: chrono::NaiveDate::parse_from_str(&params.invoice_date, "%Y-%m-%d")?,
     practitioner_office,
   };
 

@@ -22,3 +22,5 @@ target/
 *.sqlite-*
 
 .vscode
+
+.env.local
