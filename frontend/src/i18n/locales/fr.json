@@ -111,6 +111,7 @@
       "patient": "Patient",
       "id": "ID",
       "amount": "Montant de la facture",
+      "date": "Date de la facture",
       "generating": "Génération...",
       "generate": "Générer la facture",
       "completeInformation": "Compléter mes informations",
@@ -160,5 +161,10 @@
     "forbidden": "Accès interdit",
     "notFound": "Non trouvé",
     "serverError": "Erreur du serveur"
+  },
+  "components": {
+    "datePicker": {
+      "selectDate": "Sélectionner une date"
+    }
   }
 }

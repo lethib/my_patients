@@ -1,8 +1,14 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "@tanstack/react-router";
 import { CircleAlert, FileText, Loader2 } from "lucide-react";
-import React, { useState } from "react";
+import React from "react";
+import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
 import { patientSchema, type SearchPatientResponse } from "@/api/hooks/patient";
+import { FormDatePicker } from "@/components/form/FormDatePicker";
+import { FormInput } from "@/components/form/FormInput";
+import { FormProvider } from "@/components/form/FormProvider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,7 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
@@ -29,51 +34,78 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [amount, setAmount] = useState("");
-  const [error, setError] = useState("");
   const { currentUser } = useCurrentUser();
 
   const generateInvoiceMutation = patientSchema.generateInvoice.useMutation();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+  const invoiceFormSchema = z.object({
+    amount: z
+      .string()
+      .min(1, t("invoice.errors.invalidAmount"))
+      .refine(
+        (val) => {
+          const num = parseFloat(val);
+          return !isNaN(num) && num > 0;
+        },
+        { message: t("invoice.errors.invalidAmount") },
+      ),
+    date: z.date(),
+  });
 
-    // Validate amount
-    const numericAmount = parseFloat(amount);
-    if (!amount || isNaN(numericAmount) || numericAmount <= 0) {
-      setError(t("invoice.errors.invalidAmount"));
-      return;
-    }
+  type InvoiceFormData = z.infer<typeof invoiceFormSchema>;
 
-    generateInvoiceMutation
-      .mutateAsync({
+  const invoiceForm = useForm<InvoiceFormData>({
+    resolver: zodResolver(invoiceFormSchema),
+    defaultValues: {
+      amount: "",
+      date: new Date(),
+    },
+  });
+
+  const onSubmit = invoiceForm.handleSubmit(async (data) => {
+    const numericAmount = parseFloat(data.amount);
+
+    // Format date as YYYY-MM-DD using local timezone (not UTC)
+    const year = data.date.getFullYear();
+    const month = String(data.date.getMonth() + 1).padStart(2, "0");
+    const day = String(data.date.getDate()).padStart(2, "0");
+
+    generateInvoiceMutation.mutateAsync(
+      {
         patientId: patient.id,
         amount: `${numericAmount}€`,
-      })
-      .then(({ blob, filename }) => {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      });
-  };
+        invoice_date: `${year}-${month}-${day}`,
+      },
+      {
+        onSuccess: ({ blob, filename }) => {
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          invoiceForm.reset();
+          onClose();
+        },
+      },
+    );
+  });
 
   const handleClose = () => {
     if (!generateInvoiceMutation.isPending) {
-      setAmount("");
-      setError("");
+      invoiceForm.reset();
       onClose();
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className="sm:max-w-md"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
@@ -84,7 +116,11 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <FormProvider
+          methods={invoiceForm}
+          onSubmit={onSubmit}
+          className="space-y-4"
+        >
           {patient && (
             <div className="rounded-lg border bg-muted/50 p-3">
               <p className="text-sm font-medium text-foreground">
@@ -111,29 +147,27 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
           <div className="space-y-2">
             <Label htmlFor="amount">{t("invoice.modal.amount")} (€)</Label>
             <div className="relative">
-              <Input
+              <FormInput
                 id="amount"
+                name="amount"
                 type="number"
                 step="0.01"
                 min="0"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
                 placeholder="60.00"
                 disabled={generateInvoiceMutation.isPending}
-                required
                 className="pr-8"
               />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <span className="text-muted-foreground text-sm">€</span>
               </div>
             </div>
           </div>
 
-          {error && (
-            <div className="rounded-md border border-destructive/20 bg-destructive/10 p-3">
-              <p className="text-sm text-destructive">{error}</p>
-            </div>
-          )}
+          <FormDatePicker
+            name="date"
+            label={t("invoice.modal.date")}
+            disabled={generateInvoiceMutation.isPending}
+          />
 
           <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
             <Button
@@ -147,7 +181,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
             {currentUser?.business_information ? (
               <Button
                 type="submit"
-                disabled={generateInvoiceMutation.isPending || !amount}
+                disabled={generateInvoiceMutation.isPending}
                 className="w-full sm:w-auto"
               >
                 {generateInvoiceMutation.isPending ? (
@@ -171,7 +205,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
               </Button>
             )}
           </DialogFooter>
-        </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );
