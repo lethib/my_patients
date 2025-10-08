@@ -43,20 +43,22 @@ pub async fn generate_patient_invoice(
   let practitioner_office =
     practitioner_office.ok_or_else(|| ApplicationError::UNPROCESSABLE_ENTITY.to_my_error())?;
 
+  let invoice_date = chrono::NaiveDate::parse_from_str(&params.invoice_date, "%Y-%m-%d")?;
+
   let filename = format!(
     "{} {} Note d'honoraires - {} {} {}.pdf",
     current_user.first_name,
     current_user.last_name.to_uppercase(),
     &patient.last_name,
     &patient.first_name,
-    chrono::Utc::now().format("%d_%m_%Y")
+    invoice_date.format("%d_%m_%Y")
   );
 
   let args = InvoiceGeneratorArgs {
     patient,
     user: current_user.clone(),
     amount: params.amount.clone(),
-    invoice_date: chrono::NaiveDate::parse_from_str(&params.invoice_date, "%Y-%m-%d")?,
+    invoice_date,
     practitioner_office,
   };
 
