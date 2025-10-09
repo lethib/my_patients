@@ -3,7 +3,6 @@ import { Building2, Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { APIHooks } from "@/api/hooks";
-import type { PractitionerOffice } from "@/api/hooks/practitioner_office";
 import { Button } from "@/components/ui/button";
 import { CenteredSpineer } from "@/components/ui/spinner";
 import { H2 } from "@/components/ui/typography/h2";
@@ -17,17 +16,9 @@ export const Route = createFileRoute("/offices/")({
 function Offices() {
   const { t } = useTranslation();
   const [isAddOfficeModalOpened, setIsAddOfficeModalOpened] = useState(false);
-  const [editingOffice, setEditingOffice] = useState<PractitionerOffice | null>(
-    null,
-  );
 
   const officesQuery = APIHooks.user.getMyOffices.useQuery(null);
   const createOfficeMutation = APIHooks.office.createOffice.useMutation();
-
-  const handleCloseModal = () => {
-    setIsAddOfficeModalOpened(false);
-    setEditingOffice(null);
-  };
 
   return (
     <>
@@ -82,10 +73,9 @@ function Offices() {
 
       {/* Add/Edit Modal */}
       <OfficeModal
-        open={isAddOfficeModalOpened || !!editingOffice}
-        setIsOpen={handleCloseModal}
+        open={isAddOfficeModalOpened}
+        setIsOpen={setIsAddOfficeModalOpened}
         asyncMutation={createOfficeMutation.mutateAsync}
-        office={editingOffice}
       />
 
       {/* Delete Confirmation Dialog

@@ -50,10 +50,10 @@ impl ActiveModel {
 
     return Ok(
       practitioner_offices::ActiveModel {
-        name: ActiveValue::Set(params.name.clone()),
-        address_line_1: ActiveValue::Set(params.address_line_1.clone()),
-        address_zip_code: ActiveValue::Set(params.address_zip_code.clone()),
-        address_city: ActiveValue::Set(params.address_city.clone()),
+        name: ActiveValue::Set(params.name.trim().to_string()),
+        address_line_1: ActiveValue::Set(params.address_line_1.trim().to_string()),
+        address_zip_code: ActiveValue::Set(params.address_zip_code.trim().to_string()),
+        address_city: ActiveValue::Set(params.address_city.trim().to_string()),
         address_country: ActiveValue::Set("FRANCE".to_string()),
         ..Default::default()
       }
