@@ -1,5 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { LogOut, Plus, Search as SearchIcon, UserCog } from "lucide-react";
+import {
+  Building2,
+  LogOut,
+  Plus,
+  Search as SearchIcon,
+  UserCog,
+} from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -62,6 +68,11 @@ function Search() {
                     onClick={() => navigate({ to: "/my_information" })}
                   >
                     {t("navigation.myInformation")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => navigate({ to: "/offices" })}
+                  >
+                    {t("navigation.myOffices")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={logout} variant="destructive">
                     {t("auth.logout")} <LogOut />

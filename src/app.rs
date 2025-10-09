@@ -53,6 +53,7 @@ impl Hooks for App {
       .add_route(controllers::auth::routes(ctx))
       .add_route(controllers::patient::routes(ctx))
       .add_route(controllers::user::routes(ctx))
+      .add_route(controllers::practitioner_office::routes(ctx))
   }
   async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {
     queue.register(DownloadWorker::build(ctx)).await?;
