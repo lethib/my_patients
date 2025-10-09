@@ -1,14 +1,10 @@
 import { mutationEndpoint, queryEndpoint } from "../endpointGenerator";
+import type { PractitionerOffice } from "./practitioner_office";
 
 type SaveBusinessInformation = {
   rpps_number: string;
   siret_number: string;
   adeli_number?: string;
-};
-
-type MyOffice = {
-  id: number;
-  name: string;
 };
 
 export const userSchema = {
@@ -19,7 +15,7 @@ export const userSchema = {
     type: "POST",
     path: "/user/_save_business_information",
   }),
-  getMyOffices: queryEndpoint<null, MyOffice[]>({
+  getMyOffices: queryEndpoint<null, PractitionerOffice[]>({
     type: "GET",
     path: "/user/my_offices",
   }),

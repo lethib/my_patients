@@ -1,5 +1,7 @@
+use crate::models::{_entities::user_practitioner_offices, my_errors::MyErrors};
+
 pub use super::_entities::user_practitioner_offices::{ActiveModel, Entity, Model};
-use sea_orm::entity::prelude::*;
+use sea_orm::{entity::prelude::*, ActiveValue};
 pub type UserPractitionerOffices = Entity;
 
 #[async_trait::async_trait]
@@ -18,11 +20,31 @@ impl ActiveModelBehavior for ActiveModel {
   }
 }
 
+pub struct CreateLinkParams {
+  pub user_id: i32,
+  pub practitioner_office_id: i32,
+}
+
 // implement your read-oriented logic here
 impl Model {}
 
 // implement your write-oriented logic here
-impl ActiveModel {}
+impl ActiveModel {
+  pub async fn create<T: ConnectionTrait>(
+    db: &T,
+    params: &CreateLinkParams,
+  ) -> Result<Model, MyErrors> {
+    return Ok(
+      user_practitioner_offices::ActiveModel {
+        user_id: ActiveValue::Set(params.user_id),
+        practitioner_office_id: ActiveValue::Set(params.practitioner_office_id),
+        ..Default::default()
+      }
+      .insert(db)
+      .await?,
+    );
+  }
+}
 
 // implement your custom finders, selectors oriented logic here
 impl Entity {}

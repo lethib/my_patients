@@ -53,6 +53,7 @@
   "navigation": {
     "patients": "Patients",
     "myInformation": "Mes informations",
+    "myOffices": "Mes cabinets",
     "account": "Compte"
   },
   "patients": {
@@ -101,6 +102,35 @@
       "zip_code": "Code postal",
       "city": "Ville",
       "office": "Cabinet"
+    }
+  },
+  "offices": {
+    "title": "Mes cabinets",
+    "subtitle": "Gérez vos différents lieux d'exercice",
+    "addOffice": "Ajouter un cabinet",
+    "addFirstOffice": "Ajouter votre premier cabinet",
+    "noOffices": "Aucun cabinet enregistré",
+    "loading": "Chargement...",
+    "error": "Erreur lors du chargement des cabinets",
+    "form": {
+      "addTitle": "Ajouter un cabinet",
+      "addDescription": "Créez un nouveau lieu d'exercice",
+      "editTitle": "Modifier le cabinet",
+      "editDescription": "Modifiez les informations du cabinet",
+      "name": "Nom du cabinet",
+      "namePlaceholder": "Ex: Cabinet de Paris",
+      "address": "Adresse",
+      "addressPlaceholder": "Numéro et nom de rue",
+      "zipCode": "Code postal",
+      "city": "Ville",
+      "add": "Ajouter le cabinet",
+      "update": "Modifier le cabinet",
+      "validation": {
+        "nameRequired": "Le nom du cabinet est requis",
+        "addressRequired": "L'adresse est requise",
+        "zipCodeInvalid": "Le code postal ne correspond pas au format attendu",
+        "cityRequired": "La ville est requise"
+      }
     }
   },
   "invoice": {

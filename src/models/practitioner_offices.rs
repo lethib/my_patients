@@ -1,5 +1,14 @@
 pub use super::_entities::practitioner_offices::{ActiveModel, Entity, Model};
-use sea_orm::entity::prelude::*;
+use crate::{
+  models::{
+    _entities::practitioner_offices,
+    my_errors::{application_error::ApplicationError, MyErrors, ToErr},
+  },
+  validators::address::is_address_valid,
+};
+use loco_rs::model::ModelResult;
+use sea_orm::{entity::prelude::*, ActiveValue};
+use serde::{Deserialize, Serialize};
 pub type PractitionerOffices = Entity;
 
 #[async_trait::async_trait]
@@ -18,11 +27,41 @@ impl ActiveModelBehavior for ActiveModel {
   }
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PractitionerOfficeParams {
+  pub name: String,
+  pub address_line_1: String,
+  pub address_zip_code: String,
+  pub address_city: String,
+}
+
 // implement your read-oriented logic here
 impl Model {}
 
 // implement your write-oriented logic here
-impl ActiveModel {}
+impl ActiveModel {
+  pub async fn create<T: ConnectionTrait>(
+    db: &T,
+    params: &PractitionerOfficeParams,
+  ) -> ModelResult<Model, MyErrors> {
+    if !is_address_valid(&params.address_line_1, &params.address_zip_code) {
+      return ApplicationError::UNPROCESSABLE_ENTITY.to_err();
+    }
+
+    return Ok(
+      practitioner_offices::ActiveModel {
+        name: ActiveValue::Set(params.name.trim().to_string()),
+        address_line_1: ActiveValue::Set(params.address_line_1.trim().to_string()),
+        address_zip_code: ActiveValue::Set(params.address_zip_code.trim().to_string()),
+        address_city: ActiveValue::Set(params.address_city.trim().to_string()),
+        address_country: ActiveValue::Set("FRANCE".to_string()),
+        ..Default::default()
+      }
+      .insert(db)
+      .await?,
+    );
+  }
+}
 
 // implement your custom finders, selectors oriented logic here
 impl Entity {}

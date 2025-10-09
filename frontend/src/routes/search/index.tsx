@@ -63,6 +63,11 @@ function Search() {
                   >
                     {t("navigation.myInformation")}
                   </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => navigate({ to: "/offices" })}
+                  >
+                    {t("navigation.myOffices")}
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={logout} variant="destructive">
                     {t("auth.logout")} <LogOut />
                   </DropdownMenuItem>
