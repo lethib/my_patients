@@ -29,6 +29,10 @@
 
 - Implemented the encryption service using AES-GCM for secure data handling. I am completely new to cryptography, thus Claude Code helped me a lot to understand how it works.
 
+## 06/09/2025
+
+- Started implementing the UX to save a patient (Part 1).
+
 ## 07/09/2025
 
 - Implemented the DB modelisation of the relation Patient <> User.
@@ -37,10 +41,6 @@
 - Implemented UX for saving a patient (Part 2).
 - Added support for first name and last name for patients.
 - Added functionality to save a patient that already exists.
-
-## 06/09/2025
-
-- Started implementing the UX to save a patient (Part 1).
 
 ## 09/09/2025
 
