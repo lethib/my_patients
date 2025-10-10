@@ -29,8 +29,86 @@
 
 - Implemented the encryption service using AES-GCM for secure data handling. I am completely new to cryptography, thus Claude Code helped me a lot to understand how it works.
 
+## 06/09/2025
+
+- Started implementing the UX to save a patient (Part 1).
+
 ## 07/09/2025
 
 - Implemented the DB modelisation of the relation Patient <> User.
 - Created the UX to add a new patient.
 - Added the **hashed_ssn** column to have a performant and secured way to find a patient with its SSN.
+- Implemented UX for saving a patient (Part 2).
+- Added support for first name and last name for patients.
+- Added functionality to save a patient that already exists.
+
+## 09/09/2025
+
+- Implemented UX to search for a patient.
+- Added Claude Code GitHub Workflow.
+
+## 10/09/2025
+
+- Fixed root navigation and console errors.
+
+## 12/09/2025
+
+- Added functionality to save postal address for patients.
+
+## 13/09/2025
+
+- Implemented functionality to save business information for user.
+- Added logout button for user.
+- Added office field to patients.
+- Implemented automatic logout on 401 authentication errors.
+
+## 15/09/2025
+
+- Optimized Dockerfile for better CD performance.
+
+## 18/09/2025
+
+- Added French translations to the application.
+- Added favicon to the application.
+
+## 21/09/2025
+
+- Implemented invoice generation for patients.
+- Added validation to ensure business information must be completed before invoice generation.
+- Changed user name to first name and last name, and added phone number field.
+
+## 25/09/2025
+
+- Introduced practitioner office feature.
+- Implemented functionality to link patient to practitioner office.
+- Added office address to invoice.
+- Updated favicon style.
+- Added Claude Code GitHub Workflow.
+
+## 30/09/2025
+
+- Added user signature feature for invoices.
+- Implemented proper generated filename for invoices.
+- Fixed invoice handling when no signature is present.
+- Released v1.0.0.
+
+## 01/10/2025
+
+- Removed dotenv dependency.
+- Updated README documentation.
+
+## 07/10/2025
+
+- Finally found why I was getting 504 errors on my Google Cloud serverless run: PORT must be allocated dynamically and must defaults to the Google Cloud Run one... 
+- Updated README documentation.
+- Changed favicon style.
+
+## 08/10/2025
+
+- Implemented custom date feature for invoices.
+- Fixed wordings on search page.
+- Fixed invoice to use the invoice date in title instead of current date.
+
+## 09/10/2025
+
+- Implemented functionality for user to see and add office.
