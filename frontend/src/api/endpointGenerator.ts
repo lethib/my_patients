@@ -42,6 +42,8 @@ function createMutation<P, R>(endpoint: EndpointConfig<P, R>) {
             return await APIClient.post<P, R>(finalRoute, data);
           case "PUT":
             return await APIClient.put<P, R>(finalRoute, data);
+          case "DELETE":
+            return await APIClient.delete<R>(finalRoute);
           default:
             throw new Error("Type not implemented");
         }

@@ -3,14 +3,14 @@ use axum::{
   extract::{Path, State},
   middleware,
   response::Response,
-  routing::{post, put},
+  routing::{delete, post, put},
   Json,
 };
 use loco_rs::{
   app::AppContext,
   prelude::{format, Routes},
 };
-use sea_orm::{ActiveModelTrait, ActiveValue::Set, IntoActiveModel};
+use sea_orm::{ActiveModelTrait, ActiveValue::Set, IntoActiveModel, ModelTrait};
 
 use crate::{
   middlewares::current_user::{current_user_middleware, CurrentUser},
@@ -54,11 +54,28 @@ async fn update(
   Ok(format::json(serde_json::json!({ "success": true }))?)
 }
 
+async fn destroy(
+  State(ctx): State<AppContext>,
+  Path(office_id): Path<i32>,
+) -> Result<Response, MyErrors> {
+  let user_offices = ctx.current_user().0.get_my_offices(&ctx.db).await?;
+
+  let office = user_offices
+    .iter()
+    .find(|&office| office.id == office_id)
+    .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?;
+
+  office.clone().delete(&ctx.db).await?;
+
+  Ok(format::json(serde_json::json!({ "success": true }))?)
+}
+
 pub fn routes(ctx: &AppContext) -> Routes {
   Routes::new()
     .prefix("/api/practitioner_office")
     .add("/create", post(create))
     .add("/{office_id}", put(update))
+    .add("/{office_id}", delete(destroy))
     .layer(middleware::from_fn_with_state(
       ctx.clone(),
       current_user_middleware,

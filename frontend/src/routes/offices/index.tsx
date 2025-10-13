@@ -7,6 +7,7 @@ import type { PractitionerOffice } from "@/api/hooks/practitioner_office";
 import { Button } from "@/components/ui/button";
 import { CenteredSpineer } from "@/components/ui/spinner";
 import { H2 } from "@/components/ui/typography/h2";
+import { DeleteOfficeDialog } from "./components/DeleteOfficeDialog";
 import { OfficeCard } from "./components/OfficeCard";
 import { OfficeModal } from "./components/OfficeModal";
 
@@ -20,6 +21,8 @@ function Offices() {
   const [officeToEdit, setOfficeToEdit] = useState<PractitionerOffice | null>(
     null,
   );
+  const [officeToDelete, setOfficeToDelete] =
+    useState<PractitionerOffice | null>(null);
 
   const officesQuery = APIHooks.user.getMyOffices.useQuery(null);
   const createOfficeMutation = APIHooks.office.createOffice.useMutation();
@@ -84,6 +87,7 @@ function Offices() {
                   key={office.id}
                   office={office}
                   onEdit={() => handleOnEdit(office)}
+                  onDelete={() => setOfficeToDelete(office)}
                 />
               ))}
             </div>
@@ -103,12 +107,13 @@ function Offices() {
         office={officeToEdit}
       />
 
-      {/* Delete Confirmation Dialog
-      <DeleteOfficeDialog
-        open={!!deletingOffice}
-        setIsOpen={(open) => !open && setDeletingOffice(null)}
-        office={deletingOffice}
-      /> */}
+      {officeToDelete && (
+        <DeleteOfficeDialog
+          open={!!officeToDelete}
+          setIsOpen={(open) => !open && setOfficeToDelete(null)}
+          office={officeToDelete}
+        />
+      )}
     </>
   );
 }

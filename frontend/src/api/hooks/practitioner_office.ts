@@ -30,4 +30,8 @@ export const practitionerOfficeSchema = {
     type: "PUT",
     path: "/practitioner_office/{office_id}",
   }),
+  deleteOffice: mutationEndpoint<null, { success: true }>({
+    type: "DELETE",
+    path: "/practitioner_office/{office_id}",
+  }),
 };
