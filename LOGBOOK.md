@@ -112,3 +112,7 @@
 ## 09/10/2025
 
 - Implemented functionality for user to see and add office.
+
+## 13/10/2025
+
+- Added the possibility for practitioners to handle their offices. Might switch to a soft delete later on on the office deletion.
