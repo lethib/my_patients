@@ -11,9 +11,10 @@ import {
 
 interface OfficeCardProps {
   office: PractitionerOffice;
+  onEdit: VoidFunction;
 }
 
-export const OfficeCard = ({ office }: OfficeCardProps) => {
+export const OfficeCard = ({ office, onEdit }: OfficeCardProps) => {
   const { t } = useTranslation();
 
   return (
@@ -37,7 +38,7 @@ export const OfficeCard = ({ office }: OfficeCardProps) => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => null}
+              onClick={onEdit}
               aria-label={t("common.edit")}
             >
               <Pencil className="h-4 w-4" />

@@ -23,4 +23,11 @@ export const practitionerOfficeSchema = {
     type: "POST",
     path: "/practitioner_office/create",
   }),
+  updateOffice: mutationEndpoint<
+    PractitionerOfficeParams,
+    { success: boolean }
+  >({
+    type: "PUT",
+    path: "/practitioner_office/{office_id}",
+  }),
 };

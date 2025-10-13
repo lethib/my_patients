@@ -58,6 +58,14 @@ class MyPatientsAPI {
       return res.data;
     });
   };
+
+  put = async <P, R>(
+    path: string,
+    data: P,
+    config?: AxiosRequestConfig,
+  ): Promise<R> => {
+    return this.client.put<R>(path, data, config).then((res) => res.data);
+  };
 }
 
 export const APIClient = new MyPatientsAPI(import.meta.env.VITE_BASE_API_URL);
