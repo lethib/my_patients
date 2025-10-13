@@ -62,11 +62,11 @@ async fn destroy(
   State(ctx): State<AppContext>,
   Path(office_id): Path<i32>,
 ) -> Result<Response, MyErrors> {
-  let user_offices = ctx.current_user().0.get_my_offices(&ctx.db).await?;
-
-  let office = user_offices
-    .iter()
-    .find(|&office| office.id == office_id)
+  let office = practitioner_offices::Entity::find_by_id(office_id)
+    .inner_join(user_practitioner_offices::Entity)
+    .filter(user_practitioner_offices::Column::UserId.eq(ctx.current_user().0.id))
+    .one(&ctx.db)
+    .await?
     .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?;
 
   office.clone().delete(&ctx.db).await?;

@@ -40,7 +40,7 @@ export const DeleteOfficeDialog = ({
         <DialogHeader>
           <DialogTitle>{t("offices.delete.title")}</DialogTitle>
           <DialogDescription>
-            {t("offices.delete.description", { name: office?.name })}
+            {t("offices.delete.description")}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
