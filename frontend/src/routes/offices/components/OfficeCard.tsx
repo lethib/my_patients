@@ -12,9 +12,10 @@ import {
 interface OfficeCardProps {
   office: PractitionerOffice;
   onEdit: VoidFunction;
+  onDelete: VoidFunction;
 }
 
-export const OfficeCard = ({ office, onEdit }: OfficeCardProps) => {
+export const OfficeCard = ({ office, onEdit, onDelete }: OfficeCardProps) => {
   const { t } = useTranslation();
 
   return (
@@ -44,12 +45,12 @@ export const OfficeCard = ({ office, onEdit }: OfficeCardProps) => {
               <Pencil className="h-4 w-4" />
             </Button>
             <Button
-              variant="ghost"
+              variant="ghost_destructive"
               size="icon"
-              onClick={() => null}
+              onClick={onDelete}
               aria-label={t("common.delete")}
             >
-              <Trash2 className="h-4 w-4 text-destructive" />
+              <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         </div>

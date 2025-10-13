@@ -66,6 +66,10 @@ class MyPatientsAPI {
   ): Promise<R> => {
     return this.client.put<R>(path, data, config).then((res) => res.data);
   };
+
+  delete = async <R>(path: string, config?: AxiosRequestConfig): Promise<R> => {
+    return this.client.delete<R>(path, config).then((res) => res.data);
+  };
 }
 
 export const APIClient = new MyPatientsAPI(import.meta.env.VITE_BASE_API_URL);

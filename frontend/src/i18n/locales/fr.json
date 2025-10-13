@@ -131,6 +131,10 @@
         "zipCodeInvalid": "Le code postal ne correspond pas au format attendu",
         "cityRequired": "La ville est requise"
       }
+    },
+    "delete": {
+      "title": "Voulez-vous supprimer ce cabinet ?",
+      "description": "Cette action est définitive ! Vous perderez tous vos patients liés à ce cabinet"
     }
   },
   "invoice": {

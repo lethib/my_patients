@@ -3,7 +3,7 @@ use axum::{
   extract::{Path, State},
   middleware,
   response::Response,
-  routing::{post, put},
+  routing::{delete, post, put},
   Json,
 };
 use loco_rs::{
@@ -11,7 +11,8 @@ use loco_rs::{
   prelude::{format, Routes},
 };
 use sea_orm::{
-  ActiveModelTrait, ActiveValue::Set, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter,
+  ActiveModelTrait, ActiveValue::Set, ColumnTrait, EntityTrait, IntoActiveModel, ModelTrait,
+  QueryFilter,
 };
 
 use crate::{
@@ -57,11 +58,28 @@ async fn update(
   Ok(format::json(serde_json::json!({ "success": true }))?)
 }
 
+async fn destroy(
+  State(ctx): State<AppContext>,
+  Path(office_id): Path<i32>,
+) -> Result<Response, MyErrors> {
+  let office = practitioner_offices::Entity::find_by_id(office_id)
+    .inner_join(user_practitioner_offices::Entity)
+    .filter(user_practitioner_offices::Column::UserId.eq(ctx.current_user().0.id))
+    .one(&ctx.db)
+    .await?
+    .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?;
+
+  office.clone().delete(&ctx.db).await?;
+
+  Ok(format::json(serde_json::json!({ "success": true }))?)
+}
+
 pub fn routes(ctx: &AppContext) -> Routes {
   Routes::new()
     .prefix("/api/practitioner_office")
     .add("/create", post(create))
     .add("/{office_id}", put(update))
+    .add("/{office_id}", delete(destroy))
     .layer(middleware::from_fn_with_state(
       ctx.clone(),
       current_user_middleware,
