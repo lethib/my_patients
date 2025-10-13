@@ -3,6 +3,7 @@ import { Building2, Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { APIHooks } from "@/api/hooks";
+import type { PractitionerOffice } from "@/api/hooks/practitioner_office";
 import { Button } from "@/components/ui/button";
 import { CenteredSpineer } from "@/components/ui/spinner";
 import { H2 } from "@/components/ui/typography/h2";
@@ -16,9 +17,24 @@ export const Route = createFileRoute("/offices/")({
 function Offices() {
   const { t } = useTranslation();
   const [isAddOfficeModalOpened, setIsAddOfficeModalOpened] = useState(false);
+  const [officeToEdit, setOfficeToEdit] = useState<PractitionerOffice | null>(
+    null,
+  );
 
   const officesQuery = APIHooks.user.getMyOffices.useQuery(null);
   const createOfficeMutation = APIHooks.office.createOffice.useMutation();
+  const updateOfficeMutation = APIHooks.office.updateOffice.useMutation(
+    officeToEdit
+      ? {
+          office_id: officeToEdit.id,
+        }
+      : undefined,
+  );
+
+  const handleOnEdit = (office: PractitionerOffice) => {
+    setOfficeToEdit(office);
+    setIsAddOfficeModalOpened(true);
+  };
 
   return (
     <>
@@ -64,7 +80,11 @@ function Offices() {
           {officesQuery.data && officesQuery.data.length > 0 && (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {officesQuery.data.map((office) => (
-                <OfficeCard key={office.id} office={office} />
+                <OfficeCard
+                  key={office.id}
+                  office={office}
+                  onEdit={() => handleOnEdit(office)}
+                />
               ))}
             </div>
           )}
@@ -75,7 +95,12 @@ function Offices() {
       <OfficeModal
         open={isAddOfficeModalOpened}
         setIsOpen={setIsAddOfficeModalOpened}
-        asyncMutation={createOfficeMutation.mutateAsync}
+        asyncMutation={
+          officeToEdit
+            ? updateOfficeMutation.mutateAsync
+            : createOfficeMutation.mutateAsync
+        }
+        office={officeToEdit}
       />
 
       {/* Delete Confirmation Dialog
