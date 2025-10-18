@@ -116,3 +116,7 @@
 ## 13/10/2025
 
 - Added the possibility for practitioners to handle their offices. Might switch to a soft delete later on on the office deletion.
+
+## 18/10/2025
+
+- Overriden the loco.rs mailer to be able to send attachments directly using the lettre rust package. Still using the background worker provided by loco to send the mail in an async way.
