@@ -119,5 +119,5 @@
 
 ## 18/10/2025
 
-- Tried to implement transactional emails using Resend but it requires to have a domain name verified on internet to send emails in production. Let's tyry to find a free way to send emails with attachments.
+- Tried to implement transactional emails using Resend but it requires to have a domain name verified on internet to send emails in production. Let's try to find a free way to send emails with attachments.
 - Overridden the loco.rs mailer to be able to send attachments directly using the lettre rust package. Still using the background worker provided by loco to send the mail in an async way.
