@@ -40,6 +40,12 @@ base64 = "0.22.1"
 argon2 = "0.5"
 regex = "1.11"
 once_cell = "1.20"
+lettre = { version = "0.11", features = [
+    "tokio1-native-tls",  # Async support with native TLS
+    "smtp-transport",      # SMTP protocol support
+    "builder",             # Email builder API
+    "hostname"             # Hostname resolution
+] }
 # Using printpdf for native Rust PDF generation
 printpdf = "0.7"
 lopdf = "0.32"

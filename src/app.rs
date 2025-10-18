@@ -17,8 +17,10 @@ use std::path::Path;
 use crate::{
   controllers, initializers,
   models::_entities::users,
-  tasks,
-  workers::{downloader::DownloadWorker, invoice_generator::InvoiceGeneratorWorker},
+  workers::{
+    downloader::DownloadWorker, invoice_generator::InvoiceGeneratorWorker,
+    mailer::worker::EmailWorker,
+  },
 };
 
 pub struct App;
@@ -57,6 +59,7 @@ impl Hooks for App {
   }
   async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {
     queue.register(DownloadWorker::build(ctx)).await?;
+    queue.register(EmailWorker::build(ctx)).await?;
     // queue.register(InvoiceGeneratorWorker::build(ctx)).await?;
     // will be implemented in a true job with the mailing service
     Ok(())
