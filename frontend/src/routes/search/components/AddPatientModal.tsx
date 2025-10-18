@@ -50,6 +50,7 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
       .string()
       .trim()
       .min(1, t("patients.form.validation.lastNameRequired")),
+    email: z.email(t("patients.form.validation.emailRequired")),
     ssn: z
       .string()
       .length(15)
@@ -226,6 +227,18 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
                     }
                   />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">
+                  {t("patients.form.email")}
+                </Label>
+                <FormInput
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder={t("patients.form.emailPlaceholder")}
+                  className="h-11"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="address_line_1" className="text-sm font-medium">

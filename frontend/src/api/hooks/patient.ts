@@ -9,6 +9,7 @@ import {
 type SavePatientParams = {
   first_name: string;
   last_name: string;
+  email: string;
   ssn: string;
   address_line_1: string;
   address_zip_code: string;

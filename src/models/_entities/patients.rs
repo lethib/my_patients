@@ -22,6 +22,7 @@ pub struct Model {
   pub address_zip_code: String,
   pub address_city: String,
   pub address_country: String,
+  pub email: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
