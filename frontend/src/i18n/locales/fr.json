@@ -72,6 +72,8 @@
       "firstNamePlaceholder": "Prénom",
       "lastName": "Nom",
       "lastNamePlaceholder": "Nom",
+      "email": "Email",
+      "emailPlaceholder": "example@mail.com",
       "address": "Adresse",
       "addressPlaceholder": "Adresse rue",
       "zipCode": "Code postal",
@@ -88,6 +90,7 @@
       "validation": {
         "firstNameRequired": "Le prénom est requis",
         "lastNameRequired": "Le nom est requis",
+        "emailRequired": "Le mail est requis",
         "ssnInvalid": "Le numéro de sécurité sociale ne correspond pas au format attendu",
         "addressRequired": "L'adresse est requise",
         "zipCodeInvalid": "Le code postal ne correspond pas au format attendu",
