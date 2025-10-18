@@ -10,9 +10,7 @@ use loco_rs::{
   prelude::BackgroundWorker,
 };
 
-use crate::{
-  models::my_errors::unexpected_error::UnexpectedError, workers::mailer::args::EmailArgs,
-};
+use crate::workers::mailer::args::EmailArgs;
 
 pub struct EmailWorker {
   pub config: SmtpMailer,
@@ -25,7 +23,7 @@ impl BackgroundWorker<EmailArgs> for EmailWorker {
   where
     Self: Sized,
   {
-    "email_worker".to_string()
+    "EmailWorker".to_string()
   }
 
   fn build(ctx: &AppContext) -> Self {
@@ -33,28 +31,25 @@ impl BackgroundWorker<EmailArgs> for EmailWorker {
       .config
       .mailer
       .as_ref()
-      .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())
-      .unwrap();
+      .expect("Mailer configuration is required but missing from application config");
 
     let smtp_config = mailer_config
       .smtp
       .as_ref()
-      .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())
-      .unwrap();
+      .expect("SMTP configuration is required but missing from mailer config");
 
     Self {
       config: smtp_config.clone(),
       auth: smtp_config
         .auth
         .as_ref()
-        .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())
-        .unwrap()
+        .expect("SMTP authentication credentials are required but missing from SMTP config")
         .clone(),
     }
   }
 
   async fn perform(&self, args: EmailArgs) -> loco_rs::Result<()> {
-    tracing::info!("Start sending email with args {:?}", args);
+    tracing::info!("Start sending email with args");
     let email = Self::build_email(&self, &args)?;
 
     Self::send_email(&self, email).await?;
