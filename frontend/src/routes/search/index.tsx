@@ -2,6 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { LogOut, Plus, Search as SearchIcon, UserCog } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { APIHooks } from "@/api/hooks";
+import type { SearchPatientResponse } from "@/api/hooks/patient";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { H2 } from "@/components/ui/typography/h2";
 import { useDebounce } from "@/hooks/useDebounce";
 import { logout } from "@/lib/authUtils";
-import { AddPatientModal } from "./components/AddPatientModal";
+import { PatientModal } from "./components/PatientModal";
 import { PatientsTable } from "./components/PatientsTable/PatientsTable";
 
 export const Route = createFileRoute("/search/")({
@@ -25,9 +27,21 @@ export const Route = createFileRoute("/search/")({
 function Search() {
   const { t } = useTranslation();
   const [isAddPatientModalOpened, setIsAddPatientModalOpened] = useState(false);
+  const [selectedPatient, setSelectedPatient] =
+    useState<SearchPatientResponse | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 700);
   const navigate = useNavigate();
+
+  const addPatientMutation = APIHooks.patient.createPatient.useMutation();
+  const updatePatientMutation = APIHooks.patient.updatePatient.useMutation(
+    selectedPatient ? { patient_id: selectedPatient.id } : undefined,
+  );
+
+  const handleOnClickRow = (patient: SearchPatientResponse) => {
+    setSelectedPatient(patient);
+    setIsAddPatientModalOpened(true);
+  };
 
   return (
     <>
@@ -87,13 +101,22 @@ function Search() {
             />
           </div>
 
-          <PatientsTable searchQuery={debouncedSearchQuery} />
+          <PatientsTable
+            searchQuery={debouncedSearchQuery}
+            onClickRow={handleOnClickRow}
+          />
         </div>
       </div>
 
-      <AddPatientModal
+      <PatientModal
         open={isAddPatientModalOpened}
+        asyncMutation={
+          selectedPatient
+            ? updatePatientMutation.mutateAsync
+            : addPatientMutation.mutateAsync
+        }
         setIsOpen={() => setIsAddPatientModalOpened(false)}
+        selectedPatient={selectedPatient || undefined}
       />
     </>
   );

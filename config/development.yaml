@@ -35,6 +35,8 @@ server:
       allow_methods:
         - "GET"
         - "POST"
+        - "PUT"
+        - "DELETE"
         - "OPTIONS"
     fallback:
       enable: false

@@ -1,15 +1,21 @@
-import { User, FileText } from "lucide-react";
+import { FileText, User } from "lucide-react";
 import type { SearchPatientResponse } from "@/api/hooks/patient";
-import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { TableCell, TableRow } from "@/components/ui/table";
 
 interface Props {
   patient: SearchPatientResponse;
   index: number;
-  onGenerateInvoice?: (patient: SearchPatientResponse) => void;
+  onGenerateInvoice: (patient: SearchPatientResponse) => void;
+  onClickRow: (patient: SearchPatientResponse) => void;
 }
 
-export const PatientRow = ({ patient, index, onGenerateInvoice }: Props) => {
+export const PatientRow = ({
+  patient,
+  index,
+  onGenerateInvoice,
+  onClickRow,
+}: Props) => {
   const formattedSSN = `${patient.ssn[0]} ${patient.ssn.slice(1, 3)} ${patient.ssn.slice(3, 5)} ${patient.ssn.slice(5, 7)} ${patient.ssn.slice(7, 10)} ${patient.ssn.slice(10, 13)} ${patient.ssn.slice(13, 15)}`;
 
   return (
@@ -17,6 +23,7 @@ export const PatientRow = ({ patient, index, onGenerateInvoice }: Props) => {
       className={`cursor-pointer transition-colors hover:bg-muted/30 ${
         index % 2 === 0 ? "bg-background" : "bg-muted/10"
       }`}
+      onClick={() => onClickRow(patient)}
     >
       <TableCell className="px-6 py-4">
         <div className="flex items-center gap-3">
@@ -47,24 +54,22 @@ export const PatientRow = ({ patient, index, onGenerateInvoice }: Props) => {
       </TableCell>
       <TableCell className="px-4 py-4 text-right">
         <span className="text-sm font-semibold text-primary">
-          {patient.office}
+          {patient.office?.name}
         </span>
       </TableCell>
       <TableCell className="px-4 py-4 text-right">
-        {onGenerateInvoice && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onGenerateInvoice(patient);
-            }}
-            className="h-8 w-8 p-0"
-            title="Generate Invoice"
-          >
-            <FileText className="h-4 w-4" />
-          </Button>
-        )}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onGenerateInvoice(patient);
+          }}
+          className="h-8 w-8 p-0"
+          title="Generate Invoice"
+        >
+          <FileText className="h-4 w-4" />
+        </Button>
       </TableCell>
     </TableRow>
   );

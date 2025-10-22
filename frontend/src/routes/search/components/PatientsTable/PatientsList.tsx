@@ -9,9 +9,10 @@ import { PatientRow } from "./PatientRow";
 interface Props {
   searchQuery: string;
   page: number;
+  onClickRow: (patient: SearchPatientResponse) => void;
 }
 
-export const PatientList = ({ searchQuery, page }: Props) => {
+export const PatientList = ({ searchQuery, page, onClickRow }: Props) => {
   const [selectedPatient, setSelectedPatient] =
     useState<SearchPatientResponse | null>(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
@@ -56,6 +57,7 @@ export const PatientList = ({ searchQuery, page }: Props) => {
             index={index}
             key={patient.id}
             onGenerateInvoice={handleGenerateInvoice}
+            onClickRow={onClickRow}
           />
         ))}
       </TableBody>
