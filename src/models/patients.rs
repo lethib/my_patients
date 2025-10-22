@@ -86,16 +86,11 @@ impl ActiveModel {
       return ApplicationError::UNPROCESSABLE_ENTITY.to_err();
     }
 
-    let ssn_encrypted = Model::encrypt_ssn(&params.ssn)?;
-    let ssn_hashed = Model::hash_ssn(&params.ssn)?;
-
     return Ok(
       patients::ActiveModel {
         first_name: ActiveValue::Set(params.first_name.clone()),
         last_name: ActiveValue::Set(params.last_name.clone()),
         email: ActiveValue::Set(params.email.clone()),
-        ssn: ActiveValue::Set(ssn_encrypted),
-        hashed_ssn: ActiveValue::Set(ssn_hashed),
         address_line_1: ActiveValue::Set(params.address_line_1.clone()),
         address_zip_code: ActiveValue::Set(params.address_zip_code.clone()),
         address_city: ActiveValue::Set(params.address_city.clone()),

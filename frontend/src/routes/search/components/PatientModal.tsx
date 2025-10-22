@@ -36,7 +36,7 @@ import { CenteredSpineer } from "@/components/ui/spinner";
 interface Props {
   open: boolean;
   asyncMutation: MutationFunction<{ success: boolean }, SavePatientParams>;
-  setIsOpen: (open: boolean) => void;
+  onOpenChange: (open: boolean) => void;
   selectedPatient?: SearchPatientResponse;
 }
 
@@ -47,7 +47,7 @@ const FR_ZIP_CODE_REGEX = /^(?:0[1-9]|[1-8]\d|9[0-8])\d{3}$/;
 export const PatientModal = ({
   open,
   asyncMutation,
-  setIsOpen,
+  onOpenChange,
   selectedPatient,
 }: Props) => {
   const { t } = useTranslation();
@@ -156,7 +156,7 @@ export const PatientModal = ({
       practitioner_office_id: +values.practitioner_office_id,
     })
       .then(() => {
-        setIsOpen(false);
+        onOpenChange(false);
         queryClient.invalidateQueries({ queryKey: ["/patient/_search"] });
       })
       .catch((error) => alert(error.message));
@@ -185,7 +185,7 @@ export const PatientModal = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setIsOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -213,6 +213,7 @@ export const PatientModal = ({
               value={formatSSN(addPatientForm.watch("ssn") || "")}
               placeholder={t("patients.form.ssnPlaceholder")}
               className="pl-10 h-11"
+              disabled={!!selectedPatient}
               icon={
                 <IdCard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               }

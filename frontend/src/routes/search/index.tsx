@@ -43,6 +43,11 @@ function Search() {
     setIsAddPatientModalOpened(true);
   };
 
+  const handleOnOpenChange = (value: boolean) => {
+    setIsAddPatientModalOpened(value);
+    if (value == false) setSelectedPatient(null);
+  };
+
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
@@ -115,7 +120,7 @@ function Search() {
             ? updatePatientMutation.mutateAsync
             : addPatientMutation.mutateAsync
         }
-        setIsOpen={() => setIsAddPatientModalOpened(false)}
+        onOpenChange={handleOnOpenChange}
         selectedPatient={selectedPatient || undefined}
       />
     </>
