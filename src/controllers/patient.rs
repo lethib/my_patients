@@ -59,9 +59,7 @@ async fn update(
     .await?
     .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?;
 
-  patients::ActiveModel::update(&ctx.db, patient.id, &patient_params).await?;
-
-  // TODO_TM: let's not forget to delete and create association record
+  services::patients::update(&patient, &ctx.current_user().0, &patient_params).await?;
 
   Ok(format::json(serde_json::json!({ "success": true }))?)
 }
