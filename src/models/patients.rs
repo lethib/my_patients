@@ -11,7 +11,7 @@ use crate::{
 
 pub use super::_entities::patients::{ActiveModel, Entity, Model};
 use loco_rs::model::ModelResult;
-use sea_orm::{entity::prelude::*, ActiveValue};
+use sea_orm::{entity::prelude::*, ActiveValue, IntoActiveModel};
 use serde::{Deserialize, Serialize};
 pub type Patients = Entity;
 
@@ -86,16 +86,11 @@ impl ActiveModel {
       return ApplicationError::UNPROCESSABLE_ENTITY.to_err();
     }
 
-    let ssn_encrypted = Model::encrypt_ssn(&params.ssn)?;
-    let ssn_hashed = Model::hash_ssn(&params.ssn)?;
-
     return Ok(
       patients::ActiveModel {
         first_name: ActiveValue::Set(params.first_name.clone()),
         last_name: ActiveValue::Set(params.last_name.clone()),
         email: ActiveValue::Set(params.email.clone()),
-        ssn: ActiveValue::Set(ssn_encrypted),
-        hashed_ssn: ActiveValue::Set(ssn_hashed),
         address_line_1: ActiveValue::Set(params.address_line_1.clone()),
         address_zip_code: ActiveValue::Set(params.address_zip_code.clone()),
         address_city: ActiveValue::Set(params.address_city.clone()),
@@ -105,6 +100,38 @@ impl ActiveModel {
       .insert(db)
       .await?,
     );
+  }
+
+  pub async fn update<T: ConnectionTrait>(
+    db: &T,
+    patient_id: i32,
+    params: &CreatePatientParams,
+  ) -> ModelResult<(), MyErrors> {
+    let mut patient = Entity::find_by_id(patient_id)
+      .one(db)
+      .await?
+      .expect("Patient not found")
+      .into_active_model();
+
+    if !is_address_valid(&params.address_line_1, &params.address_zip_code) {
+      return ApplicationError::UNPROCESSABLE_ENTITY.to_err();
+    }
+
+    let ssn_encrypted = Model::encrypt_ssn(&params.ssn)?;
+    let ssn_hashed = Model::hash_ssn(&params.ssn)?;
+
+    patient.first_name = ActiveValue::Set(params.first_name.trim().to_string());
+    patient.last_name = ActiveValue::Set(params.last_name.trim().to_string());
+    patient.email = ActiveValue::Set(params.email.trim().to_string());
+    patient.ssn = ActiveValue::Set(ssn_encrypted);
+    patient.hashed_ssn = ActiveValue::Set(ssn_hashed);
+    patient.address_line_1 = ActiveValue::Set(params.address_line_1.trim().to_string());
+    patient.address_zip_code = ActiveValue::Set(params.address_zip_code.trim().to_string());
+    patient.address_city = ActiveValue::Set(params.address_city.trim().to_string());
+
+    patient.update(db).await?;
+
+    Ok(())
   }
 }
 

@@ -6,7 +6,7 @@ import {
   queryEndpoint,
 } from "../endpointGenerator";
 
-type SavePatientParams = {
+export type SavePatientParams = {
   first_name: string;
   last_name: string;
   email: string;
@@ -36,18 +36,23 @@ export type SearchPatientResponse = {
   id: number;
   first_name: string;
   last_name: string;
+  email: string | null;
   ssn: string;
   address_line_1: string;
   address_zip_code: string;
   address_city: string;
   address_country: string;
-  office: string;
+  office: { id: number; name: string } | null;
 };
 
 export const patientSchema = {
-  savePatient: mutationEndpoint<SavePatientParams, { success: boolean }>({
+  createPatient: mutationEndpoint<SavePatientParams, { success: boolean }>({
     type: "POST",
-    path: "/patient/save",
+    path: "/patient/create",
+  }),
+  updatePatient: mutationEndpoint<SavePatientParams, { success: boolean }>({
+    type: "PUT",
+    path: "/patient/{patient_id}",
   }),
   searchBySSN: queryEndpoint<{ ssn: string }, SearchBySSNPatientResponse>({
     type: "GET",

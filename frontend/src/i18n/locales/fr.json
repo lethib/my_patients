@@ -64,7 +64,10 @@
     "loading": "Chargement...",
     "error": "Erreur lors du chargement des patients",
     "form": {
-      "title": "Ajouter un patient",
+      "title": {
+        "create": "Ajouter un patient",
+        "update": "Modifier les données du patient"
+      },
       "description": "Remplissez le numéro de sécurité sociale pour commencer",
       "ssn": "Numéro de sécurité sociale",
       "ssnPlaceholder": "15 chiffres",
@@ -86,7 +89,10 @@
         "RueilMalmaison": "Rueil-Malmaison",
         "VitrySurSeine": "Vitry-sur-Seine"
       },
-      "submit": "Ajouter le patient",
+      "submit": {
+        "create": "Ajouter le patient",
+        "update": "Sauvegarder les données"
+      },
       "validation": {
         "firstNameRequired": "Le prénom est requis",
         "lastNameRequired": "Le nom est requis",

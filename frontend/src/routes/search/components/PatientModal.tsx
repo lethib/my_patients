@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { MutationFunction } from "@tanstack/react-query";
 import { IdCard, User } from "lucide-react";
 import { type ChangeEvent, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -6,6 +7,10 @@ import { useTranslation } from "react-i18next";
 import z from "zod";
 import { queryClient } from "@/api/api";
 import { APIHooks } from "@/api/hooks";
+import type {
+  SavePatientParams,
+  SearchPatientResponse,
+} from "@/api/hooks/patient";
 import { FormInput } from "@/components/form/FormInput";
 import { FormProvider } from "@/components/form/FormProvider";
 import {
@@ -30,16 +35,22 @@ import { CenteredSpineer } from "@/components/ui/spinner";
 
 interface Props {
   open: boolean;
-  setIsOpen: (open: boolean) => void;
+  asyncMutation: MutationFunction<{ success: boolean }, SavePatientParams>;
+  onOpenChange: (open: boolean) => void;
+  selectedPatient?: SearchPatientResponse;
 }
 
 const FR_SSN_REGEX =
   /([12])([0-9]{2})(0[1-9]|1[0-2])(2[AB]|[0-9]{2})[0-9]{3}[0-9]{3}([0-9]{2})/;
 const FR_ZIP_CODE_REGEX = /^(?:0[1-9]|[1-8]\d|9[0-8])\d{3}$/;
 
-export const AddPatientModal = ({ open, setIsOpen }: Props) => {
+export const PatientModal = ({
+  open,
+  asyncMutation,
+  onOpenChange,
+  selectedPatient,
+}: Props) => {
   const { t } = useTranslation();
-  const addPatientMutation = APIHooks.patient.savePatient.useMutation();
 
   const addPatientFormSchema = z.object({
     first_name: z
@@ -94,12 +105,28 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
 
   const findPatientBySSNQuery = APIHooks.patient.searchBySSN.useQuery(
     { ssn: addPatientForm.getValues("ssn") },
-    { enabled: canSearchPatient },
+    { enabled: canSearchPatient && !selectedPatient },
   );
 
   const myOfficesQuery = APIHooks.user.getMyOffices.useQuery(null, {
     enabled: canSearchPatient,
   });
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: dependencies controlled manually
+  useEffect(() => {
+    if (open) {
+      addPatientForm.reset({
+        first_name: selectedPatient?.first_name || "",
+        last_name: selectedPatient?.last_name || "",
+        ssn: selectedPatient?.ssn || "",
+        email: selectedPatient?.email || "",
+        address_line_1: selectedPatient?.address_line_1 || "",
+        address_zip_code: selectedPatient?.address_zip_code || "",
+        address_city: selectedPatient?.address_city || "",
+        practitioner_office_id: selectedPatient?.office?.id.toString() || "",
+      });
+    }
+  }, [open, selectedPatient]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: not needed
   useEffect(() => {
@@ -124,13 +151,12 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
   }, [findPatientBySSNQuery.data?.ssn]);
 
   const onSubmit = addPatientForm.handleSubmit(async (values) => {
-    addPatientMutation
-      .mutateAsync({
-        ...values,
-        practitioner_office_id: +values.practitioner_office_id,
-      })
+    asyncMutation({
+      ...values,
+      practitioner_office_id: +values.practitioner_office_id,
+    })
       .then(() => {
-        setIsOpen(false);
+        onOpenChange(false);
         queryClient.invalidateQueries({ queryKey: ["/patient/_search"] });
       })
       .catch((error) => alert(error.message));
@@ -159,10 +185,12 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setIsOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("patients.form.title")}</DialogTitle>
+          <DialogTitle>
+            {t(`patients.form.title.${selectedPatient ? "update" : "create"}`)}
+          </DialogTitle>
           <DialogDescription>
             {t("patients.form.description")}
           </DialogDescription>
@@ -185,6 +213,7 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
               value={formatSSN(addPatientForm.watch("ssn") || "")}
               placeholder={t("patients.form.ssnPlaceholder")}
               className="pl-10 h-11"
+              disabled={!!selectedPatient}
               icon={
                 <IdCard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               }
@@ -193,7 +222,8 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
           {findPatientBySSNQuery.isFetching && (
             <CenteredSpineer className="text-secondary" />
           )}
-          {findPatientBySSNQuery.isFetched && canSearchPatient && (
+          {((findPatientBySSNQuery.isFetched && canSearchPatient) ||
+            !!selectedPatient) && (
             <>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -322,8 +352,8 @@ export const AddPatientModal = ({ open, setIsOpen }: Props) => {
               </div>
             </>
           )}
-          <Button type="submit" className="w-full">
-            {t("patients.form.submit")}
+          <Button type="submit" className="w-full" disabled={!canSearchPatient}>
+            {t(`patients.form.submit.${selectedPatient ? "update" : "create"}`)}
           </Button>
         </FormProvider>
       </DialogContent>

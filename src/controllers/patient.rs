@@ -3,7 +3,7 @@ use axum::{
   extract::{Path, Query, State},
   middleware,
   response::Response,
-  routing::{get, post},
+  routing::{get, post, put},
   Json,
 };
 use base64::Engine;
@@ -11,6 +11,7 @@ use loco_rs::{
   app::AppContext,
   prelude::{format, Routes},
 };
+use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -27,7 +28,8 @@ struct SearchParams {
 use crate::{
   middlewares::current_user::{current_user_middleware, CurrentUser},
   models::{
-    my_errors::MyErrors,
+    _entities::{patient_users, patients},
+    my_errors::{unexpected_error::UnexpectedError, MyErrors},
     patients::{CreatePatientParams, Model},
   },
   services::{self, invoice::GenerateInvoiceParams},
@@ -35,11 +37,29 @@ use crate::{
 };
 
 #[debug_handler]
-async fn save(
+async fn create(
   State(ctx): State<AppContext>,
   Json(create_patient_params): Json<CreatePatientParams>,
 ) -> Result<Response, MyErrors> {
   services::patients::create(&create_patient_params, &ctx.current_user().0).await?;
+
+  Ok(format::json(serde_json::json!({ "success": true }))?)
+}
+
+#[debug_handler]
+async fn update(
+  State(ctx): State<AppContext>,
+  Path(patient_id): Path<i32>,
+  Json(patient_params): Json<CreatePatientParams>,
+) -> Result<Response, MyErrors> {
+  let patient = patients::Entity::find_by_id(patient_id)
+    .inner_join(patient_users::Entity)
+    .filter(patient_users::Column::UserId.eq(ctx.current_user().0.id))
+    .one(&ctx.db)
+    .await?
+    .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?;
+
+  services::patients::update(&patient, &ctx.current_user().0, &patient_params).await?;
 
   Ok(format::json(serde_json::json!({ "success": true }))?)
 }
@@ -72,7 +92,7 @@ async fn search(
 
   let patient_responses: Vec<PatientResponse> = patients
     .iter()
-    .map(|p| PatientResponse::from_model(&p.0, &p.1.name))
+    .map(|p| PatientResponse::from_model(&p.0, &p.1))
     .collect();
 
   Ok(format::json(serde_json::json!({
@@ -104,7 +124,8 @@ async fn generate_invoice(
 pub fn routes(ctx: &AppContext) -> Routes {
   Routes::new()
     .prefix("/api/patient")
-    .add("/save", post(save))
+    .add("/create", post(create))
+    .add("/{patient_id}", put(update))
     .add("/_search_by_ssn", get(search_by_ssn))
     .add("/_search", get(search))
     .add("/{patient_id}/_generate_invoice", post(generate_invoice))

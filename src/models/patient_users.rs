@@ -11,6 +11,10 @@ pub struct CreateLinkParams {
   pub practitioner_office_id: i32,
 }
 
+pub struct UpdateLinkParams {
+  pub practitioner_office_id: i32,
+}
+
 #[async_trait::async_trait]
 impl ActiveModelBehavior for ActiveModel {
   async fn before_save<C>(self, _db: &C, insert: bool) -> std::result::Result<Self, DbErr>
@@ -46,6 +50,23 @@ impl ActiveModel {
       .insert(db)
       .await?,
     );
+  }
+
+  pub async fn update<T: ConnectionTrait>(
+    db: &T,
+    user_id: i32,
+    patient_id: i32,
+    params: &UpdateLinkParams,
+  ) -> ModelResult<Model, MyErrors> {
+    let patient_user = Entity::find_by_id((user_id, patient_id))
+      .one(db)
+      .await?
+      .ok_or_else(|| DbErr::RecordNotFound("Patient-User association not found".to_string()))?;
+
+    let mut patient_user_active: ActiveModel = patient_user.into();
+    patient_user_active.practitioner_office_id = ActiveValue::Set(params.practitioner_office_id);
+
+    return Ok(patient_user_active.update(db).await?);
   }
 }
 

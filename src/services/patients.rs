@@ -1,7 +1,7 @@
 use crate::initializers::get_services;
 use crate::models::_entities::{patient_users, patients, practitioner_offices};
 use crate::models::my_errors::unexpected_error::UnexpectedError;
-use crate::models::patient_users::CreateLinkParams;
+use crate::models::patient_users::{CreateLinkParams, UpdateLinkParams};
 use crate::models::{
   my_errors::MyErrors,
   patients::{CreatePatientParams, Model as PatientModel},
@@ -38,6 +38,32 @@ pub async fn create(
   db_transaction.commit().await?;
 
   Ok(created_patient)
+}
+
+pub async fn update(
+  patient: &patients::Model,
+  linked_to_user: &users::Model,
+  patient_params: &CreatePatientParams,
+) -> Result<(), MyErrors> {
+  let services = get_services();
+
+  let db_transaction = services.db.begin().await?;
+
+  patients::ActiveModel::update(&db_transaction, patient.id, patient_params).await?;
+
+  patient_users::ActiveModel::update(
+    &db_transaction,
+    linked_to_user.id,
+    patient.id,
+    &UpdateLinkParams {
+      practitioner_office_id: patient_params.practitioner_office_id,
+    },
+  )
+  .await?;
+
+  db_transaction.commit().await?;
+
+  Ok(())
 }
 
 pub async fn search_paginated(
