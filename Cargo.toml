@@ -2,7 +2,7 @@
 
 [package]
 name = "my_patients"
-version = "1.0.7"
+version = "1.0.9"
 edition = "2021"
 publish = false
 default-run = "my_patients-cli"
