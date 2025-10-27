@@ -2732,7 +2732,7 @@ checksum = "32a282da65faaf38286cf3be983213fcf1d2e2a58700e808f83f4ea9a4804bc0"
 
 [[package]]
 name = "migration"
-version = "1.0.9"
+version = "1.0.10"
 dependencies = [
  "loco-rs",
  "sea-orm-migration",
@@ -2812,7 +2812,7 @@ dependencies = [
 
 [[package]]
 name = "my_patients"
-version = "1.0.9"
+version = "1.0.10"
 dependencies = [
  "aes-gcm",
  "argon2",
