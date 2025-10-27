@@ -39,7 +39,7 @@ impl MigratorTrait for Migrator {
       Box::new(m20250922_074830_create_practitioner_office_table::Migration),
       Box::new(m20250930_145445_add_signature_file_name_to_user_business_information::Migration),
       Box::new(m20251018_123530_add_email_to_patient::Migration),
-            Box::new(m20251025_210751_remove_unique_constraints_from_patient_ssn::Migration),
+      Box::new(m20251025_210751_remove_unique_constraints_from_patient_ssn::Migration),
       // inject-above (do not remove this comment)
     ]
   }

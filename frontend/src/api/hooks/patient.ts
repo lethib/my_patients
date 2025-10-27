@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import type { UUID } from "crypto";
 import { APIClient } from "../api";
 import {
   mutationEndpoint,
@@ -20,7 +21,7 @@ export type SavePatientParams = {
 
 export type SearchBySSNPatientResponse = {
   id: number;
-  pid: string;
+  pid: UUID;
   first_name: string;
   last_name: string;
   email: string;
@@ -38,7 +39,7 @@ interface SearchPatientParams {
 
 export type SearchPatientResponse = {
   id: number;
-  pid: string;
+  pid: UUID;
   first_name: string;
   last_name: string;
   email: string | null;
