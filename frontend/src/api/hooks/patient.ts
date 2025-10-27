@@ -7,6 +7,7 @@ import {
 } from "../endpointGenerator";
 
 export type SavePatientParams = {
+  pid?: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -17,15 +18,18 @@ export type SavePatientParams = {
   practitioner_office_id: number;
 };
 
-type SearchBySSNPatientResponse = {
+export type SearchBySSNPatientResponse = {
+  id: number;
+  pid: string;
   first_name: string;
   last_name: string;
+  email: string;
   ssn: string;
   address_line_1: string;
   address_zip_code: string;
   address_city: string;
   address_country: string;
-} | null;
+};
 
 interface SearchPatientParams {
   q: string;
@@ -34,6 +38,7 @@ interface SearchPatientParams {
 
 export type SearchPatientResponse = {
   id: number;
+  pid: string;
   first_name: string;
   last_name: string;
   email: string | null;
@@ -54,7 +59,7 @@ export const patientSchema = {
     type: "PUT",
     path: "/patient/{patient_id}",
   }),
-  searchBySSN: queryEndpoint<{ ssn: string }, SearchBySSNPatientResponse>({
+  searchBySSN: queryEndpoint<{ ssn: string }, SearchBySSNPatientResponse[]>({
     type: "GET",
     path: "/patient/_search_by_ssn",
   }),

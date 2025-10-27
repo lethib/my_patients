@@ -17,6 +17,7 @@ pub type Patients = Entity;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CreatePatientParams {
+  pub pid: Option<String>,
   first_name: String,
   last_name: String,
   pub ssn: String,
@@ -44,17 +45,26 @@ impl Model {
     Crypto::decrypt(&self.ssn)
   }
 
-  pub async fn search_by_ssn<C: ConnectionTrait>(
-    db: &C,
-    ssn: &str,
-  ) -> Result<Option<Self>, MyErrors> {
+  pub async fn search_by_ssn<C: ConnectionTrait>(db: &C, ssn: &str) -> Result<Vec<Self>, MyErrors> {
     let hashed_ssn = Self::hash_ssn(ssn)?;
 
-    let patient = Entity::find()
+    let patients = Entity::find()
       .filter(patients::Column::HashedSsn.eq(hashed_ssn))
-      .one(db)
+      .all(db)
       .await
       .map_err(MyErrors::from)?;
+
+    Ok(patients)
+  }
+
+  pub async fn search_by_pid<C: ConnectionTrait>(
+    db: &C,
+    pid: Uuid,
+  ) -> Result<Option<Self>, MyErrors> {
+    let patient = Entity::find()
+      .filter(patients::Column::Pid.eq(pid))
+      .one(db)
+      .await?;
 
     Ok(patient)
   }
@@ -86,11 +96,16 @@ impl ActiveModel {
       return ApplicationError::UNPROCESSABLE_ENTITY.to_err();
     }
 
+    let ssn_encrypted = Model::encrypt_ssn(&params.ssn)?;
+    let ssn_hashed = Model::hash_ssn(&params.ssn)?;
+
     return Ok(
       patients::ActiveModel {
         first_name: ActiveValue::Set(params.first_name.clone()),
         last_name: ActiveValue::Set(params.last_name.clone()),
         email: ActiveValue::Set(params.email.clone()),
+        ssn: ActiveValue::Set(ssn_encrypted),
+        hashed_ssn: ActiveValue::Set(ssn_hashed),
         address_line_1: ActiveValue::Set(params.address_line_1.clone()),
         address_zip_code: ActiveValue::Set(params.address_zip_code.clone()),
         address_city: ActiveValue::Set(params.address_city.clone()),
@@ -117,14 +132,9 @@ impl ActiveModel {
       return ApplicationError::UNPROCESSABLE_ENTITY.to_err();
     }
 
-    let ssn_encrypted = Model::encrypt_ssn(&params.ssn)?;
-    let ssn_hashed = Model::hash_ssn(&params.ssn)?;
-
     patient.first_name = ActiveValue::Set(params.first_name.trim().to_string());
     patient.last_name = ActiveValue::Set(params.last_name.trim().to_string());
     patient.email = ActiveValue::Set(params.email.trim().to_string());
-    patient.ssn = ActiveValue::Set(ssn_encrypted);
-    patient.hashed_ssn = ActiveValue::Set(ssn_hashed);
     patient.address_line_1 = ActiveValue::Set(params.address_line_1.trim().to_string());
     patient.address_zip_code = ActiveValue::Set(params.address_zip_code.trim().to_string());
     patient.address_city = ActiveValue::Set(params.address_city.trim().to_string());

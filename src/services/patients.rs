@@ -9,6 +9,7 @@ use crate::models::{
 };
 use sea_orm::{ColumnTrait, Condition, QueryFilter, QuerySelect, RelationTrait};
 use sea_orm::{EntityTrait, JoinType, PaginatorTrait, QueryOrder, TransactionTrait};
+use uuid::Uuid;
 
 pub async fn create(
   patient_params: &CreatePatientParams,
@@ -16,12 +17,16 @@ pub async fn create(
 ) -> Result<PatientModel, MyErrors> {
   let services = get_services();
 
-  let existing_patient = PatientModel::search_by_ssn(&services.db, &patient_params.ssn).await?;
-
   let db_transaction = services.db.begin().await?;
 
-  let created_patient = match existing_patient {
-    Some(patient) => patient,
+  let created_patient = match &patient_params.pid {
+    Some(pid) => {
+      let pid =
+        Uuid::parse_str(pid).map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?;
+      PatientModel::search_by_pid(&db_transaction, pid)
+        .await?
+        .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?
+    }
     None => patients::ActiveModel::create(&db_transaction, patient_params).await?,
   };
 

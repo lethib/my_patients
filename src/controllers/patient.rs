@@ -69,9 +69,14 @@ async fn search_by_ssn(
   State(ctx): State<AppContext>,
   Query(params): Query<SearchBySSNParams>,
 ) -> Result<Response, MyErrors> {
-  let found_patient = Model::search_by_ssn(&ctx.db, &params.ssn).await?;
+  let found_patients = Model::search_by_ssn(&ctx.db, &params.ssn).await?;
 
-  Ok(format::json(PatientResponse::new(&found_patient, None))?)
+  let serialized_patients: Vec<PatientResponse> = found_patients
+    .iter()
+    .map(|patient| PatientResponse::new(patient, None))
+    .collect();
+
+  Ok(format::json(serialized_patients)?)
 }
 
 #[debug_handler]

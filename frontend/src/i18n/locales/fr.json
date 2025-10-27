@@ -102,6 +102,11 @@
         "zipCodeInvalid": "Le code postal ne correspond pas au format attendu",
         "cityRequired": "La ville est requise",
         "officeRequired": "Sélectionnez un bureau valide"
+      },
+      "selector": {
+        "prompt": "Veuillez sélectionner un patient pour continuer",
+        "newPatient": "Nouveau Patient",
+        "patientId": "ID"
       }
     },
     "table": {
