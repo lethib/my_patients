@@ -121,3 +121,8 @@
 
 - Tried to implement transactional emails using Resend but it requires to have a domain name verified on internet to send emails in production. Let's try to find a free way to send emails with attachments.
 - Overridden the loco.rs mailer to be able to send attachments directly using the lettre rust package. Still using the background worker provided by loco to send the mail in an async way.
+
+## 27/10/2025
+
+- Created database migration to remove unique constraints on `ssn` and `hashed_ssn` columns in patients table.
+- Refactored PatientModal component to simplify state management to handle multiple results returned by the `search_by_ssn`.
