@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { H2 } from "@/components/ui/typography/h2";
 import { useDebounce } from "@/hooks/useDebounce";
 import { logout } from "@/lib/authUtils";
-import { PatientModal } from "./components/PatientModal";
+import { PatientModal } from "./components/PatientModal/PatientModal";
 import { PatientsTable } from "./components/PatientsTable/PatientsTable";
 
 export const Route = createFileRoute("/search/")({

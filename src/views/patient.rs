@@ -1,6 +1,7 @@
 use crate::models::{_entities::practitioner_offices, patients};
 use practitioner_offices::Model as PractitionerOffice;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct OfficeIdAndName {
@@ -11,6 +12,7 @@ struct OfficeIdAndName {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct PatientResponse {
   id: i32,
+  pid: Uuid,
   pub first_name: String,
   pub last_name: String,
   pub email: Option<String>,
@@ -24,12 +26,10 @@ pub struct PatientResponse {
 
 impl PatientResponse {
   #[must_use]
-  pub fn new(
-    patient: &Option<patients::Model>,
-    office: Option<&PractitionerOffice>,
-  ) -> Option<Self> {
-    patient.as_ref().map(|patient| Self {
-      id: patient.id.clone(),
+  pub fn new(patient: &patients::Model, office: Option<&PractitionerOffice>) -> Self {
+    Self {
+      id: patient.id,
+      pid: patient.pid.clone(),
       first_name: patient.first_name.clone(),
       last_name: patient.last_name.clone(),
       email: (patient.email != "default@mail.com").then(|| patient.email.clone()),
@@ -44,13 +44,14 @@ impl PatientResponse {
         id: office.id,
         name: office.name.clone(),
       }),
-    })
+    }
   }
 
   #[must_use]
   pub fn from_model(patient: &patients::Model, office: &PractitionerOffice) -> Self {
     Self {
-      id: patient.id.clone(),
+      id: patient.id,
+      pid: patient.pid.clone(),
       first_name: patient.first_name.clone(),
       last_name: patient.last_name.clone(),
       email: (patient.email != "default@mail.com").then(|| patient.email.clone()),
