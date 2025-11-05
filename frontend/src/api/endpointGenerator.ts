@@ -14,14 +14,16 @@ export type EndpointConfig<P, R> = {
   response?: R;
 };
 
+export type PaginationMetaData = {
+  page: number;
+  per_page: number;
+  total_pages: number;
+  has_more: boolean;
+};
+
 export type Paginated<D> = {
   paginated_data: D[];
-  pagination: {
-    page: number;
-    per_page: number;
-    total_pages: number;
-    has_more: boolean;
-  };
+  pagination: PaginationMetaData;
 };
 
 // Generic hook generators

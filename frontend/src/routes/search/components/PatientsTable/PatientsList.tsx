@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { APIHooks } from "@/api/hooks";
 import type { SearchPatientResponse } from "@/api/hooks/patient";
 import { InvoiceModal } from "@/components/patients/InvoiceModal";
 import { CenteredSpineer } from "@/components/ui/spinner";
@@ -7,20 +6,19 @@ import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { PatientRow } from "./PatientRow";
 
 interface Props {
-  searchQuery: string;
-  page: number;
+  patientsList: SearchPatientResponse[] | undefined;
+  isDataFetching: boolean;
   onClickRow: (patient: SearchPatientResponse) => void;
 }
 
-export const PatientList = ({ searchQuery, page, onClickRow }: Props) => {
+export const PatientList = ({
+  patientsList,
+  isDataFetching,
+  onClickRow,
+}: Props) => {
   const [selectedPatient, setSelectedPatient] =
     useState<SearchPatientResponse | null>(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
-
-  const searchPatientsQuery = APIHooks.patient.search.useQuery({
-    q: searchQuery,
-    page,
-  });
 
   const handleGenerateInvoice = (patient: SearchPatientResponse) => {
     setSelectedPatient(patient);
@@ -32,11 +30,11 @@ export const PatientList = ({ searchQuery, page, onClickRow }: Props) => {
     setSelectedPatient(null);
   };
 
-  if (searchPatientsQuery.data?.paginated_data.length === 0) {
+  if (patientsList?.length === 0) {
     return null; // Let parent handle empty state
   }
 
-  if (searchPatientsQuery.isFetching) {
+  if (isDataFetching) {
     return (
       <TableBody>
         <TableRow>
@@ -51,7 +49,7 @@ export const PatientList = ({ searchQuery, page, onClickRow }: Props) => {
   return (
     <>
       <TableBody>
-        {searchPatientsQuery.data?.paginated_data.map((patient, index) => (
+        {patientsList?.map((patient, index) => (
           <PatientRow
             patient={patient}
             index={index}
