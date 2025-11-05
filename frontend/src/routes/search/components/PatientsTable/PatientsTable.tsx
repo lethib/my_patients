@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { APIHooks } from "@/api/hooks";
 import type { SearchPatientResponse } from "@/api/hooks/patient";
@@ -21,6 +21,15 @@ interface Props {
 export const PatientsTable = ({ searchQuery, onClickRow }: Props) => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
+  const prevSearchQueryRef = useRef(searchQuery);
+
+  // Reset page during render when searchQuery changes (prevents double requests)
+  if (prevSearchQueryRef.current !== searchQuery) {
+    prevSearchQueryRef.current = searchQuery;
+    if (page !== 1) {
+      setPage(1);
+    }
+  }
 
   const searchPatientsQuery = APIHooks.patient.search.useQuery({
     q: searchQuery,

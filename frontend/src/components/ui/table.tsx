@@ -121,6 +121,10 @@ function TablePagination({
   paginationData: PaginationMetaData;
 }) {
   const MiddleItems = () => {
+    if (paginationData.total_pages <= 2) {
+      return null;
+    }
+
     const middlePage =
       currentPage === 1
         ? 2
@@ -153,7 +157,7 @@ function TablePagination({
         <PaginationItem>
           <PaginationLink
             onClick={() => setCurrentPage(1)}
-            isActive={currentPage == 1}
+            isActive={currentPage === 1}
           >
             1
           </PaginationLink>
@@ -176,7 +180,7 @@ function TablePagination({
         {paginationData.total_pages !== 1 && (
           <PaginationItem>
             <PaginationLink
-              isActive={currentPage == paginationData.total_pages}
+              isActive={currentPage === paginationData.total_pages}
               onClick={() => setCurrentPage(paginationData.total_pages)}
             >
               {paginationData.total_pages}
