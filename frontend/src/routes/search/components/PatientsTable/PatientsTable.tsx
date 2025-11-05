@@ -1,7 +1,16 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { APIHooks } from "@/api/hooks";
 import type { SearchPatientResponse } from "@/api/hooks/patient";
-import { Table, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TablePagination,
+  TableRow,
+} from "@/components/ui/table";
 import { PatientList } from "./PatientsList";
 
 interface Props {
@@ -11,7 +20,14 @@ interface Props {
 
 export const PatientsTable = ({ searchQuery, onClickRow }: Props) => {
   const { t } = useTranslation();
-  const [page, _setPage] = useState(1);
+  const [page, setPage] = useState(1);
+
+  const searchPatientsQuery = APIHooks.patient.search.useQuery({
+    q: searchQuery,
+    page,
+  });
+
+  const paginationData = searchPatientsQuery.data?.pagination;
 
   return (
     <div className="space-y-4">
@@ -43,11 +59,26 @@ export const PatientsTable = ({ searchQuery, onClickRow }: Props) => {
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
+
           <PatientList
-            searchQuery={searchQuery}
-            page={page}
+            patientsList={searchPatientsQuery.data?.paginated_data}
+            isDataFetching={searchPatientsQuery.isFetching}
             onClickRow={onClickRow}
           />
+
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={8}>
+                {paginationData && (
+                  <TablePagination
+                    currentPage={page}
+                    setCurrentPage={setPage}
+                    paginationData={paginationData}
+                  />
+                )}
+              </TableCell>
+            </TableRow>
+          </TableFooter>
         </Table>
       </div>
     </div>
