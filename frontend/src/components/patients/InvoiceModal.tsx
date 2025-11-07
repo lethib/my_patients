@@ -104,8 +104,6 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
     }
   };
 
-  console.log(invoiceForm.watch("shouldSendInvoiceByEmail"));
-
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent

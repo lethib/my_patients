@@ -46,7 +46,7 @@ pub async fn send_invoice(
 
   let args = EmailArgs::new_text(
     generated_invoice.patient_email.clone(),
-    format!("Votre consulation du {}", invoice_date),
+    format!("Votre consultation du {}", invoice_date),
     format!(
       "Vous trouverez ci-joint votre facture pour la consultation du {}",
       invoice_date
