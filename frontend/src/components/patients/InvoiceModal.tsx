@@ -78,6 +78,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
         patientId: patient.id,
         amount: `${numericAmount}€`,
         invoice_date: `${year}-${month}-${day}`,
+        should_be_sent_by_email: data.shouldSendInvoiceByEmail,
       },
       {
         onSuccess: ({ blob, filename }) => {

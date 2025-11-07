@@ -18,6 +18,7 @@ use serde::{Deserialize, Serialize};
 pub struct GenerateInvoiceParams {
   pub amount: String,
   pub invoice_date: String,
+  pub should_be_sent_by_email: bool,
 }
 
 pub struct GenerateInvoiceResponse {
