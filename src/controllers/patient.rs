@@ -118,7 +118,12 @@ async fn generate_invoice(
   Json(params): Json<GenerateInvoiceParams>,
 ) -> Result<Response, MyErrors> {
   let invoice_generated =
-    services::invoice::generate_patient_invoice(patient_id, &params, &ctx.current_user().0).await?;
+    services::invoice::generate_patient_invoice(&patient_id, &params, &ctx.current_user().0)
+      .await?;
+
+  if params.should_be_sent_by_email {
+    services::invoice::send_invoice(&ctx, &invoice_generated, &ctx.current_user().0).await?;
+  }
 
   Ok(format::json(serde_json::json!({
     "pdf_data": base64::prelude::BASE64_STANDARD.encode(&invoice_generated.pdf_data),

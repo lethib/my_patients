@@ -162,6 +162,7 @@
       "generating": "Génération...",
       "generate": "Générer la facture",
       "completeInformation": "Compléter mes informations",
+      "sendInvoiceByEmail": "Envoi de la facture par email",
       "missingInformationAlert": "Vous devez compléter vos informations professionnelles avant de pouvoir générer une facture"
     },
     "errors": {

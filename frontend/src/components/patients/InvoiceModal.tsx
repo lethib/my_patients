@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { FormSwitch } from "../form/FormSwitch";
 
 interface InvoiceModalProps {
   isOpen: boolean;
@@ -50,6 +51,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
         { message: t("invoice.errors.invalidAmount") },
       ),
     date: z.date(),
+    shouldSendInvoiceByEmail: z.boolean(),
   });
 
   type InvoiceFormData = z.infer<typeof invoiceFormSchema>;
@@ -59,6 +61,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
     defaultValues: {
       amount: "",
       date: new Date(),
+      shouldSendInvoiceByEmail: false,
     },
   });
 
@@ -75,6 +78,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
         patientId: patient.id,
         amount: `${numericAmount}€`,
         invoice_date: `${year}-${month}-${day}`,
+        should_be_sent_by_email: data.shouldSendInvoiceByEmail,
       },
       {
         onSuccess: ({ blob, filename }) => {
@@ -168,6 +172,23 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
             label={t("invoice.modal.date")}
             disabled={generateInvoiceMutation.isPending}
           />
+
+          <div className="py-2">
+            <div className="flex items-center space-x-3">
+              <FormSwitch
+                id="shouldSendInvoiceByEmail"
+                name="shouldSendInvoiceByEmail"
+                size="lg"
+                className="cursor-pointer"
+              />
+              <Label
+                htmlFor="shouldSendInvoiceByEmail"
+                className="cursor-pointer"
+              >
+                {t("invoice.modal.sendInvoiceByEmail")}
+              </Label>
+            </div>
+          </div>
 
           <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
             <Button
