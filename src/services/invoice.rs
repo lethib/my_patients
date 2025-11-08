@@ -3,6 +3,7 @@ use crate::{
   models::{
     _entities::{patient_users, patients, practitioner_offices, users},
     my_errors::{application_error::ApplicationError, MyErrors, ToErr},
+    patients as PatientModel,
   },
   workers::{
     self,
@@ -33,7 +34,7 @@ pub async fn send_invoice(
   generated_invoice: &GenerateInvoiceResponse,
   current_user: &users::Model,
 ) -> Result<(), MyErrors> {
-  if generated_invoice.patient_email == "default@mail.com" {
+  if generated_invoice.patient_email == PatientModel::DEFAULT_EMAIL {
     return ApplicationError::UNPROCESSABLE_ENTITY.to_err();
   }
 

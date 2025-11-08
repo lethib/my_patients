@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "@tanstack/react-router";
 import { CircleAlert, FileText, Loader2 } from "lucide-react";
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -64,15 +64,6 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
       shouldSendInvoiceByEmail: false,
     },
   });
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <only patient email necessary here>
-  useEffect(() => {
-    if (!patient.email) {
-      invoiceForm.setError("shouldSendInvoiceByEmail", {
-        message: t("invoice.modal.missingPatientAddressMail"),
-      });
-    }
-  }, [patient.email]);
 
   const onSubmit = invoiceForm.handleSubmit(async (data) => {
     const numericAmount = parseFloat(data.amount);
@@ -182,7 +173,17 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
             disabled={generateInvoiceMutation.isPending}
           />
 
-          <div className="py-2">
+          <div className="py-2 space-y-2">
+            {!patient.email && (
+              <div className="rounded-lg border-destructive border-2 bg-muted/50 p-3">
+                <div className="flex gap-2">
+                  <CircleAlert className="text-destructive size-8" />
+                  <p className="text-sm font-medium text-foreground">
+                    {t("invoice.modal.missingPatientAddressMail")}
+                  </p>
+                </div>
+              </div>
+            )}
             <FormSwitch
               id="shouldSendInvoiceByEmail"
               name="shouldSendInvoiceByEmail"
