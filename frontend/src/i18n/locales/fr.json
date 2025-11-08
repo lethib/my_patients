@@ -163,7 +163,8 @@
       "generate": "Générer la facture",
       "completeInformation": "Compléter mes informations",
       "sendInvoiceByEmail": "Envoi de la facture par email",
-      "missingInformationAlert": "Vous devez compléter vos informations professionnelles avant de pouvoir générer une facture"
+      "missingInformationAlert": "Vous devez compléter vos informations professionnelles avant de pouvoir générer une facture",
+      "missingPatientAddressMail": "Le patient n'a pas d'adresse mail. Veuillez mettre à jour les informations du patient pour pouvoir envoyer la facture par mail."
     },
     "errors": {
       "invalidAmount": "Veuillez entrer un montant valide supérieur à 0"

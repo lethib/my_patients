@@ -2,7 +2,7 @@ use crate::{
   initializers::get_services,
   models::{
     _entities::{patient_users, patients, practitioner_offices, users},
-    my_errors::{application_error::ApplicationError, MyErrors},
+    my_errors::{application_error::ApplicationError, MyErrors, ToErr},
   },
   workers::{
     self,
@@ -33,6 +33,10 @@ pub async fn send_invoice(
   generated_invoice: &GenerateInvoiceResponse,
   current_user: &users::Model,
 ) -> Result<(), MyErrors> {
+  if generated_invoice.patient_email == "default@mail.com" {
+    return ApplicationError::UNPROCESSABLE_ENTITY.to_err();
+  }
+
   let attachment = EmailAttachment::from_bytes(
     generated_invoice.filename.to_string(),
     "application/pdf".to_string(),

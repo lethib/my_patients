@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "@tanstack/react-router";
 import { CircleAlert, FileText, Loader2 } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -64,6 +64,15 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
       shouldSendInvoiceByEmail: false,
     },
   });
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <only patient email necessary here>
+  useEffect(() => {
+    if (!patient.email) {
+      invoiceForm.setError("shouldSendInvoiceByEmail", {
+        message: t("invoice.modal.missingPatientAddressMail"),
+      });
+    }
+  }, [patient.email]);
 
   const onSubmit = invoiceForm.handleSubmit(async (data) => {
     const numericAmount = parseFloat(data.amount);
@@ -174,20 +183,14 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
           />
 
           <div className="py-2">
-            <div className="flex items-center space-x-3">
-              <FormSwitch
-                id="shouldSendInvoiceByEmail"
-                name="shouldSendInvoiceByEmail"
-                size="lg"
-                className="cursor-pointer"
-              />
-              <Label
-                htmlFor="shouldSendInvoiceByEmail"
-                className="cursor-pointer"
-              >
-                {t("invoice.modal.sendInvoiceByEmail")}
-              </Label>
-            </div>
+            <FormSwitch
+              id="shouldSendInvoiceByEmail"
+              name="shouldSendInvoiceByEmail"
+              label={t("invoice.modal.sendInvoiceByEmail")}
+              size="lg"
+              className="cursor-pointer"
+              disabled={!patient.email}
+            />
           </div>
 
           <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
