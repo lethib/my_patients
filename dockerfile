@@ -141,4 +141,4 @@ ENV RUST_LOG=info
 ENV RUST_BACKTRACE=0
 
 EXPOSE 5150
-ENTRYPOINT ["/app/my_patients-cli", "start"]
+ENTRYPOINT ["/app/my_patients-cli", "start", "--server-and-worker"]
