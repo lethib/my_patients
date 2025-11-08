@@ -173,21 +173,25 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
             disabled={generateInvoiceMutation.isPending}
           />
 
-          <div className="py-2">
-            <div className="flex items-center space-x-3">
-              <FormSwitch
-                id="shouldSendInvoiceByEmail"
-                name="shouldSendInvoiceByEmail"
-                size="lg"
-                className="cursor-pointer"
-              />
-              <Label
-                htmlFor="shouldSendInvoiceByEmail"
-                className="cursor-pointer"
-              >
-                {t("invoice.modal.sendInvoiceByEmail")}
-              </Label>
-            </div>
+          <div className="py-2 space-y-2">
+            {!patient.email && (
+              <div className="rounded-lg border-destructive border-2 bg-muted/50 p-3">
+                <div className="flex gap-2">
+                  <CircleAlert className="text-destructive size-8" />
+                  <p className="text-sm font-medium text-foreground">
+                    {t("invoice.modal.missingPatientAddressMail")}
+                  </p>
+                </div>
+              </div>
+            )}
+            <FormSwitch
+              id="shouldSendInvoiceByEmail"
+              name="shouldSendInvoiceByEmail"
+              label={t("invoice.modal.sendInvoiceByEmail")}
+              size="lg"
+              className="cursor-pointer"
+              disabled={!patient.email}
+            />
           </div>
 
           <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
