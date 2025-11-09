@@ -15,9 +15,11 @@
 
 ## 📖 About
 
-My Patients is a full-stack web application designed to help healthcare practitioners manage their patient records securely. Built with a focus on data privacy and security, it provides encrypted storage for sensitive patient information including social security numbers, along with automated invoice generation capabilities.
+My Patients is a full-stack web application designed to help healthcare practitioners manage their patient records securely. Built with a focus on data privacy and security, it provides encrypted storage for sensitive patient information including social security numbers, along with automated invoice generation and delivery capabilities.
 
-This is a personal project built to explore modern web technologies including Rust backend development and secure cryptographic practices.
+Key capabilities include comprehensive patient management, multi-office support, professional PDF invoice generation, and automated email delivery through background job processing.
+
+This is a personal project built to explore modern web technologies including Rust backend development, secure cryptographic practices, and asynchronous background job processing.
 
 ## ✨ Features
 
@@ -26,10 +28,17 @@ This is a personal project built to explore modern web technologies including Ru
 - **SSN Protection** - Double-layer security with encrypted storage and hashed indexing for fast, secure lookups
 - **Multi-Office Support** - Manage patients across multiple practitioner offices
 
-### Invoice Generation
+### Invoice Generation & Delivery
 - **PDF Invoices** - Generate professional PDF invoices with native Rust PDF generation
 - **Digital Signatures** - Add practitioner signatures to invoices
+- **Email Delivery** - Send invoices directly to patients via email with automatic PDF attachment
+- **Custom Invoice Dates** - Set specific dates for invoices instead of using the current date
 - **Business Information** - Complete practitioner business details integration
+
+### Office Management
+- **Multiple Offices** - Create and manage multiple practitioner office locations
+- **Office-Patient Linking** - Associate patients with specific practitioner offices
+- **Office Details on Invoices** - Automatically include office address and information on generated invoices
 
 ## 🛠️ Tech Stack
 
@@ -38,6 +47,8 @@ This is a personal project built to explore modern web technologies including Ru
 - **[Loco](https://loco.rs/)** - Rails-inspired web framework for Rust
 - **[SeaORM](https://www.sea-ql.org/SeaORM/)** - Async ORM for database operations
 - **PostgreSQL** - Primary database (SQLite supported for development)
+- **Background Workers** - Asynchronous job processing for email delivery and long-running tasks
+- **SMTP Integration** - Email delivery system for invoice distribution
 
 ### Frontend
 - **[TypeScript](https://www.typescriptlang.org/)** - Type-safe JavaScript
@@ -69,7 +80,7 @@ This is a personal project built to explore modern web technologies including Ru
 
 ### Environment Setup
 
-Create a `.env` file in the root directory:
+Create a `.env.local` file in the root directory (or simply copy the `.env` file):
 
 ```env
 # Database
@@ -81,6 +92,12 @@ SSN_SALT_KEY=your-secure-salt-key
 
 # JWT
 JWT_SECRET=your-jwt-secret-key
+
+# SMTP Email Configuration (for invoice delivery)
+SMTP_SERVER_HOST=smtp.your-provider.com
+SMTP_SERVER_PORT=465
+SMTP_AUTH_USER=your-email@example.com
+SMTP_AUTH_PASSWORD=your-smtp-password
 
 # Supabase Storage (optional, for invoice storage)
 SUPABASE_URL=your-supabase-url
@@ -116,7 +133,7 @@ cargo loco db migrate
 
 In one terminal (backend):
 ```bash
-cargo loco start
+cargo loco start --server-and-worker
 ```
 
 In another terminal (frontend):
