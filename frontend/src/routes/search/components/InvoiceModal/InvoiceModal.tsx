@@ -23,6 +23,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
 
   const handleClose = () => {
     setGeneratedInvoice(null);
+    setIsEmailSent(false);
     onClose();
   };
 

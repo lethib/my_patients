@@ -112,17 +112,15 @@ export const GenerateInvoiceContent = ({
         onSubmit={onSubmit}
         className="space-y-4"
       >
-        {patient && (
-          <div className="rounded-lg border bg-muted/50 p-3">
-            <p className="text-sm font-medium text-foreground">
-              {t("invoice.modal.patient")}: {patient.first_name}{" "}
-              {patient.last_name}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {t("invoice.modal.id")}: {patient.id}
-            </p>
-          </div>
-        )}
+        <div className="rounded-lg border bg-muted/50 p-3">
+          <p className="text-sm font-medium text-foreground">
+            {t("invoice.modal.patient")}: {patient.first_name}{" "}
+            {patient.last_name}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {t("invoice.modal.id")}: {patient.id}
+          </p>
+        </div>
 
         {!currentUser?.business_information && (
           <div className="rounded-lg border-destructive border-2 bg-muted/50 p-3">
