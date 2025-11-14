@@ -1,8 +1,8 @@
 import { useState } from "react";
 import type { SearchPatientResponse } from "@/api/hooks/patient";
-import { InvoiceModal } from "@/components/patients/InvoiceModal";
 import { CenteredSpineer } from "@/components/ui/spinner";
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { InvoiceModal } from "../InvoiceModal/InvoiceModal";
 import { PatientRow } from "./PatientRow";
 
 interface Props {
