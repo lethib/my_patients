@@ -155,14 +155,18 @@
     "modal": {
       "title": "Générer une facture",
       "description": "Créer une facture PDF pour ce patient",
+      "downloadDescription": "Votre facture a été générée avec succès",
       "patient": "Patient",
       "id": "ID",
+      "filename": "Fichier",
       "amount": "Montant de la facture",
       "date": "Date de la facture",
       "generating": "Génération...",
       "generate": "Générer la facture",
+      "download": "Télécharger la facture",
       "completeInformation": "Compléter mes informations",
       "sendInvoiceByEmail": "Envoi de la facture par email",
+      "emailSentConfirmation": "La facture a été envoyée par email avec succès",
       "missingInformationAlert": "Vous devez compléter vos informations professionnelles avant de pouvoir générer une facture",
       "missingPatientAddressMail": "Le patient n'a pas d'adresse mail. Veuillez mettre à jour les informations du patient pour pouvoir envoyer la facture par mail."
     },
