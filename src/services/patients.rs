@@ -99,8 +99,7 @@ pub async fn search_paginated(
     .filter(patient_users::Column::UserId.eq(user.id))
     .filter(search_condition)
     .select_also(practitioner_offices::Entity)
-    .order_by_asc(patients::Column::FirstName)
-    .order_by_asc(patients::Column::LastName)
+    .order_by_desc(patients::Column::UpdatedAt)
     .paginate(db, 10);
 
   let total_pages = paginator.num_pages().await?;
