@@ -1,9 +1,7 @@
 use crate::{
   models::{
     _entities::patients,
-    my_errors::{
-      application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors, ToErr,
-    },
+    my_errors::{application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors},
   },
   services::crypto::Crypto,
   validators::address::is_address_valid,
@@ -95,7 +93,7 @@ impl ActiveModel {
     params: &CreatePatientParams,
   ) -> ModelResult<Model, MyErrors> {
     if !is_address_valid(&params.address_line_1, &params.address_zip_code) {
-      return ApplicationError::UNPROCESSABLE_ENTITY.to_err();
+      return Err(ApplicationError::UNPROCESSABLE_ENTITY());
     }
 
     let ssn_encrypted = Model::encrypt_ssn(&params.ssn)?;
@@ -131,7 +129,7 @@ impl ActiveModel {
       .into_active_model();
 
     if !is_address_valid(&params.address_line_1, &params.address_zip_code) {
-      return ApplicationError::UNPROCESSABLE_ENTITY.to_err();
+      return Err(ApplicationError::UNPROCESSABLE_ENTITY());
     }
 
     patient.first_name = ActiveValue::Set(params.first_name.trim().to_string());

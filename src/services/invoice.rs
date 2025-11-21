@@ -2,7 +2,7 @@ use crate::{
   initializers::get_services,
   models::{
     _entities::{patient_users, patients, practitioner_offices, users},
-    my_errors::{application_error::ApplicationError, MyErrors, ToErr},
+    my_errors::{application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors},
     patients as PatientModel,
   },
   workers::{
@@ -35,7 +35,7 @@ pub async fn send_invoice(
   current_user: &users::Model,
 ) -> Result<(), MyErrors> {
   if generated_invoice.patient_email == PatientModel::DEFAULT_EMAIL {
-    return ApplicationError::UNPROCESSABLE_ENTITY.to_err();
+    return Err(UnexpectedError::SHOULD_NOT_HAPPEN());
   }
 
   let attachment = EmailAttachment::from_bytes(
@@ -82,10 +82,9 @@ pub async fn generate_patient_invoice(
     .select_also(practitioner_offices::Entity)
     .one(&services.db)
     .await?
-    .ok_or_else(|| ApplicationError::UNPROCESSABLE_ENTITY.to_my_error())?;
+    .ok_or(ApplicationError::UNPROCESSABLE_ENTITY())?; // TODO_TM: change that to have a 404 not found
 
-  let practitioner_office =
-    practitioner_office.ok_or_else(|| ApplicationError::UNPROCESSABLE_ENTITY.to_my_error())?;
+  let practitioner_office = practitioner_office.ok_or(ApplicationError::UNPROCESSABLE_ENTITY())?; // TODO_TM: change that to have a 404
 
   let invoice_date = chrono::NaiveDate::parse_from_str(&params.invoice_date, "%Y-%m-%d")?;
 

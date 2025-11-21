@@ -2,7 +2,7 @@ pub use super::_entities::practitioner_offices::{ActiveModel, Entity, Model};
 use crate::{
   models::{
     _entities::practitioner_offices,
-    my_errors::{application_error::ApplicationError, MyErrors, ToErr},
+    my_errors::{application_error::ApplicationError, MyErrors},
   },
   validators::address::is_address_valid,
 };
@@ -45,7 +45,7 @@ impl ActiveModel {
     params: &PractitionerOfficeParams,
   ) -> ModelResult<Model, MyErrors> {
     if !is_address_valid(&params.address_line_1, &params.address_zip_code) {
-      return ApplicationError::UNPROCESSABLE_ENTITY.to_err();
+      return Err(ApplicationError::UNPROCESSABLE_ENTITY());
     }
 
     return Ok(

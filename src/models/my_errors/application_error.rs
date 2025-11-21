@@ -1,28 +1,21 @@
-use crate::models::my_errors::{MyErrors, ToErr};
+use crate::models::my_errors::MyErrors;
+use axum::http::StatusCode;
 
-#[allow(non_camel_case_types)]
-pub enum ApplicationError {
-  UNPROCESSABLE_ENTITY,
-  new(String),
-}
+pub struct ApplicationError {}
 
 impl ApplicationError {
-  pub fn to_my_error(self) -> MyErrors {
-    match self {
-      ApplicationError::UNPROCESSABLE_ENTITY => MyErrors {
-        code: axum::http::StatusCode::BAD_REQUEST,
-        msg: "unprocessable_entity".into(),
-      },
-      ApplicationError::new(msg) => MyErrors {
-        code: axum::http::StatusCode::BAD_REQUEST,
-        msg: msg,
-      },
+  #[allow(non_snake_case)]
+  pub fn UNPROCESSABLE_ENTITY() -> MyErrors {
+    MyErrors {
+      code: StatusCode::BAD_REQUEST,
+      msg: "unprocessable_entity".into(),
     }
   }
-}
 
-impl ToErr for ApplicationError {
-  fn to_err<_T>(self) -> Result<_T, super::MyErrors> {
-    Err(self.to_my_error())
+  pub fn new(msg: String) -> MyErrors {
+    MyErrors {
+      code: StatusCode::BAD_REQUEST,
+      msg,
+    }
   }
 }
