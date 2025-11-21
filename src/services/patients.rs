@@ -111,7 +111,7 @@ pub async fn search_paginated(
       .map(|(patient, office_option)| {
         office_option
           .map(|office| (patient, office))
-          .ok_or(ApplicationError::NOT_FOUND())
+          .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())
       })
       .collect();
 

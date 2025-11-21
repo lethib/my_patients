@@ -19,7 +19,7 @@ use crate::{
   middlewares::current_user::{current_user_middleware, CurrentUser},
   models::{
     _entities::{practitioner_offices, user_practitioner_offices},
-    my_errors::{application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors},
+    my_errors::{application_error::ApplicationError, MyErrors},
     practitioner_offices::PractitionerOfficeParams,
   },
   services,

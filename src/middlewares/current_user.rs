@@ -37,7 +37,7 @@ pub async fn current_user_middleware(
 
   let claims = auth::jwt::JWT::new(&jwt_config.secret)
     .validate(token)
-    .map_err(|err| UnexpectedError::new(err.to_string()))?;
+    .map_err(|_| AuthenticationError::INVALID_AUTH_TOKEN())?;
 
   let user = users::Model::find_by_pid(&ctx.db, &claims.claims.pid).await?;
   ctx.shared_store.insert(user);

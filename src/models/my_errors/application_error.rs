@@ -7,7 +7,7 @@ impl ApplicationError {
   #[allow(non_snake_case)]
   pub fn UNPROCESSABLE_ENTITY() -> MyErrors {
     MyErrors {
-      code: StatusCode::BAD_REQUEST,
+      code: StatusCode::UNPROCESSABLE_ENTITY,
       msg: "unprocessable_entity".into(),
     }
   }
