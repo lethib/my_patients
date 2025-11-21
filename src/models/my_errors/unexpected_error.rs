@@ -1,28 +1,21 @@
-use crate::models::my_errors::{MyErrors, ToErr};
+use crate::models::my_errors::MyErrors;
+use axum::http::StatusCode;
 
-#[allow(non_camel_case_types)]
-pub enum UnexpectedError {
-  SHOULD_NOT_HAPPEN,
-  new(String),
-}
+pub struct UnexpectedError {}
 
 impl UnexpectedError {
-  pub fn to_my_error(self) -> MyErrors {
-    match self {
-      UnexpectedError::SHOULD_NOT_HAPPEN => MyErrors {
-        code: axum::http::StatusCode::INTERNAL_SERVER_ERROR,
-        msg: "should_not_happen".into(),
-      },
-      UnexpectedError::new(msg) => MyErrors {
-        code: axum::http::StatusCode::INTERNAL_SERVER_ERROR,
-        msg: msg,
-      },
+  #[allow(non_snake_case)]
+  pub fn SHOULD_NOT_HAPPEN() -> MyErrors {
+    MyErrors {
+      code: StatusCode::INTERNAL_SERVER_ERROR,
+      msg: "should_not_happen".into(),
     }
   }
-}
 
-impl ToErr for UnexpectedError {
-  fn to_err<_T>(self) -> Result<_T, super::MyErrors> {
-    Err(self.to_my_error())
+  pub fn new(msg: String) -> MyErrors {
+    MyErrors {
+      code: StatusCode::INTERNAL_SERVER_ERROR,
+      msg: msg,
+    }
   }
 }

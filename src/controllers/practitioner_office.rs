@@ -45,7 +45,7 @@ async fn update(
     .filter(user_practitioner_offices::Column::UserId.eq(ctx.current_user().0.id))
     .one(&ctx.db)
     .await?
-    .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?;
+    .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())?; // TODO_TM: change that to an application error
 
   let mut office = office.clone().into_active_model();
   office.name = Set(params.name.trim().to_string());
@@ -67,7 +67,7 @@ async fn destroy(
     .filter(user_practitioner_offices::Column::UserId.eq(ctx.current_user().0.id))
     .one(&ctx.db)
     .await?
-    .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?;
+    .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())?; // TODO_TM: change that to an application error
 
   office.clone().delete(&ctx.db).await?;
 

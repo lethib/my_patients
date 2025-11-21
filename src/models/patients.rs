@@ -38,8 +38,8 @@ impl Model {
   }
 
   fn hash_ssn(ssn: &str) -> Result<String, MyErrors> {
-    let salt = std::env::var("SSN_SALT_KEY")
-      .map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?;
+    let salt =
+      std::env::var("SSN_SALT_KEY").map_err(|err| UnexpectedError::new(err.to_string()))?;
     Crypto::hash(ssn, &salt)
   }
 

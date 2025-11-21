@@ -21,11 +21,10 @@ pub async fn create(
 
   let created_patient = match &patient_params.pid {
     Some(pid) => {
-      let pid =
-        Uuid::parse_str(pid).map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?;
+      let pid = Uuid::parse_str(pid).map_err(|err| UnexpectedError::new(err.to_string()))?;
       PatientModel::search_by_pid(&db_transaction, pid)
         .await?
-        .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?
+        .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())? // TODO_TM: change that to an application error
     }
     None => patients::ActiveModel::create(&db_transaction, patient_params).await?,
   };
@@ -109,10 +108,11 @@ pub async fn search_paginated(
     patients_with_optional_offices
       .into_iter()
       .map(|(patient, office_option)| {
-        office_option.map(|office| (patient, office)).ok_or(
-          UnexpectedError::new("Patient should always have a practitioner office".to_string())
-            .to_my_error(),
-        )
+        office_option
+          .map(|office| (patient, office))
+          .ok_or(UnexpectedError::new(
+            "Patient should always have a practitioner office".to_string(),
+          )) // TODO_TM: change that to an application error
       })
       .collect();
 

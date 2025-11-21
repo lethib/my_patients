@@ -57,7 +57,7 @@ async fn update(
     .filter(patient_users::Column::UserId.eq(ctx.current_user().0.id))
     .one(&ctx.db)
     .await?
-    .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?;
+    .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())?; // TODO_TM: change that to an application_error
 
   services::patients::update(&patient, &ctx.current_user().0, &patient_params).await?;
 
