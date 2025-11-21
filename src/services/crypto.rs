@@ -8,7 +8,7 @@ use argon2::{
 };
 use base64::{engine::general_purpose as Base64Engine, Engine};
 
-use crate::models::my_errors::{unexpected_error::UnexpectedError, MyErrors, ToErr};
+use crate::models::my_errors::{unexpected_error::UnexpectedError, MyErrors};
 
 pub struct Crypto {
   pub encryption_key: Key<Aes256Gcm>,
@@ -19,7 +19,7 @@ impl Crypto {
     let key_string = std::env::var("SSN_ENCRYPTION_KEY")?;
 
     if key_string.len() != 32 {
-      return UnexpectedError::SHOULD_NOT_HAPPEN.to_err();
+      return Err(UnexpectedError::SHOULD_NOT_HAPPEN());
     }
 
     return Ok(Crypto {
@@ -34,7 +34,7 @@ impl Crypto {
 
     let encrypted_str = cipher
       .encrypt(&nonce, str_to_encrypt.as_bytes())
-      .map_err(|err| UnexpectedError::new(err.to_string().into()).to_my_error())?;
+      .map_err(|err| UnexpectedError::new(err.to_string()))?;
 
     let mut final_encryption = nonce.to_vec();
     final_encryption.extend_from_slice(&encrypted_str);
@@ -48,10 +48,10 @@ impl Crypto {
 
     let encrypted_data = Base64Engine::STANDARD
       .decode(encrypted_str)
-      .map_err(|err| UnexpectedError::new(err.to_string().into()).to_my_error())?;
+      .map_err(|err| UnexpectedError::new(err.to_string()))?;
 
     if encrypted_data.len() < 12 {
-      return UnexpectedError::SHOULD_NOT_HAPPEN.to_err();
+      return Err(UnexpectedError::SHOULD_NOT_HAPPEN());
     }
 
     let (nonce_bytes, encrypted_data) = encrypted_data.split_at(12);
@@ -59,10 +59,9 @@ impl Crypto {
 
     let decrypted_bytes = cipher
       .decrypt(&nonce, encrypted_data)
-      .map_err(|err| UnexpectedError::new(err.to_string().into()).to_my_error())?;
+      .map_err(|err| UnexpectedError::new(err.to_string()))?;
 
-    String::from_utf8(decrypted_bytes)
-      .map_err(|err| UnexpectedError::new(err.to_string().into()).to_my_error())
+    String::from_utf8(decrypted_bytes).map_err(|err| UnexpectedError::new(err.to_string()))
   }
 
   pub fn hash(value: &str, salt: &String) -> Result<String, MyErrors> {
@@ -73,12 +72,12 @@ impl Crypto {
     );
 
     let salt_string = SaltString::encode_b64(salt.as_bytes())
-      .map_err(|err| UnexpectedError::new(err.to_string().into()).to_my_error())?;
+      .map_err(|err| UnexpectedError::new(err.to_string()))?;
 
     Ok(
       arg2
         .hash_password(value.as_bytes(), &salt_string)
-        .map_err(|err| UnexpectedError::new(err.to_string().into()).to_my_error())?
+        .map_err(|err| UnexpectedError::new(err.to_string()))?
         .to_string(),
     )
   }

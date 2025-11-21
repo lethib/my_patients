@@ -29,7 +29,7 @@ use crate::{
   middlewares::current_user::{current_user_middleware, CurrentUser},
   models::{
     _entities::{patient_users, patients},
-    my_errors::{unexpected_error::UnexpectedError, MyErrors},
+    my_errors::{application_error::ApplicationError, MyErrors},
     patients::{CreatePatientParams, Model},
   },
   services::{self, invoice::GenerateInvoiceParams},
@@ -57,7 +57,7 @@ async fn update(
     .filter(patient_users::Column::UserId.eq(ctx.current_user().0.id))
     .one(&ctx.db)
     .await?
-    .ok_or_else(|| UnexpectedError::SHOULD_NOT_HAPPEN.to_my_error())?;
+    .ok_or(ApplicationError::NOT_FOUND())?;
 
   services::patients::update(&patient, &ctx.current_user().0, &patient_params).await?;
 

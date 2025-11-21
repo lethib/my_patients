@@ -2,7 +2,7 @@ use crate::{
   middlewares::current_user::{current_user_middleware, CurrentUser},
   models::{
     _entities::users,
-    my_errors::{authentication_error::AuthenticationError, MyErrors, ToErr},
+    my_errors::{authentication_error::AuthenticationError, MyErrors},
     users::{LoginParams, RegisterParams},
   },
   views::auth::{CurrentResponse, LoginResponse},
@@ -90,18 +90,13 @@ async fn login(
   State(ctx): State<AppContext>,
   Json(params): Json<LoginParams>,
 ) -> Result<Response, MyErrors> {
-  let Ok(user) = users::Model::find_by_email(&ctx.db, &params.email).await else {
-    tracing::debug!(
-      email = params.email,
-      "login attempt with non-existent email"
-    );
-    return AuthenticationError::INVALID_CREDENTIALS.to_err();
-  };
-
+  let user = users::Model::find_by_email(&ctx.db, &params.email)
+    .await
+    .map_err(|_| AuthenticationError::INVALID_CREDENTIALS())?;
   let valid = user.verify_password(&params.password);
 
   if !valid {
-    return AuthenticationError::INVALID_CREDENTIALS.to_err();
+    return Err(AuthenticationError::INVALID_CREDENTIALS());
   }
 
   let jwt_secret = ctx.config.get_jwt_config()?;
