@@ -1,5 +1,6 @@
 use crate::initializers::get_services;
 use crate::models::_entities::{patient_users, patients, practitioner_offices};
+use crate::models::my_errors::application_error::ApplicationError;
 use crate::models::my_errors::unexpected_error::UnexpectedError;
 use crate::models::patient_users::{CreateLinkParams, UpdateLinkParams};
 use crate::models::{
@@ -24,7 +25,7 @@ pub async fn create(
       let pid = Uuid::parse_str(pid).map_err(|err| UnexpectedError::new(err.to_string()))?;
       PatientModel::search_by_pid(&db_transaction, pid)
         .await?
-        .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())? // TODO_TM: change that to an application error
+        .ok_or(ApplicationError::NOT_FOUND())?
     }
     None => patients::ActiveModel::create(&db_transaction, patient_params).await?,
   };
@@ -110,9 +111,7 @@ pub async fn search_paginated(
       .map(|(patient, office_option)| {
         office_option
           .map(|office| (patient, office))
-          .ok_or(UnexpectedError::new(
-            "Patient should always have a practitioner office".to_string(),
-          )) // TODO_TM: change that to an application error
+          .ok_or(ApplicationError::NOT_FOUND())
       })
       .collect();
 

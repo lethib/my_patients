@@ -82,9 +82,9 @@ pub async fn generate_patient_invoice(
     .select_also(practitioner_offices::Entity)
     .one(&services.db)
     .await?
-    .ok_or(ApplicationError::UNPROCESSABLE_ENTITY())?; // TODO_TM: change that to have a 404 not found
+    .ok_or(ApplicationError::NOT_FOUND())?;
 
-  let practitioner_office = practitioner_office.ok_or(ApplicationError::UNPROCESSABLE_ENTITY())?; // TODO_TM: change that to have a 404
+  let practitioner_office = practitioner_office.ok_or(ApplicationError::NOT_FOUND())?;
 
   let invoice_date = chrono::NaiveDate::parse_from_str(&params.invoice_date, "%Y-%m-%d")?;
 

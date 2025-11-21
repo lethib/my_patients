@@ -12,6 +12,14 @@ impl ApplicationError {
     }
   }
 
+  #[allow(non_snake_case)]
+  pub fn NOT_FOUND() -> MyErrors {
+    MyErrors {
+      code: StatusCode::NOT_FOUND,
+      msg: "resource_not_found".into(),
+    }
+  }
+
   pub fn new(msg: String) -> MyErrors {
     MyErrors {
       code: StatusCode::BAD_REQUEST,

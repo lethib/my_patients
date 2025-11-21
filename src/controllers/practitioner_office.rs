@@ -19,7 +19,7 @@ use crate::{
   middlewares::current_user::{current_user_middleware, CurrentUser},
   models::{
     _entities::{practitioner_offices, user_practitioner_offices},
-    my_errors::{unexpected_error::UnexpectedError, MyErrors},
+    my_errors::{application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors},
     practitioner_offices::PractitionerOfficeParams,
   },
   services,
@@ -45,7 +45,7 @@ async fn update(
     .filter(user_practitioner_offices::Column::UserId.eq(ctx.current_user().0.id))
     .one(&ctx.db)
     .await?
-    .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())?; // TODO_TM: change that to an application error
+    .ok_or(ApplicationError::NOT_FOUND())?;
 
   let mut office = office.clone().into_active_model();
   office.name = Set(params.name.trim().to_string());
@@ -67,7 +67,7 @@ async fn destroy(
     .filter(user_practitioner_offices::Column::UserId.eq(ctx.current_user().0.id))
     .one(&ctx.db)
     .await?
-    .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())?; // TODO_TM: change that to an application error
+    .ok_or(ApplicationError::NOT_FOUND())?;
 
   office.clone().delete(&ctx.db).await?;
 
