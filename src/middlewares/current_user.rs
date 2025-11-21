@@ -1,6 +1,8 @@
 use crate::models::{
   _entities::{user_business_informations, users},
-  my_errors::{authentication_error::AuthenticationError, MyErrors},
+  my_errors::{
+    authentication_error::AuthenticationError, unexpected_error::UnexpectedError, MyErrors,
+  },
 };
 use axum::{
   extract::{Request, State},
@@ -20,22 +22,22 @@ pub async fn current_user_middleware(
     .and_then(|h| h.to_str().ok())
     .ok_or_else(|| {
       tracing::error!("Authorization header not found");
-      AuthenticationError::INVALID_AUTH_TOKEN.to_my_error()
+      AuthenticationError::INVALID_AUTH_TOKEN()
     })?;
 
   let token = auth_header.strip_prefix("Bearer ").ok_or_else(|| {
     tracing::error!("No Bearer token found in Authorization header");
-    AuthenticationError::INVALID_AUTH_TOKEN.to_my_error()
+    AuthenticationError::INVALID_AUTH_TOKEN()
   })?;
 
   let jwt_config = ctx
     .config
     .get_jwt_config()
-    .map_err(|_| AuthenticationError::INVALID_AUTH_TOKEN.to_my_error())?;
+    .map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN())?;
 
   let claims = auth::jwt::JWT::new(&jwt_config.secret)
     .validate(token)
-    .map_err(|_| AuthenticationError::INVALID_AUTH_TOKEN.to_my_error())?;
+    .map_err(|err| UnexpectedError::new(err.to_string()))?;
 
   let user = users::Model::find_by_pid(&ctx.db, &claims.claims.pid).await?;
   ctx.shared_store.insert(user);
