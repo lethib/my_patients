@@ -27,7 +27,9 @@ pub async fn create(
         .await?
         .ok_or(ApplicationError::NOT_FOUND())?
     }
-    None => patients::ActiveModel::create(&db_transaction, patient_params).await?,
+    None => {
+      patients::ActiveModel::create(&db_transaction, patient_params, linked_to_user.id).await?
+    }
   };
 
   patient_users::ActiveModel::create(
