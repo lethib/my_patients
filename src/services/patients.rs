@@ -27,7 +27,9 @@ pub async fn create(
         .await?
         .ok_or(ApplicationError::NOT_FOUND())?
     }
-    None => patients::ActiveModel::create(&db_transaction, patient_params).await?,
+    None => {
+      patients::ActiveModel::create(&db_transaction, patient_params, linked_to_user.id).await?
+    }
   };
 
   patient_users::ActiveModel::create(
@@ -96,7 +98,7 @@ pub async fn search_paginated(
       JoinType::InnerJoin,
       patient_users::Relation::PractitionerOffices.def(),
     )
-    .filter(patient_users::Column::UserId.eq(user.id))
+    .filter(patients::Column::UserId.eq(user.id))
     .filter(search_condition)
     .select_also(practitioner_offices::Entity)
     .order_by_desc(patients::Column::UpdatedAt)

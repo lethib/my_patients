@@ -91,6 +91,7 @@ impl ActiveModel {
   pub async fn create<T: ConnectionTrait>(
     db: &T,
     params: &CreatePatientParams,
+    linked_to_user_id: i32,
   ) -> ModelResult<Model, MyErrors> {
     if !is_address_valid(&params.address_line_1, &params.address_zip_code) {
       return Err(ApplicationError::UNPROCESSABLE_ENTITY());
@@ -110,6 +111,7 @@ impl ActiveModel {
         address_zip_code: ActiveValue::Set(params.address_zip_code.clone()),
         address_city: ActiveValue::Set(params.address_city.clone()),
         address_country: ActiveValue::Set("FRANCE".to_string()),
+        user_id: ActiveValue::Set(linked_to_user_id),
         ..Default::default()
       }
       .insert(db)
