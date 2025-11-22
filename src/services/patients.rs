@@ -96,7 +96,7 @@ pub async fn search_paginated(
       JoinType::InnerJoin,
       patient_users::Relation::PractitionerOffices.def(),
     )
-    .filter(patient_users::Column::UserId.eq(user.id))
+    .filter(patients::Column::UserId.eq(user.id))
     .filter(search_condition)
     .select_also(practitioner_offices::Entity)
     .order_by_desc(patients::Column::UpdatedAt)

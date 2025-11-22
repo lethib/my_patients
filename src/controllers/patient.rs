@@ -28,7 +28,7 @@ struct SearchParams {
 use crate::{
   middlewares::current_user::{current_user_middleware, CurrentUser},
   models::{
-    _entities::{patient_users, patients},
+    _entities::patients,
     my_errors::{application_error::ApplicationError, MyErrors},
     patients::{CreatePatientParams, Model},
   },
@@ -53,8 +53,7 @@ async fn update(
   Json(patient_params): Json<CreatePatientParams>,
 ) -> Result<Response, MyErrors> {
   let patient = patients::Entity::find_by_id(patient_id)
-    .inner_join(patient_users::Entity)
-    .filter(patient_users::Column::UserId.eq(ctx.current_user().0.id))
+    .filter(patients::Column::UserId.eq(ctx.current_user().0.id))
     .one(&ctx.db)
     .await?
     .ok_or(ApplicationError::NOT_FOUND())?;

@@ -78,7 +78,7 @@ pub async fn generate_patient_invoice(
       sea_orm::JoinType::InnerJoin,
       patient_users::Relation::PractitionerOffices.def(),
     )
-    .filter(patient_users::Column::UserId.eq(current_user.id))
+    .filter(patients::Column::UserId.eq(current_user.id))
     .select_also(practitioner_offices::Entity)
     .one(&services.db)
     .await?
