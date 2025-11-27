@@ -22,7 +22,6 @@ pub struct CreatePatientParams {
   address_line_1: String,
   address_zip_code: String,
   address_city: String,
-  pub practitioner_office_id: i32,
   email: String,
 }
 

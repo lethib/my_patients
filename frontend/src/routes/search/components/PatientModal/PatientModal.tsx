@@ -81,9 +81,6 @@ export const PatientModal = ({
       .string()
       .trim()
       .min(1, t("patients.form.validation.cityRequired")),
-    practitioner_office_id: z.string(
-      t("patients.form.validation.officeRequired"),
-    ),
   });
 
   const addPatientForm = useForm({
@@ -95,7 +92,6 @@ export const PatientModal = ({
       address_line_1: "",
       address_zip_code: "",
       address_city: "",
-      practitioner_office_id: "",
     },
   });
 
@@ -120,7 +116,6 @@ export const PatientModal = ({
       address_line_1: "",
       address_zip_code: "",
       address_city: "",
-      practitioner_office_id: "",
     });
   };
 
@@ -135,10 +130,6 @@ export const PatientModal = ({
         address_line_1: currentPatient.address_line_1 || "",
         address_zip_code: currentPatient.address_zip_code || "",
         address_city: currentPatient.address_city || "",
-        practitioner_office_id:
-          ("office" in currentPatient &&
-            currentPatient.office?.id.toString()) ||
-          "",
       });
     }
   }, [open, currentPatient, isNewPatientFlowStarted]);
@@ -147,7 +138,6 @@ export const PatientModal = ({
     asyncMutation({
       ...values,
       pid: linkedPatient?.pid,
-      practitioner_office_id: +values.practitioner_office_id,
     })
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ["/patient/_search"] });

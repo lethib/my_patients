@@ -16,7 +16,6 @@ export type SavePatientParams = {
   address_line_1: string;
   address_zip_code: string;
   address_city: string;
-  practitioner_office_id: number;
 };
 
 export type SearchBySSNPatientResponse = {
@@ -48,7 +47,6 @@ export type SearchPatientResponse = {
   address_zip_code: string;
   address_city: string;
   address_country: string;
-  office: { id: number; name: string } | null;
 };
 
 export const patientSchema = {

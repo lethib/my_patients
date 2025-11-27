@@ -1,24 +1,10 @@
 import { User } from "lucide-react";
-import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { APIHooks } from "@/api/hooks";
 import { FormInput } from "@/components/form/FormInput";
 import { Label } from "@/components/ui";
-import { FormControl, FormField, FormItem } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export const PatientFormFields = () => {
   const { t } = useTranslation();
-  const { control } = useFormContext();
-
-  const myOfficesQuery = APIHooks.user.getMyOffices.useQuery(null);
 
   return (
     <>
@@ -108,38 +94,6 @@ export const PatientFormFields = () => {
             className="h-11"
           />
         </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="office" className="text-sm font-medium">
-          {t("patients.form.office")}
-        </Label>
-        <FormField
-          name="practitioner_office_id"
-          control={control}
-          render={({ field }) => (
-            <FormItem>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="w-full">
-                    <SelectValue
-                      placeholder={t("patients.form.officePlaceholder")}
-                    />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectGroup>
-                    {myOfficesQuery.data?.map((office) => (
-                      <SelectItem value={office.id.toString()} key={office.id}>
-                        {office.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
       </div>
     </>
   );
