@@ -6,3 +6,4 @@ pub mod patients;
 pub mod user_business_informations;
 pub mod practitioner_offices;
 pub mod user_practitioner_offices;
+pub mod medical_appointments;

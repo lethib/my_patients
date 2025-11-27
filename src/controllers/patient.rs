@@ -58,7 +58,7 @@ async fn update(
     .await?
     .ok_or(ApplicationError::NOT_FOUND())?;
 
-  services::patients::update(&patient, &ctx.current_user().0, &patient_params).await?;
+  services::patients::update(&patient, &patient_params).await?;
 
   Ok(format::json(serde_json::json!({ "success": true }))?)
 }
@@ -72,7 +72,7 @@ async fn search_by_ssn(
 
   let serialized_patients: Vec<PatientResponse> = found_patients
     .iter()
-    .map(|patient| PatientResponse::new(patient, None))
+    .map(|patient| PatientResponse::new(patient))
     .collect();
 
   Ok(format::json(serialized_patients)?)
@@ -96,7 +96,7 @@ async fn search(
 
   let patient_responses: Vec<PatientResponse> = patients
     .iter()
-    .map(|p| PatientResponse::from_model(&p.0, &p.1))
+    .map(|p| PatientResponse::from_model(&p))
     .collect();
 
   Ok(format::json(serde_json::json!({

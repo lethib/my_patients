@@ -1,5 +1,4 @@
-use crate::models::{_entities::practitioner_offices, patients};
-use practitioner_offices::Model as PractitionerOffice;
+use crate::models::patients;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -21,12 +20,11 @@ pub struct PatientResponse {
   pub address_zip_code: String,
   pub address_city: String,
   pub address_country: String,
-  office: Option<OfficeIdAndName>,
 }
 
 impl PatientResponse {
   #[must_use]
-  pub fn new(patient: &patients::Model, office: Option<&PractitionerOffice>) -> Self {
+  pub fn new(patient: &patients::Model) -> Self {
     Self {
       id: patient.id,
       pid: patient.pid.clone(),
@@ -40,15 +38,11 @@ impl PatientResponse {
       address_zip_code: patient.address_zip_code.clone(),
       address_city: patient.address_city.clone(),
       address_country: patient.address_country.clone(),
-      office: office.map(|office| OfficeIdAndName {
-        id: office.id,
-        name: office.name.clone(),
-      }),
     }
   }
 
   #[must_use]
-  pub fn from_model(patient: &patients::Model, office: &PractitionerOffice) -> Self {
+  pub fn from_model(patient: &patients::Model) -> Self {
     Self {
       id: patient.id,
       pid: patient.pid.clone(),
@@ -62,10 +56,6 @@ impl PatientResponse {
       address_zip_code: patient.address_zip_code.clone(),
       address_city: patient.address_city.clone(),
       address_country: patient.address_country.clone(),
-      office: Some(OfficeIdAndName {
-        id: office.id,
-        name: office.name.clone(),
-      }),
     }
   }
 }

@@ -83,7 +83,6 @@
       "zipCodePlaceholder": "Code postal",
       "city": "Ville",
       "cityPlaceholder": "Ville",
-      "office": "Cabinet",
       "officePlaceholder": "Sélectionnez un cabinet",
       "offices": {
         "RueilMalmaison": "Rueil-Malmaison",
@@ -100,8 +99,7 @@
         "ssnInvalid": "Le numéro de sécurité sociale ne correspond pas au format attendu",
         "addressRequired": "L'adresse est requise",
         "zipCodeInvalid": "Le code postal ne correspond pas au format attendu",
-        "cityRequired": "La ville est requise",
-        "officeRequired": "Sélectionnez un bureau valide"
+        "cityRequired": "La ville est requise"
       },
       "selector": {
         "prompt": "Veuillez sélectionner un patient pour continuer",
@@ -114,8 +112,7 @@
       "ssn": "Numéro de sécurité sociale",
       "address": "Adresse",
       "zip_code": "Code postal",
-      "city": "Ville",
-      "office": "Cabinet"
+      "city": "Ville"
     }
   },
   "offices": {

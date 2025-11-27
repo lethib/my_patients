@@ -53,11 +53,6 @@ export const PatientRow = ({
         <span className="text-sm">{patient.address_city}</span>
       </TableCell>
       <TableCell className="px-4 py-4 text-right">
-        <span className="text-sm font-semibold text-primary">
-          {patient.office?.name}
-        </span>
-      </TableCell>
-      <TableCell className="px-4 py-4 text-right">
         <Button
           variant="outline"
           size="sm"

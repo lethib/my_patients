@@ -21,14 +21,12 @@ export const PatientSelector = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-sm">
-        {t("patients.form.selector.prompt")}
-      </span>
+      <span className="text-sm">{t("patients.form.selector.prompt")}</span>
       {patients.map((patient) => (
         <Card
           key={patient.id}
           className="py-2 pl-5 cursor-pointer hover:bg-accent transition-colors"
-          onClick={() => onSelectExistingPatient({ ...patient, office: null })}
+          onClick={() => onSelectExistingPatient(patient)}
         >
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">

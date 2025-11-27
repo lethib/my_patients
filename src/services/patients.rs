@@ -1,15 +1,14 @@
 use crate::initializers::get_services;
-use crate::models::_entities::{patient_users, patients, practitioner_offices};
+use crate::models::_entities::patients;
 use crate::models::my_errors::application_error::ApplicationError;
 use crate::models::my_errors::unexpected_error::UnexpectedError;
-use crate::models::patient_users::{CreateLinkParams, UpdateLinkParams};
 use crate::models::{
   my_errors::MyErrors,
   patients::{CreatePatientParams, Model as PatientModel},
   users,
 };
-use sea_orm::{ColumnTrait, Condition, QueryFilter, QuerySelect, RelationTrait};
-use sea_orm::{EntityTrait, JoinType, PaginatorTrait, QueryOrder, TransactionTrait};
+use sea_orm::{ColumnTrait, Condition, QueryFilter};
+use sea_orm::{EntityTrait, PaginatorTrait, QueryOrder, TransactionTrait};
 use uuid::Uuid;
 
 pub async fn create(
@@ -32,15 +31,7 @@ pub async fn create(
     }
   };
 
-  patient_users::ActiveModel::create(
-    &db_transaction,
-    &CreateLinkParams {
-      user_id: linked_to_user.id,
-      patient_id: created_patient.id,
-      practitioner_office_id: patient_params.practitioner_office_id,
-    },
-  )
-  .await?;
+  // TODO_TM: create medical_appointment here
 
   db_transaction.commit().await?;
 
@@ -49,7 +40,6 @@ pub async fn create(
 
 pub async fn update(
   patient: &patients::Model,
-  linked_to_user: &users::Model,
   patient_params: &CreatePatientParams,
 ) -> Result<(), MyErrors> {
   let services = get_services();
@@ -57,16 +47,6 @@ pub async fn update(
   let db_transaction = services.db.begin().await?;
 
   patients::ActiveModel::update(&db_transaction, patient.id, patient_params).await?;
-
-  patient_users::ActiveModel::update(
-    &db_transaction,
-    linked_to_user.id,
-    patient.id,
-    &UpdateLinkParams {
-      practitioner_office_id: patient_params.practitioner_office_id,
-    },
-  )
-  .await?;
 
   db_transaction.commit().await?;
 
@@ -77,7 +57,7 @@ pub async fn search_paginated(
   query: &str,
   page: u64,
   user: &users::Model,
-) -> Result<(Vec<(PatientModel, practitioner_offices::Model)>, u64), MyErrors> {
+) -> Result<(Vec<PatientModel>, u64), MyErrors> {
   let db = &get_services().db;
 
   // Build search condition for first_name and last_name (case-insensitive)
@@ -93,29 +73,13 @@ pub async fn search_paginated(
 
   // Query patients that belong to the current user and match the search
   let paginator = patients::Entity::find()
-    .inner_join(patient_users::Entity)
-    .join(
-      JoinType::InnerJoin,
-      patient_users::Relation::PractitionerOffices.def(),
-    )
     .filter(patients::Column::UserId.eq(user.id))
     .filter(search_condition)
-    .select_also(practitioner_offices::Entity)
     .order_by_desc(patients::Column::UpdatedAt)
     .paginate(db, 10);
 
   let total_pages = paginator.num_pages().await?;
   let patients_with_optional_offices = paginator.fetch_page(page - 1).await?; // SeaORM uses 0-based pagination
 
-  let result: Result<Vec<(PatientModel, practitioner_offices::Model)>, MyErrors> =
-    patients_with_optional_offices
-      .into_iter()
-      .map(|(patient, office_option)| {
-        office_option
-          .map(|office| (patient, office))
-          .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())
-      })
-      .collect();
-
-  Ok((result?, total_pages))
+  Ok((patients_with_optional_offices, total_pages))
 }
