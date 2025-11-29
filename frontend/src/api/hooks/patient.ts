@@ -74,11 +74,13 @@ export const patientSchema = {
           amount,
           invoice_date,
           should_be_sent_by_email,
+          practitioner_office_id,
         }: {
           patientId: number;
           amount: string;
           invoice_date: string;
           should_be_sent_by_email: boolean;
+          practitioner_office_id: number;
         }) => {
           const response = await APIClient.client.post<{
             pdf_data: string;
@@ -87,6 +89,7 @@ export const patientSchema = {
             amount,
             invoice_date,
             should_be_sent_by_email,
+            practitioner_office_id,
           });
 
           // Decode base64 PDF data to blob

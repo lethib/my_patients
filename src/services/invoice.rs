@@ -1,8 +1,9 @@
 use crate::{
   initializers::get_services,
   models::{
-    _entities::{patient_users, patients, practitioner_offices, users},
-    my_errors::{application_error::ApplicationError, MyErrors},
+    _entities::{patients, practitioner_offices::Entity as PractitionerOffices, users},
+    medical_appointments::{ActiveModel as MedicalAppointments, CreateMedicalAppointmentParams},
+    my_errors::{application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors},
     patients as PatientModel,
   },
   workers::{
@@ -12,7 +13,6 @@ use crate::{
   },
 };
 use loco_rs::prelude::*;
-use sea_orm::{QuerySelect, RelationTrait};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -20,6 +20,7 @@ pub struct GenerateInvoiceParams {
   pub amount: String,
   pub invoice_date: String,
   pub should_be_sent_by_email: bool,
+  pub practitioner_office_id: i32,
 }
 
 pub struct GenerateInvoiceResponse {
@@ -72,19 +73,11 @@ pub async fn generate_patient_invoice(
 ) -> Result<GenerateInvoiceResponse, MyErrors> {
   let services = get_services();
 
-  let (patient, practitioner_office) = patients::Entity::find_by_id(*patient_id)
-    .inner_join(patient_users::Entity)
-    .join(
-      sea_orm::JoinType::InnerJoin,
-      patient_users::Relation::PractitionerOffices.def(),
-    )
+  let patient = patients::Entity::find_by_id(*patient_id)
     .filter(patients::Column::UserId.eq(current_user.id))
-    .select_also(practitioner_offices::Entity)
     .one(&services.db)
     .await?
     .ok_or(ApplicationError::NOT_FOUND())?;
-
-  let practitioner_office = practitioner_office.ok_or(ApplicationError::NOT_FOUND())?;
 
   let invoice_date = chrono::NaiveDate::parse_from_str(&params.invoice_date, "%Y-%m-%d")?;
 
@@ -96,6 +89,22 @@ pub async fn generate_patient_invoice(
     &patient.first_name,
     invoice_date.format("%d_%m_%Y")
   );
+
+  let medical_appointment_params = CreateMedicalAppointmentParams {
+    user_id: current_user.id,
+    patient_id: *patient_id,
+    practitioner_office_id: params.practitioner_office_id,
+    date: invoice_date,
+  };
+
+  let created_medical_appointment =
+    MedicalAppointments::create(&services.db, &medical_appointment_params).await?;
+
+  let practitioner_office =
+    PractitionerOffices::find_by_id(created_medical_appointment.practitioner_office_id)
+      .one(&services.db)
+      .await?
+      .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())?;
 
   let args = InvoiceGeneratorArgs {
     patient: patient.clone(),

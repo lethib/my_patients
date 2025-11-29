@@ -4,7 +4,8 @@ import { CircleAlert, FileText, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
-import { patientSchema, type SearchPatientResponse } from "@/api/hooks/patient";
+import { APIHooks } from "@/api/hooks";
+import { type SearchPatientResponse } from "@/api/hooks/patient";
 import { FormDatePicker } from "@/components/form/FormDatePicker";
 import { FormInput } from "@/components/form/FormInput";
 import { FormProvider } from "@/components/form/FormProvider";
@@ -18,6 +19,15 @@ import {
   DialogTitle,
   Label,
 } from "@/components/ui";
+import { FormControl, FormField, FormItem } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import type { LocalInvoiceFile } from "./InvoiceModal";
 
@@ -38,7 +48,9 @@ export const GenerateInvoiceContent = ({
   const navigate = useNavigate();
   const { currentUser } = useCurrentUser();
 
-  const generateInvoiceMutation = patientSchema.generateInvoice.useMutation();
+  const myOfficesQuery = APIHooks.user.getMyOffices.useQuery(null);
+  const generateInvoiceMutation =
+    APIHooks.patient.generateInvoice.useMutation();
 
   const invoiceFormSchema = z.object({
     amount: z
@@ -53,6 +65,7 @@ export const GenerateInvoiceContent = ({
       ),
     date: z.date(),
     shouldSendInvoiceByEmail: z.boolean(),
+    practitionerOfficeId: z.string(t("invoice.errors.officeMustBeSelected")),
   });
 
   type InvoiceFormData = z.infer<typeof invoiceFormSchema>;
@@ -63,6 +76,7 @@ export const GenerateInvoiceContent = ({
       amount: "",
       date: new Date(),
       shouldSendInvoiceByEmail: false,
+      practitionerOfficeId: "",
     },
   });
 
@@ -87,6 +101,7 @@ export const GenerateInvoiceContent = ({
         amount: `${numericAmount}€`,
         invoice_date: `${year}-${month}-${day}`,
         should_be_sent_by_email: data.shouldSendInvoiceByEmail,
+        practitioner_office_id: +data.practitionerOfficeId,
       })
       .then(({ blob, filename }) => {
         setGeneratedInvoice({ blob, filename });
@@ -157,6 +172,43 @@ export const GenerateInvoiceContent = ({
           label={t("invoice.modal.date")}
           disabled={generateInvoiceMutation.isPending}
         />
+
+        <div className="space-y-2">
+          <Label htmlFor="office" className="text-sm font-medium">
+            {t("invoice.modal.office")}
+          </Label>
+          <FormField
+            name="practitionerOfficeId"
+            render={({ field }) => (
+              <FormItem>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue
+                        placeholder={t("patients.form.officePlaceholder")}
+                      />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      {myOfficesQuery.data?.map((office) => (
+                        <SelectItem
+                          value={office.id.toString()}
+                          key={office.id}
+                        >
+                          {office.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div className="py-2 space-y-2">
           {!patient.email && (
