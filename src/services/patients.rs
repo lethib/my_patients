@@ -8,7 +8,7 @@ use crate::models::{
   users,
 };
 use sea_orm::{ColumnTrait, Condition, QueryFilter};
-use sea_orm::{EntityTrait, PaginatorTrait, QueryOrder, TransactionTrait};
+use sea_orm::{EntityTrait, PaginatorTrait, QueryOrder};
 use uuid::Uuid;
 
 pub async fn create(
@@ -17,23 +17,15 @@ pub async fn create(
 ) -> Result<PatientModel, MyErrors> {
   let services = get_services();
 
-  let db_transaction = services.db.begin().await?;
-
   let created_patient = match &patient_params.pid {
     Some(pid) => {
       let pid = Uuid::parse_str(pid).map_err(|err| UnexpectedError::new(err.to_string()))?;
-      PatientModel::search_by_pid(&db_transaction, pid)
+      PatientModel::search_by_pid(&services.db, pid)
         .await?
         .ok_or(ApplicationError::NOT_FOUND())?
     }
-    None => {
-      patients::ActiveModel::create(&db_transaction, patient_params, linked_to_user.id).await?
-    }
+    None => patients::ActiveModel::create(&services.db, patient_params, linked_to_user.id).await?,
   };
-
-  // TODO_TM: create medical_appointment here
-
-  db_transaction.commit().await?;
 
   Ok(created_patient)
 }
@@ -44,11 +36,7 @@ pub async fn update(
 ) -> Result<(), MyErrors> {
   let services = get_services();
 
-  let db_transaction = services.db.begin().await?;
-
-  patients::ActiveModel::update(&db_transaction, patient.id, patient_params).await?;
-
-  db_transaction.commit().await?;
+  patients::ActiveModel::update(&services.db, patient.id, patient_params).await?;
 
   Ok(())
 }

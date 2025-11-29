@@ -20,6 +20,7 @@ mod m20251018_123530_add_email_to_patient;
 mod m20251025_210751_remove_unique_constraints_from_patient_ssn;
 mod m20251122_092542_add_user_id_to_patients;
 mod m20251123_103746_create_medicale_appointments_table;
+mod m20251129_135113_add_default_timestamps_to_medical_appointments;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -44,6 +45,7 @@ impl MigratorTrait for Migrator {
       Box::new(m20251025_210751_remove_unique_constraints_from_patient_ssn::Migration),
       Box::new(m20251122_092542_add_user_id_to_patients::Migration),
       Box::new(m20251123_103746_create_medicale_appointments_table::Migration),
+      Box::new(m20251129_135113_add_default_timestamps_to_medical_appointments::Migration),
       // inject-above (do not remove this comment)
     ]
   }
