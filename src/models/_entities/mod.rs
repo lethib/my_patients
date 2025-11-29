@@ -3,7 +3,6 @@
 pub mod prelude;
 
 pub mod medical_appointments;
-pub mod patient_users;
 pub mod patients;
 pub mod practitioner_offices;
 pub mod user_business_informations;
