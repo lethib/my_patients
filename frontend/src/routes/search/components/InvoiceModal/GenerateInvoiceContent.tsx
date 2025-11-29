@@ -65,7 +65,9 @@ export const GenerateInvoiceContent = ({
       ),
     date: z.date(),
     shouldSendInvoiceByEmail: z.boolean(),
-    practitionerOfficeId: z.string(t("invoice.errors.officeMustBeSelected")),
+    practitionerOfficeId: z
+      .string()
+      .min(1, t("invoice.errors.officeMustBeSelected")),
   });
 
   type InvoiceFormData = z.infer<typeof invoiceFormSchema>;
