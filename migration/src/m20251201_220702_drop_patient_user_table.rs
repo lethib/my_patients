@@ -11,7 +11,9 @@ impl MigrationTrait for Migration {
   }
 
   async fn down(&self, _m: &SchemaManager) -> Result<(), DbErr> {
-    Ok(())
+    Err(DbErr::Migration(
+      "Cannot rollback: patient_users table removal is irreversible".to_string(),
+    ))
   }
 }
 
