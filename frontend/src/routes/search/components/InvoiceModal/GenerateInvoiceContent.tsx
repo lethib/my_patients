@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "@tanstack/react-router";
 import { CircleAlert, FileText, Loader2 } from "lucide-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
@@ -81,6 +82,15 @@ export const GenerateInvoiceContent = ({
       practitionerOfficeId: "",
     },
   });
+
+  useEffect(() => {
+    if (myOfficesQuery.data?.length === 1) {
+      invoiceForm.setValue(
+        "practitionerOfficeId",
+        myOfficesQuery.data[0].id.toString(),
+      );
+    }
+  }, [myOfficesQuery.data, invoiceForm]);
 
   const handleOnClose = () => {
     if (!generateInvoiceMutation.isPending) {
@@ -185,7 +195,7 @@ export const GenerateInvoiceContent = ({
               <FormItem>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  value={field.value}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
