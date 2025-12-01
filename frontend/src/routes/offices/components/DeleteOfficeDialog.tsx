@@ -40,6 +40,7 @@ export const DeleteOfficeDialog = ({
         <DialogHeader>
           <DialogTitle>{t("offices.delete.title")}</DialogTitle>
           <DialogDescription>
+            {/* TODO_TM: change the description with medical appointments once the feature is live */}
             {t("offices.delete.description")}
           </DialogDescription>
         </DialogHeader>
