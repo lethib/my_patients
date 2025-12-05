@@ -52,13 +52,19 @@ impl Config {
   /// Load configuration from a YAML file based on the environment
   /// Environment can be: "development", "production", or "test"
   pub fn load(environment: &str) -> Result<Self, ConfigError> {
-    ConfigLoader::builder()
+    let mut builder = ConfigLoader::builder()
       // Load the environment-specific config file
       .add_source(File::with_name(&format!("config/{}", environment)).required(true))
       // Allow environment variables with APP__ prefix to override config
       // Example: APP__DATABASE__URL=postgres://... will override database.url
-      .add_source(Environment::with_prefix("APP").separator("__"))
-      .build()?
-      .try_deserialize()
+      .add_source(Environment::with_prefix("APP").separator("__"));
+
+    // Handle PORT environment variable (standard for cloud platforms like Google Cloud Run)
+    // Falls back to the port defined in the YAML file (default: 5150)
+    if let Ok(port) = std::env::var("PORT") {
+      builder = builder.set_override("server.port", port)?;
+    }
+
+    builder.build()?.try_deserialize()
   }
 }

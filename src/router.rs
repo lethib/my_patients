@@ -6,6 +6,7 @@ use axum::{
 use tower_http::{
     cors::CorsLayer,
     services::{ServeDir, ServeFile},
+    trace::TraceLayer,
 };
 use crate::{app_state::AppState, controllers, middleware::auth::auth_middleware};
 
@@ -46,6 +47,8 @@ pub fn create_router(state: AppState) -> Router {
             ServeDir::new("frontend/dist")
                 .fallback(ServeFile::new("frontend/dist/index.html"))
         )
+        // HTTP request tracing middleware
+        .layer(TraceLayer::new_for_http())
         // CORS middleware
         .layer(
             CorsLayer::new()

@@ -98,7 +98,13 @@ fn setup_logging(level: &str) {
   tracing_subscriber::registry()
     .with(
       tracing_subscriber::EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| format!("my_patients={},tower_http=debug", level).into()),
+        .unwrap_or_else(|_| {
+          format!(
+            "my_patients={},tower_http=debug,sea_orm=warn,sqlx=warn",
+            level
+          )
+          .into()
+        }),
     )
     .with(tracing_subscriber::fmt::layer())
     .init();

@@ -69,7 +69,7 @@ LABEL stage=planner
 
 # Copy only Cargo files for dependency analysis
 COPY Cargo.toml Cargo.lock ./
-COPY migration/Cargo.toml migration/
+COPY migration/ migration/
 COPY src/ src/
 
 # Generate recipe.json with all dependency information
@@ -82,8 +82,10 @@ RUN cargo chef prepare --recipe-path recipe.json
 FROM chef AS rust-deps
 LABEL stage=rust-deps
 
-# Copy recipe and build dependencies only
+# Copy recipe and Cargo.toml files (needed by cargo chef cook)
 COPY --from=planner /app/recipe.json recipe.json
+COPY Cargo.toml Cargo.lock ./
+COPY migration/ migration/
 
 # Build dependencies with release optimizations and specific target
 # This layer will be cached unless dependencies change
@@ -110,9 +112,9 @@ COPY src/ src/
 # Using explicit target for consistent builds across architectures
 RUN cargo build --release --target x86_64-unknown-linux-gnu && \
     # Strip binary to reduce size (remove debug symbols)
-    strip target/x86_64-unknown-linux-gnu/release/my_patients-cli && \
+    strip target/x86_64-unknown-linux-gnu/release/my_patients && \
     # Verify binary was built successfully
-    [ -f "target/x86_64-unknown-linux-gnu/release/my_patients-cli" ] || \
+    [ -f "target/x86_64-unknown-linux-gnu/release/my_patients" ] || \
         (echo "Rust build failed - binary not found" && exit 1)
 
 # ------------------------------------------------------------------------------
@@ -133,7 +135,7 @@ WORKDIR /app
 # The 'nonroot' user has UID 65532 and GID 65532
 COPY --from=frontend-builder --chown=65532:65532 /app/dist ./frontend/dist/
 COPY --from=rust-builder --chown=65532:65532 \
-    /app/target/x86_64-unknown-linux-gnu/release/my_patients-cli ./my_patients-cli
+    /app/target/x86_64-unknown-linux-gnu/release/my_patients ./my_patients
 COPY --chown=65532:65532 config/ ./config/
 
 # Set optimal defaults for production
@@ -141,4 +143,4 @@ ENV RUST_LOG=info
 ENV RUST_BACKTRACE=0
 
 EXPOSE 5150
-ENTRYPOINT ["/app/my_patients-cli", "start", "--server-and-worker"]
+ENTRYPOINT ["/app/my_patients"]
