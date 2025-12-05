@@ -1,5 +1,4 @@
 use axum::http::StatusCode;
-use loco_rs::prelude::*;
 use printpdf::*;
 use serde::Serialize;
 use std::io::BufWriter;
@@ -9,13 +8,9 @@ use crate::models::{
   my_errors::MyErrors,
 };
 use crate::services::storage::StorageService;
-use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{prelude::Date, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 
-pub struct InvoiceGeneratorWorker {
-  pub ctx: AppContext,
-}
-
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct InvoiceGeneratorArgs {
   pub patient: patients::Model,
   pub user: users::Model,
@@ -31,28 +26,35 @@ pub struct InvoiceGenerationResult {
   pub error: Option<String>,
 }
 
-#[async_trait]
-impl BackgroundWorker<InvoiceGeneratorArgs> for InvoiceGeneratorWorker {
-  fn build(ctx: &AppContext) -> Self {
-    Self { ctx: ctx.clone() }
-  }
+/// Process invoice generation as a background job
+#[allow(dead_code)]
+pub async fn process_invoice(
+  args: InvoiceGeneratorArgs,
+  db: &DatabaseConnection,
+) -> anyhow::Result<()> {
+  tracing::info!(
+    "Starting invoice generation for patient: {} {}",
+    args.patient.first_name,
+    args.patient.last_name
+  );
 
-  async fn perform(&self, args: InvoiceGeneratorArgs) -> loco_rs::Result<()> {
-    let result = generate_invoice_pdf(&self.ctx.db, &args).await;
+  let result = generate_invoice_pdf(db, &args).await;
 
-    match result {
-      Ok(_) => Ok(()),
-      Err(e) => Err(loco_rs::Error::string(&format!(
-        "Invoice generation failed: {}",
-        e
-      ))),
+  match result {
+    Ok(_) => {
+      tracing::info!("Invoice generated successfully");
+      Ok(())
+    }
+    Err(e) => {
+      tracing::error!("Invoice generation failed: {:?}", e);
+      Err(anyhow::anyhow!("Invoice generation failed: {:?}", e))
     }
   }
 }
 
 /// Generate an invoice PDF based on the French invoice template
-pub async fn generate_invoice_pdf<C: ConnectionTrait>(
-  db: &C,
+pub async fn generate_invoice_pdf(
+  db: &DatabaseConnection,
   args: &InvoiceGeneratorArgs,
 ) -> std::result::Result<Vec<u8>, MyErrors> {
   // Initialize storage service for signature fetching

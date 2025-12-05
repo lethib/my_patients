@@ -1,4 +1,3 @@
-use loco_rs::app::AppContext;
 use std::sync::OnceLock;
 
 // Application services to hold database connection and other shared resources
@@ -8,8 +7,8 @@ pub struct AppServices {
 }
 
 impl AppServices {
-  pub fn new(ctx: &AppContext) -> Self {
-    Self { db: ctx.db.clone() }
+  pub fn new(db: &sea_orm::DatabaseConnection) -> Self {
+    Self { db: db.clone() }
   }
 }
 
@@ -17,10 +16,8 @@ impl AppServices {
 static APP_SERVICES: OnceLock<AppServices> = OnceLock::new();
 
 // Initialize services - should be called during app initialization
-pub fn init_services(ctx: &AppContext) -> Result<(), String> {
-  APP_SERVICES
-    .set(AppServices::new(ctx))
-    .map_err(|_| "Failed to initialize app services".to_string())
+pub fn init_services(db: &sea_orm::DatabaseConnection) {
+  let _ = APP_SERVICES.set(AppServices::new(db));
 }
 
 // Helper function to get services from anywhere in the application

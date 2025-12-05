@@ -1,4 +1,5 @@
 use crate::{
+  app_state::{AppState, WorkerJob},
   initializers::get_services,
   models::{
     _entities::{patients, practitioner_offices::Entity as PractitionerOffices, users},
@@ -9,10 +10,10 @@ use crate::{
   workers::{
     self,
     invoice_generator::InvoiceGeneratorArgs,
-    mailer::{args::EmailArgs, attachment::EmailAttachment, worker::EmailWorker},
+    mailer::{args::EmailArgs, attachment::EmailAttachment},
   },
 };
-use loco_rs::prelude::*;
+use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -31,7 +32,7 @@ pub struct GenerateInvoiceResponse {
 }
 
 pub async fn send_invoice(
-  ctx: &AppContext,
+  state: &AppState,
   generated_invoice: &GenerateInvoiceResponse,
   current_user: &users::Model,
 ) -> Result<(), MyErrors> {
@@ -61,7 +62,9 @@ pub async fn send_invoice(
   .with_attachment(attachment)
   .with_reply_to(current_user.email.to_string());
 
-  EmailWorker::perform_later(ctx, args).await?;
+  // Enqueue email job via worker channel
+  state.worker_tx.send(WorkerJob::Email(args)).await
+    .map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN())?;
 
   Ok(())
 }

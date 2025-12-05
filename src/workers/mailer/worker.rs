@@ -1,142 +1,114 @@
-use async_trait::async_trait;
 use lettre::{
   message::{header::ContentType, Attachment, Mailbox, MultiPart, SinglePart},
   transport::smtp::authentication::Credentials,
   AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor,
 };
-use loco_rs::{
-  app::AppContext,
-  config::{MailerAuth, SmtpMailer},
-  prelude::BackgroundWorker,
-};
+use std::sync::Arc;
+use crate::{config::Config, workers::mailer::args::EmailArgs};
 
-use crate::workers::mailer::args::EmailArgs;
+pub async fn process_email(args: EmailArgs, config: &Arc<Config>) -> anyhow::Result<()> {
+    tracing::info!("Start sending email to: {}", args.to);
 
-pub struct EmailWorker {
-  pub config: SmtpMailer,
-  pub auth: MailerAuth,
-}
+    let email = build_email(&args, config)?;
+    send_email(email, config).await?;
 
-#[async_trait]
-impl BackgroundWorker<EmailArgs> for EmailWorker {
-  fn class_name() -> String
-  where
-    Self: Sized,
-  {
-    "EmailWorker".to_string()
-  }
-
-  fn build(ctx: &AppContext) -> Self {
-    let mailer_config = ctx
-      .config
-      .mailer
-      .as_ref()
-      .expect("Mailer configuration is required but missing from application config");
-
-    let smtp_config = mailer_config
-      .smtp
-      .as_ref()
-      .expect("SMTP configuration is required but missing from mailer config");
-
-    Self {
-      config: smtp_config.clone(),
-      auth: smtp_config
-        .auth
-        .as_ref()
-        .expect("SMTP authentication credentials are required but missing from SMTP config")
-        .clone(),
-    }
-  }
-
-  async fn perform(&self, args: EmailArgs) -> loco_rs::Result<()> {
-    tracing::info!("Start sending email with args");
-    let email = Self::build_email(&self, &args)?;
-
-    Self::send_email(&self, email).await?;
-
-    tracing::info!("Email sent");
-
+    tracing::info!("Email sent successfully");
     Ok(())
-  }
 }
 
-impl EmailWorker {
-  fn build_email(&self, args: &EmailArgs) -> loco_rs::Result<Message> {
+fn build_email(args: &EmailArgs, _config: &Arc<Config>) -> anyhow::Result<Message> {
     let to: Mailbox = if let Some(name) = &args.to_name {
-      format!("{} <{}>", name, args.to)
-        .parse()
-        .map_err(|e| loco_rs::Error::Message(format!("Invalid to address: {}", e)))?
+        format!("{} <{}>", name, args.to)
+            .parse()
+            .map_err(|e| anyhow::anyhow!("Invalid to address: {}", e))?
     } else {
-      args
-        .to
-        .parse()
-        .map_err(|e| loco_rs::Error::Message(format!("Invalid to address: {}", e)))?
+        args
+            .to
+            .parse()
+            .map_err(|e| anyhow::anyhow!("Invalid to address: {}", e))?
     };
 
+    let smtp_user = std::env::var("SMTP_AUTH_USER")
+        .map_err(|_| anyhow::anyhow!("SMTP_AUTH_USER environment variable not set"))?;
+
     let mut message_builder = Message::builder()
-      .from(format!("{} <{}>", "My Patients", self.auth.user).parse()?)
-      .to(to)
-      .subject(&args.subject);
+        .from(
+            format!("{} <{}>", "My Patients", smtp_user)
+                .parse()
+                .map_err(|e| anyhow::anyhow!("Invalid from address: {}", e))?,
+        )
+        .to(to)
+        .subject(&args.subject);
 
     if let Some(reply_to) = &args.reply_to {
-      message_builder = message_builder.reply_to(reply_to.parse()?);
+        message_builder = message_builder
+            .reply_to(reply_to.parse().map_err(|e| anyhow::anyhow!("Invalid reply-to address: {}", e))?);
     }
 
     let message = if args.attachments.is_empty() {
-      Self::build_simple_body(message_builder, args)?
+        build_simple_body(message_builder, args)?
     } else {
-      Self::build_multipart_body(message_builder, args)?
+        build_multipart_body(message_builder, args)?
     };
 
     Ok(message)
-  }
+}
 
-  fn build_simple_body(
+fn build_simple_body(
     builder: lettre::message::MessageBuilder,
     args: &EmailArgs,
-  ) -> loco_rs::Result<Message> {
+) -> anyhow::Result<Message> {
     builder
-      .body(args.text_body.clone())
-      .map_err(|e| loco_rs::Error::Message(format!("Failed to build email: {}", e)))
-  }
+        .body(args.text_body.clone())
+        .map_err(|e| anyhow::anyhow!("Failed to build email: {}", e))
+}
 
-  fn build_multipart_body(
+fn build_multipart_body(
     builder: lettre::message::MessageBuilder,
     args: &EmailArgs,
-  ) -> loco_rs::Result<Message> {
+) -> anyhow::Result<Message> {
     let mut multipart = MultiPart::mixed().singlepart(SinglePart::plain(args.text_body.clone()));
 
     for attachment in &args.attachments {
-      let data = attachment
-        .decode_data()
-        .map_err(|e| loco_rs::Error::Message(format!("Failed to decode attachment: {}", e)))?;
+        let data = attachment
+            .decode_data()
+            .map_err(|e| anyhow::anyhow!("Failed to decode attachment: {}", e))?;
 
-      let content_type: ContentType = attachment
-        .content_type
-        .parse()
-        .map_err(|e| loco_rs::Error::Message(format!("Invalid content type: {}", e)))?;
+        let content_type: ContentType = attachment
+            .content_type
+            .parse()
+            .map_err(|e| anyhow::anyhow!("Invalid content type: {}", e))?;
 
-      multipart =
-        multipart.singlepart(Attachment::new(attachment.filename.clone()).body(data, content_type));
+        multipart = multipart.singlepart(Attachment::new(attachment.filename.clone()).body(data, content_type));
     }
 
-    Ok(builder.multipart(multipart)?)
-  }
+    Ok(builder.multipart(multipart).map_err(|e| anyhow::anyhow!("Failed to build multipart email: {}", e))?)
+}
 
-  async fn send_email(&self, email: Message) -> loco_rs::Result<()> {
-    let creds = Credentials::new(self.auth.user.clone(), self.auth.password.clone());
+async fn send_email(email: Message, _config: &Arc<Config>) -> anyhow::Result<()> {
+    let smtp_host = std::env::var("SMTP_SERVER_HOST")
+        .map_err(|_| anyhow::anyhow!("SMTP_SERVER_HOST environment variable not set"))?;
+    let smtp_port: u16 = std::env::var("SMTP_SERVER_PORT")
+        .map_err(|_| anyhow::anyhow!("SMTP_SERVER_PORT environment variable not set"))?
+        .parse()
+        .map_err(|_| anyhow::anyhow!("SMTP_SERVER_PORT must be a valid port number"))?;
+    let smtp_user = std::env::var("SMTP_AUTH_USER")
+        .map_err(|_| anyhow::anyhow!("SMTP_AUTH_USER environment variable not set"))?;
+    let smtp_password = std::env::var("SMTP_AUTH_PASSWORD")
+        .map_err(|_| anyhow::anyhow!("SMTP_AUTH_PASSWORD environment variable not set"))?;
 
-    let transport = AsyncSmtpTransport::<Tokio1Executor>::relay(&self.config.host)
-      .map_err(|e| loco_rs::Error::Message(format!("Failed to create SMTP transport: {}", e)))?
-      .credentials(creds)
-      .port(self.config.port)
-      .build();
+    let creds = Credentials::new(smtp_user, smtp_password);
+
+    let transport = AsyncSmtpTransport::<Tokio1Executor>::relay(&smtp_host)
+        .map_err(|e| anyhow::anyhow!("Failed to create SMTP transport: {}", e))?
+        .credentials(creds)
+        .port(smtp_port)
+        .build();
 
     transport
-      .send(email)
-      .await
-      .map_err(|e| loco_rs::Error::Message(format!("Failed to send email: {}", e)))?;
+        .send(email)
+        .await
+        .map_err(|e| anyhow::anyhow!("Failed to send email: {}", e))?;
 
     Ok(())
-  }
 }

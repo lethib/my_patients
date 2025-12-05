@@ -1,5 +1,6 @@
 use crate::{
-  middlewares::current_user::{current_user_middleware, CurrentUser},
+  app_state::{AppState, CurrentUserExt},
+  auth::jwt::JwtService,
   models::{
     _entities::users,
     my_errors::{authentication_error::AuthenticationError, MyErrors},
@@ -7,8 +8,7 @@ use crate::{
   },
   views::auth::{CurrentResponse, LoginResponse},
 };
-use axum::debug_handler;
-use loco_rs::prelude::*;
+use axum::{debug_handler, extract::State, http::StatusCode, Json};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -32,99 +32,78 @@ pub struct ResendVerificationParams {
   pub email: String,
 }
 
-/// Register function creates a new user with the given parameters and sends a
-/// welcome email to the user
+/// Register function creates a new user with the given parameters
 #[debug_handler]
-async fn register(
-  State(ctx): State<AppContext>,
+pub async fn register(
+  State(state): State<AppState>,
   Json(params): Json<RegisterParams>,
-) -> Result<Response, MyErrors> {
-  users::Model::create_with_password(&ctx.db, &params).await?;
-  Ok(format::json(())?)
+) -> Result<Json<()>, MyErrors> {
+  users::Model::create_with_password(&state.db, &params).await?;
+  Ok(Json(()))
 }
 
-/// In case the user forgot his password  this endpoints generate a forgot token
-/// and send email to the user. In case the email not found in our DB, we are
-/// returning a valid request for for security reasons (not exposing users DB
-/// list).
+/// In case the user forgot his password, this endpoint generates a forgot token
+/// and sends email to the user. In case the email is not found in our DB, we are
+/// returning a valid request for security reasons (not exposing users DB list).
 #[debug_handler]
-async fn forgot(
-  State(ctx): State<AppContext>,
+pub async fn forgot(
+  State(state): State<AppState>,
   Json(params): Json<ForgotParams>,
-) -> Result<Response> {
-  let Ok(_user) = users::Model::find_by_email(&ctx.db, &params.email).await else {
-    // we don't want to expose our users email. if the email is invalid we still
-    // returning success to the caller
-    return format::json(());
+) -> Result<Json<()>, MyErrors> {
+  let Ok(_user) = users::Model::find_by_email(&state.db, &params.email).await else {
+    // we don't want to expose our users' emails. if the email is invalid we still
+    // return success to the caller
+    return Ok(Json(()));
   };
 
   // TODO: implement the forgot password logic
 
-  format::json(())
+  Ok(Json(()))
 }
 
-/// reset user password by the given parameters
+/// Reset user password by the given parameters
 #[debug_handler]
-async fn reset(
-  State(_ctx): State<AppContext>,
+pub async fn reset(
+  State(_state): State<AppState>,
   Json(_params): Json<ResetParams>,
-) -> Result<Response> {
-  return Err(loco_rs::errors::Error::BadRequest("not implemented".into()));
-  // let Ok(user) = users::Model::find_by_email(&ctx.db, &params.token).await else {
-  //     // we don't want to expose our users email. if the email is invalid we still
-  //     // returning success to the caller
-  //     tracing::info!("reset token not found");
-
-  //     return format::json(());
-  // };
-  // user.into_active_model()
-  //     .reset_password(&ctx.db, &params.password)
-  //     .await?;
-
-  // format::json(())
+) -> Result<Json<()>, MyErrors> {
+  return Err(MyErrors {
+    code: StatusCode::BAD_REQUEST,
+    msg: "not implemented".to_string(),
+  });
 }
 
 /// Creates a user login and returns a token
 #[debug_handler]
-async fn login(
-  State(ctx): State<AppContext>,
+pub async fn login(
+  State(state): State<AppState>,
   Json(params): Json<LoginParams>,
-) -> Result<Response, MyErrors> {
-  let user = users::Model::find_by_email(&ctx.db, &params.email)
+) -> Result<Json<LoginResponse>, MyErrors> {
+  let user = users::Model::find_by_email(&state.db, &params.email)
     .await
     .map_err(|_| AuthenticationError::INVALID_CREDENTIALS())?;
+
   let valid = user.verify_password(&params.password);
 
   if !valid {
     return Err(AuthenticationError::INVALID_CREDENTIALS());
   }
 
-  let jwt_secret = ctx.config.get_jwt_config()?;
+  let jwt_service = JwtService::new(&state.config.jwt.secret);
+  let token = jwt_service
+    .generate_token(&user.pid.to_string(), state.config.jwt.expiration)
+    .map_err(|_| MyErrors {
+      code: StatusCode::UNAUTHORIZED,
+      msg: "Failed to generate token".to_string(),
+    })?;
 
-  let token = user
-    .generate_jwt(&jwt_secret.secret, jwt_secret.expiration)
-    .or_else(|_| unauthorized("unauthorized!"))?;
-
-  Ok(format::json(LoginResponse::new(&user, &token))?)
+  Ok(Json(LoginResponse::new(&user, &token)))
 }
 
+/// Get current authenticated user
 #[debug_handler]
-async fn me(State(ctx): State<AppContext>) -> Result<Response, MyErrors> {
-  Ok(format::json(CurrentResponse::new(&ctx.current_user()))?)
-}
-
-pub fn routes(ctx: &AppContext) -> Routes {
-  Routes::new()
-    .prefix("/api/auth")
-    .add("/register", post(register))
-    .add("/login", post(login))
-    .add("/forgot", post(forgot))
-    .add("/reset", post(reset))
-    .add(
-      "/me",
-      get(me).layer(axum::middleware::from_fn_with_state(
-        ctx.clone(),
-        current_user_middleware,
-      )),
-    )
+pub async fn me(
+  CurrentUserExt(user, business_info): CurrentUserExt,
+) -> Result<Json<CurrentResponse>, MyErrors> {
+  Ok(Json(CurrentResponse::new(&(user, business_info))))
 }

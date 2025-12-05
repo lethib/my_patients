@@ -1,24 +1,40 @@
-use loco_rs::schema::{add_column, remove_column};
 use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
+#[derive(Iden)]
+enum UserBusinessInformations {
+  Table,
+  SignatureFileName,
+}
+
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
-  async fn up(&self, m: &SchemaManager) -> Result<(), DbErr> {
-    add_column(
-      m,
-      "user_business_informations",
-      "signature_file_name",
-      loco_rs::schema::ColType::StringWithDefault("temp.png".to_string()),
-    )
-    .await?;
-    Ok(())
+  async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+    manager
+      .alter_table(
+        Table::alter()
+          .table(UserBusinessInformations::Table)
+          .add_column(
+            ColumnDef::new(UserBusinessInformations::SignatureFileName)
+              .string()
+              .not_null()
+              .default("temp.png"),
+          )
+          .to_owned(),
+      )
+      .await
   }
 
-  async fn down(&self, m: &SchemaManager) -> Result<(), DbErr> {
-    remove_column(m, "user_business_informations", "signature_file_name").await?;
-    Ok(())
+  async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+    manager
+      .alter_table(
+        Table::alter()
+          .table(UserBusinessInformations::Table)
+          .drop_column(UserBusinessInformations::SignatureFileName)
+          .to_owned(),
+      )
+      .await
   }
 }

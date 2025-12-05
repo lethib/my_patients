@@ -29,11 +29,6 @@ impl EmailArgs {
     self
   }
 
-  pub fn with_recipient_name(mut self, name: String) -> Self {
-    self.to_name = Some(name);
-    self
-  }
-
   pub fn with_reply_to(mut self, reply_to: String) -> Self {
     self.reply_to = Some(reply_to);
     self

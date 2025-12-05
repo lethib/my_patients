@@ -2,7 +2,6 @@ use crate::models::{_entities::user_practitioner_offices, my_errors::MyErrors};
 
 pub use super::_entities::user_practitioner_offices::{ActiveModel, Entity, Model};
 use sea_orm::{entity::prelude::*, ActiveValue};
-pub type UserPractitionerOffices = Entity;
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for ActiveModel {

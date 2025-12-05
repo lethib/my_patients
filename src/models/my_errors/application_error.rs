@@ -20,6 +20,7 @@ impl ApplicationError {
     }
   }
 
+  #[allow(dead_code)]
   pub fn new(msg: String) -> MyErrors {
     MyErrors {
       code: StatusCode::BAD_REQUEST,

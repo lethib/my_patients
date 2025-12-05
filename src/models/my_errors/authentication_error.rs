@@ -11,7 +11,7 @@ impl AuthenticationError {
     }
   }
 
-  #[allow(non_snake_case)]
+  #[allow(non_snake_case, dead_code)]
   pub fn INVALID_AUTH_TOKEN() -> MyErrors {
     MyErrors {
       code: StatusCode::UNAUTHORIZED,
@@ -19,6 +19,7 @@ impl AuthenticationError {
     }
   }
 
+  #[allow(dead_code)]
   pub fn new(msg: String) -> MyErrors {
     MyErrors {
       code: StatusCode::UNAUTHORIZED,

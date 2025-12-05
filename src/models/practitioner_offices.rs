@@ -6,10 +6,8 @@ use crate::{
   },
   validators::address::is_address_valid,
 };
-use loco_rs::model::ModelResult;
 use sea_orm::{entity::prelude::*, ActiveValue};
 use serde::{Deserialize, Serialize};
-pub type PractitionerOffices = Entity;
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for ActiveModel {
@@ -43,7 +41,7 @@ impl ActiveModel {
   pub async fn create<T: ConnectionTrait>(
     db: &T,
     params: &PractitionerOfficeParams,
-  ) -> ModelResult<Model, MyErrors> {
+  ) -> Result<Model, MyErrors> {
     if !is_address_valid(&params.address_line_1, &params.address_zip_code) {
       return Err(ApplicationError::UNPROCESSABLE_ENTITY());
     }

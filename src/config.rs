@@ -1,0 +1,64 @@
+use config::{Config as ConfigLoader, ConfigError, Environment, File};
+use serde::Deserialize;
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct Config {
+  pub server: ServerConfig,
+  pub database: DatabaseConfig,
+  pub jwt: JwtConfig,
+  pub logger: LoggerConfig,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct ServerConfig {
+  pub host: String,
+  pub port: u16,
+  #[serde(default = "default_binding")]
+  pub binding: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct DatabaseConfig {
+  pub url: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct JwtConfig {
+  pub secret: String,
+  #[serde(default = "default_jwt_expiration")]
+  pub expiration: u64,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct LoggerConfig {
+  #[serde(default = "default_log_level")]
+  pub level: String,
+}
+
+// Default value functions
+fn default_binding() -> String {
+  "localhost".to_string()
+}
+
+fn default_jwt_expiration() -> u64 {
+  604800 // 7 days
+}
+
+fn default_log_level() -> String {
+  "info".to_string()
+}
+
+impl Config {
+  /// Load configuration from a YAML file based on the environment
+  /// Environment can be: "development", "production", or "test"
+  pub fn load(environment: &str) -> Result<Self, ConfigError> {
+    ConfigLoader::builder()
+      // Load the environment-specific config file
+      .add_source(File::with_name(&format!("config/{}", environment)).required(true))
+      // Allow environment variables with APP__ prefix to override config
+      // Example: APP__DATABASE__URL=postgres://... will override database.url
+      .add_source(Environment::with_prefix("APP").separator("__"))
+      .build()?
+      .try_deserialize()
+  }
+}
