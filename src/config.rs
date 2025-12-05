@@ -7,6 +7,7 @@ pub struct Config {
   pub database: DatabaseConfig,
   pub jwt: JwtConfig,
   pub logger: LoggerConfig,
+  pub cors: CorsConfig,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -35,6 +36,17 @@ pub struct LoggerConfig {
   pub level: String,
 }
 
+#[derive(Debug, Clone, Deserialize)]
+pub struct CorsConfig {
+  #[serde(default = "default_cors_enable")]
+  pub enable: bool,
+  pub allow_origins: Vec<String>,
+  #[serde(default = "default_cors_allow_headers")]
+  pub allow_headers: Vec<String>,
+  #[serde(default = "default_cors_allow_methods")]
+  pub allow_methods: Vec<String>,
+}
+
 // Default value functions
 fn default_binding() -> String {
   "localhost".to_string()
@@ -46,6 +58,28 @@ fn default_jwt_expiration() -> u64 {
 
 fn default_log_level() -> String {
   "info".to_string()
+}
+
+fn default_cors_enable() -> bool {
+  true
+}
+
+fn default_cors_allow_headers() -> Vec<String> {
+  vec![
+    "Authorization".to_string(),
+    "Content-Type".to_string(),
+    "Accept".to_string(),
+  ]
+}
+
+fn default_cors_allow_methods() -> Vec<String> {
+  vec![
+    "GET".to_string(),
+    "POST".to_string(),
+    "PUT".to_string(),
+    "DELETE".to_string(),
+    "OPTIONS".to_string(),
+  ]
 }
 
 impl Config {

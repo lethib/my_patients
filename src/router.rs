@@ -1,4 +1,5 @@
 use axum::{
+    http::{HeaderName, Method},
     middleware,
     routing::{delete, get, post, put},
     Router,
@@ -38,6 +39,38 @@ pub fn create_router(state: AppState) -> Router {
         // Apply auth middleware to all protected routes
         .layer(middleware::from_fn_with_state(state.clone(), auth_middleware));
 
+    // Build CORS layer from configuration
+    let cors_config = &state.config.cors;
+    let mut cors_layer = CorsLayer::new();
+
+    // Configure allowed origins
+    if cors_config.allow_origins.contains(&"*".to_string()) {
+        cors_layer = cors_layer.allow_origin(tower_http::cors::Any);
+    } else {
+        let origins: Vec<_> = cors_config
+            .allow_origins
+            .iter()
+            .filter_map(|origin| origin.parse().ok())
+            .collect();
+        cors_layer = cors_layer.allow_origin(origins);
+    }
+
+    // Configure allowed methods
+    let methods: Vec<Method> = cors_config
+        .allow_methods
+        .iter()
+        .filter_map(|method| method.parse().ok())
+        .collect();
+    cors_layer = cors_layer.allow_methods(methods);
+
+    // Configure allowed headers
+    let headers: Vec<HeaderName> = cors_config
+        .allow_headers
+        .iter()
+        .filter_map(|header| header.parse().ok())
+        .collect();
+    cors_layer = cors_layer.allow_headers(headers);
+
     // Combine all routes
     let app = Router::new()
         .merge(public_routes)
@@ -49,17 +82,8 @@ pub fn create_router(state: AppState) -> Router {
         )
         // HTTP request tracing middleware
         .layer(TraceLayer::new_for_http())
-        // CORS middleware
-        .layer(
-            CorsLayer::new()
-                .allow_origin(tower_http::cors::Any)
-                .allow_methods(tower_http::cors::Any)
-                .allow_headers(vec![
-                    axum::http::header::AUTHORIZATION,
-                    axum::http::header::CONTENT_TYPE,
-                    axum::http::header::ACCEPT,
-                ])
-        )
+        // CORS middleware (configured from environment)
+        .layer(cors_layer)
         .with_state(state);
 
     app
