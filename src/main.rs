@@ -21,16 +21,11 @@ use config::Config;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-  // Load environment variables from .env.local
   dotenvy::from_filename(".env.local").ok();
 
-  // Determine environment (development, production, or test)
   let environment = std::env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
-
-  // Load configuration from YAML files
   let config = Config::load(&environment).expect("Failed to load configuration");
 
-  // Initialize logging
   setup_logging(&config.logger.level);
 
   tracing::info!(
@@ -38,42 +33,31 @@ async fn main() -> anyhow::Result<()> {
     environment
   );
 
-  // Connect to database
   let db = sea_orm::Database::connect(&config.database.url)
     .await
     .expect("Failed to connect to database");
-
   tracing::info!("Connected to database");
 
-  // Run database migrations
   migration::Migrator::up(&db, None)
     .await
     .expect("Failed to run database migrations");
-
   tracing::info!("Database migrations completed");
 
-  // Create worker channel for background jobs
-  let (worker_tx, worker_rx) = workers::create_worker_channel();
-
-  // Initialize application state
-  let state = AppState::new(db.clone(), config.clone(), worker_tx);
+  let (worker_transmitter, worker_receiver) = workers::create_worker_channel();
+  let state = AppState::new(db.clone(), config.clone(), worker_transmitter);
 
   // Initialize global services (for backward compatibility with existing code)
   initializers::app_services::init_services(&db);
 
-  // Start worker pool (4 workers)
   let worker_config = state.config.clone();
-  let worker_db = db.clone();
   tokio::spawn(async move {
-    workers::start_worker_pool(worker_rx, worker_db, worker_config, 4).await;
+    workers::start_worker_pool(worker_receiver, worker_config).await;
   });
 
-  tracing::info!("Worker pool started with 4 workers");
+  tracing::info!("Worker pool started");
 
-  // Create Axum router with all routes
   let app = router::create_router(state.clone());
 
-  // Start HTTP server
   let addr = format!("{}:{}", config.server.binding, config.server.port);
   let listener = tokio::net::TcpListener::bind(&addr)
     .await
@@ -97,14 +81,13 @@ async fn main() -> anyhow::Result<()> {
 fn setup_logging(level: &str) {
   tracing_subscriber::registry()
     .with(
-      tracing_subscriber::EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| {
-          format!(
-            "my_patients={},tower_http=debug,sea_orm=warn,sqlx=warn",
-            level
-          )
-          .into()
-        }),
+      tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+        format!(
+          "my_patients={},tower_http=debug,sea_orm=warn,sqlx=warn",
+          level
+        )
+        .into()
+      }),
     )
     .with(tracing_subscriber::fmt::layer())
     .init();

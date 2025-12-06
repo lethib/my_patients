@@ -38,8 +38,6 @@ pub struct LoggerConfig {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct CorsConfig {
-  #[serde(default = "default_cors_enable")]
-  pub enable: bool,
   pub allow_origins: Vec<String>,
   #[serde(default = "default_cors_allow_headers")]
   pub allow_headers: Vec<String>,
@@ -58,10 +56,6 @@ fn default_jwt_expiration() -> u64 {
 
 fn default_log_level() -> String {
   "info".to_string()
-}
-
-fn default_cors_enable() -> bool {
-  true
 }
 
 fn default_cors_allow_headers() -> Vec<String> {

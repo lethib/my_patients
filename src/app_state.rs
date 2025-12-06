@@ -8,24 +8,23 @@ use std::sync::Arc;
 pub struct AppState {
   pub db: DatabaseConnection,
   pub config: Arc<Config>,
-  pub worker_tx: tokio::sync::mpsc::Sender<WorkerJob>,
+  pub worker_transmitter: tokio::sync::mpsc::Sender<WorkerJob>,
 }
 
 impl AppState {
   pub fn new(
     db: DatabaseConnection,
     config: Config,
-    worker_tx: tokio::sync::mpsc::Sender<WorkerJob>,
+    worker_transmitter: tokio::sync::mpsc::Sender<WorkerJob>,
   ) -> Self {
     Self {
       db,
       config: Arc::new(config),
-      worker_tx,
+      worker_transmitter,
     }
   }
 }
 
-// For storing per-request authenticated user
 #[derive(Clone)]
 pub struct CurrentUserExt(
   pub crate::models::_entities::users::Model,

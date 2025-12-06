@@ -63,7 +63,10 @@ pub async fn send_invoice(
   .with_reply_to(current_user.email.to_string());
 
   // Enqueue email job via worker channel
-  state.worker_tx.send(WorkerJob::Email(args)).await
+  state
+    .worker_transmitter
+    .send(WorkerJob::Email(args))
+    .await
     .map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN())?;
 
   Ok(())

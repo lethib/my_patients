@@ -1,5 +1,4 @@
 use crate::{app_state::WorkerJob, config::Config};
-use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 
@@ -16,15 +15,8 @@ pub fn create_worker_channel() -> (mpsc::Sender<WorkerJob>, mpsc::Receiver<Worke
 
 /// Start the worker pool with the specified number of workers
 /// Each worker will continuously process jobs from the channel
-pub async fn start_worker_pool(
-  mut rx: mpsc::Receiver<WorkerJob>,
-  _db: DatabaseConnection,
-  config: Arc<Config>,
-  num_workers: usize,
-) {
+pub async fn start_worker_pool(mut rx: mpsc::Receiver<WorkerJob>, config: Arc<Config>) {
   tokio::spawn(async move {
-    tracing::info!("Worker pool started with {} workers", num_workers);
-
     while let Some(job) = rx.recv().await {
       let config_clone = config.clone();
 
