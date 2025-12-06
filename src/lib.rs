@@ -1,8 +1,12 @@
-pub mod app;
+pub mod app_state;
+pub mod auth;
+pub mod config;
 pub mod controllers;
 pub mod initializers;
-pub mod middlewares;
+pub mod middleware;
+pub mod middlewares; // Keep for backward compatibility during transition
 pub mod models;
+pub mod router;
 pub mod services;
 pub mod validators;
 pub mod views;

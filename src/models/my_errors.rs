@@ -48,7 +48,3 @@ where
     }
   }
 }
-
-pub trait ToErr {
-  fn to_err<_T>(self) -> Result<_T, MyErrors>;
-}

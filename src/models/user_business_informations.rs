@@ -1,11 +1,8 @@
 use super::_entities::user_business_informations::{ActiveModel, Entity, Model};
 use crate::models::user_business_informations;
 use crate::validators::business_information::{validate_rpps_number, validate_siret_number};
-use loco_rs::model::ModelResult;
 use sea_orm::{entity::prelude::*, ActiveValue};
 use serde::Deserialize;
-
-pub type UserBusinessInformations = Entity;
 
 #[derive(Deserialize)]
 pub struct CreateBusinessInfomation {
@@ -53,7 +50,7 @@ impl ActiveModel {
     db: &T,
     params: &CreateBusinessInfomation,
     concerned_user_id: &i32,
-  ) -> ModelResult<Model, DbErr> {
+  ) -> Result<Model, DbErr> {
     Ok(
       user_business_informations::ActiveModel {
         user_id: ActiveValue::Set(*concerned_user_id),

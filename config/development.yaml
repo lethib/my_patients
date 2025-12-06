@@ -1,108 +1,47 @@
-# Loco configuration file documentation
+# Configuration file for development environment
+# This uses the config crate (not Loco) for configuration management
+# Environment variables with APP__ prefix will override these values
+# Example: APP__DATABASE__URL=postgres://... will override database.url
 
-# Application logging configuration
+# Logging configuration
 logger:
-  # Enable or disable logging.
   enable: true
-  # Enable pretty backtrace (sets RUST_BACKTRACE=1)
-  pretty_backtrace: true
-  # Log level, options: trace, debug, info, warn or error.
   level: debug
-  # Define the logging format. options: compact, pretty or json
   format: compact
-  # By default the logger has filtering only logs that came from your code or logs that came from `loco` framework. to see all third party libraries
-  # Uncomment the line below to override to see all third party libraries you can enable this config and override the logger filters.
-  # override_filter: trace
 
-# Web server configuration
+# Server configuration
 server:
-  # Port on which the server will listen. the server binding is 0.0.0.0:{PORT}
-  port: 5150
-  # Binding for the server (which interface to bind to)
-  binding: localhost
-  # The UI hostname or IP address that mailers will point to.
   host: http://localhost
-  # Out of the box middleware configuration. to disable middleware you can changed the `enable` field to `false` of comment the middleware block
-  middlewares:
-    cors:
-      enable: true
-      allow_origins:
-        - "*"
-      allow_headers:
-        - "Authorization"
-        - "Content-Type"
-        - "Accept"
-      allow_methods:
-        - "GET"
-        - "POST"
-        - "PUT"
-        - "DELETE"
-        - "OPTIONS"
-    fallback:
-      enable: false
-    static:
-      enable: true
-      must_exist: true
-      precompressed: false
-      folder:
-        uri: "/"
-        path: "frontend/dist"
-      fallback: "frontend/dist/index.html"
+  port: 5150
+  binding: localhost
 
-# Worker Configuration
-workers:
-  # specifies the worker mode. Options:
-  #   - BackgroundQueue - Workers operate asynchronously in the background, processing queued.
-  #   - ForegroundBlocking - Workers operate in the foreground and block until tasks are completed.
-  #   - BackgroundAsync - Workers operate asynchronously in the background, processing tasks with async capabilities.
-  mode: BackgroundAsync
-
-  
-
-# Mailer Configuration.
-mailer:
-  # SMTP mailer configuration.
-  smtp:
-    # Enable/Disable smtp mailer.
-    enable: true
-    # SMTP server host. e.x localhost, smtp.gmail.com
-    host: {{ get_env(name="SMTP_SERVER_HOST") }}
-    # SMTP server port
-    port: {{ get_env(name="SMTP_SERVER_PORT") }}
-    # Use secure connection (SSL/TLS).
-    secure: true
-    auth:
-      user: {{ get_env(name="SMTP_AUTH_USER") }}
-      password: {{ get_env(name="SMTP_AUTH_PASSWORD") }}
-    # Override the SMTP hello name (default is the machine's hostname)
-    # hello_name:
-
-# Database Configuration
+# Database configuration
 database:
-  # Database connection URI
-  uri: {{ get_env(name="DATABASE_URL", default="postgres://loco:loco@localhost:5430/main") }}
-  # When enabled, the sql query will be logged.
-  enable_logging: false
-  # Set the timeout duration when acquiring a connection.
-  connect_timeout: {{ get_env(name="DB_CONNECT_TIMEOUT", default="500") }}
-  # Set the idle duration before closing a connection.
-  idle_timeout: {{ get_env(name="DB_IDLE_TIMEOUT", default="500") }}
-  # Minimum number of connections for a pool.
-  min_connections: {{ get_env(name="DB_MIN_CONNECTIONS", default="1") }}
-  # Maximum number of connections for a pool.
-  max_connections: {{ get_env(name="DB_MAX_CONNECTIONS", default="1") }}
-  # Run migration up when application loaded
-  auto_migrate: true
-  # Truncate database when application loaded. This is a dangerous operation, make sure that you using this flag only on dev environments or test mode
-  dangerously_truncate: false
-  # Recreating schema when application loaded.  This is a dangerous operation, make sure that you using this flag only on dev environments or test mode
-  dangerously_recreate: false
+  url: postgres://loco:loco@localhost:5430/main
 
-# Authentication Configuration
-auth:
-  # JWT authentication
-  jwt:
-    # Secret key for token generation and verification
-    secret: vbI8tJIb6vuStrJty8gS
-    # Token expiration time in seconds
-    expiration: 604800 # 7 days
+# JWT authentication configuration
+jwt:
+  secret: vbI8tJIb6vuStrJty8gS
+  expiration: 604800  # 7 days in seconds
+
+# CORS configuration (development allows all origins)
+cors:
+  enable: true
+  allow_origins:
+    - "*"
+  allow_headers:
+    - "Authorization"
+    - "Content-Type"
+    - "Accept"
+  allow_methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+    - "OPTIONS"
+
+# SMTP configuration is read from environment variables:
+# - SMTP_SERVER_HOST
+# - SMTP_SERVER_PORT
+# - SMTP_AUTH_USER
+# - SMTP_AUTH_PASSWORD

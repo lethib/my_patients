@@ -1,14 +1,7 @@
 use axum::{
   debug_handler,
   extract::{Path, State},
-  middleware,
-  response::Response,
-  routing::{delete, post, put},
   Json,
-};
-use loco_rs::{
-  app::AppContext,
-  prelude::{format, Routes},
 };
 use sea_orm::{
   ActiveModelTrait, ActiveValue::Set, ColumnTrait, EntityTrait, IntoActiveModel, ModelTrait,
@@ -16,7 +9,7 @@ use sea_orm::{
 };
 
 use crate::{
-  middlewares::current_user::{current_user_middleware, CurrentUser},
+  app_state::{AppState, CurrentUserExt},
   models::{
     _entities::{practitioner_offices, user_practitioner_offices},
     my_errors::{application_error::ApplicationError, MyErrors},
@@ -26,24 +19,27 @@ use crate::{
 };
 
 #[debug_handler]
-async fn create(
-  State(ctx): State<AppContext>,
+pub async fn create(
+  State(_state): State<AppState>,
+  CurrentUserExt(user, _): CurrentUserExt,
   Json(params): Json<PractitionerOfficeParams>,
-) -> Result<Response, MyErrors> {
-  services::practitioner_office::create(&params, &ctx.current_user().0).await?;
+) -> Result<Json<serde_json::Value>, MyErrors> {
+  services::practitioner_office::create(&params, &user).await?;
 
-  Ok(format::json(serde_json::json!({ "success": true }))?)
+  Ok(Json(serde_json::json!({ "success": true })))
 }
 
-async fn update(
-  State(ctx): State<AppContext>,
+#[debug_handler]
+pub async fn update(
+  State(state): State<AppState>,
+  CurrentUserExt(user, _): CurrentUserExt,
   Path(office_id): Path<i32>,
   Json(params): Json<PractitionerOfficeParams>,
-) -> Result<Response, MyErrors> {
+) -> Result<Json<serde_json::Value>, MyErrors> {
   let office = practitioner_offices::Entity::find_by_id(office_id)
     .inner_join(user_practitioner_offices::Entity)
-    .filter(user_practitioner_offices::Column::UserId.eq(ctx.current_user().0.id))
-    .one(&ctx.db)
+    .filter(user_practitioner_offices::Column::UserId.eq(user.id))
+    .one(&state.db)
     .await?
     .ok_or(ApplicationError::NOT_FOUND())?;
 
@@ -53,35 +49,25 @@ async fn update(
   office.address_zip_code = Set(params.address_zip_code.trim().to_string());
   office.address_city = Set(params.address_city.trim().to_string());
 
-  office.update(&ctx.db).await?;
+  office.update(&state.db).await?;
 
-  Ok(format::json(serde_json::json!({ "success": true }))?)
+  Ok(Json(serde_json::json!({ "success": true })))
 }
 
-async fn destroy(
-  State(ctx): State<AppContext>,
+#[debug_handler]
+pub async fn destroy(
+  State(state): State<AppState>,
+  CurrentUserExt(user, _): CurrentUserExt,
   Path(office_id): Path<i32>,
-) -> Result<Response, MyErrors> {
+) -> Result<Json<serde_json::Value>, MyErrors> {
   let office = practitioner_offices::Entity::find_by_id(office_id)
     .inner_join(user_practitioner_offices::Entity)
-    .filter(user_practitioner_offices::Column::UserId.eq(ctx.current_user().0.id))
-    .one(&ctx.db)
+    .filter(user_practitioner_offices::Column::UserId.eq(user.id))
+    .one(&state.db)
     .await?
     .ok_or(ApplicationError::NOT_FOUND())?;
 
-  office.clone().delete(&ctx.db).await?;
+  office.clone().delete(&state.db).await?;
 
-  Ok(format::json(serde_json::json!({ "success": true }))?)
-}
-
-pub fn routes(ctx: &AppContext) -> Routes {
-  Routes::new()
-    .prefix("/api/practitioner_office")
-    .add("/create", post(create))
-    .add("/{office_id}", put(update))
-    .add("/{office_id}", delete(destroy))
-    .layer(middleware::from_fn_with_state(
-      ctx.clone(),
-      current_user_middleware,
-    ))
+  Ok(Json(serde_json::json!({ "success": true })))
 }

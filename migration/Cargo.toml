@@ -8,10 +8,6 @@ publish = false
 name = "migration"
 path = "src/lib.rs"
 
-[dependencies]
-loco-rs = { workspace = true }
-
-
 [dependencies.sea-orm-migration]
 version = "1.1.0"
 features = [

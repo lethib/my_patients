@@ -1,10 +1,8 @@
-use loco_rs::model::ModelResult;
 use sea_orm::{entity::prelude::*, ActiveValue};
 
 use crate::models::my_errors::MyErrors;
 
 pub use super::_entities::medical_appointments::{ActiveModel, Entity, Model};
-pub type MedicalAppointments = Entity;
 
 pub struct CreateMedicalAppointmentParams {
   pub user_id: i32,
@@ -37,7 +35,7 @@ impl ActiveModel {
   pub async fn create<T: ConnectionTrait>(
     db: &T,
     params: &CreateMedicalAppointmentParams,
-  ) -> ModelResult<Model, MyErrors> {
+  ) -> Result<Model, MyErrors> {
     let created_medical_appointment = ActiveModel {
       user_id: ActiveValue::Set(params.user_id),
       patient_id: ActiveValue::Set(params.patient_id),

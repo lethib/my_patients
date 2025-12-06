@@ -15,7 +15,9 @@ impl BusinessInformation {
     Self {
       rpps_number: business_information.rpps_number.clone(),
       siret_number: business_information.siret_number.clone(),
-      adeli_number: business_information.adeli_number.as_ref()
+      adeli_number: business_information
+        .adeli_number
+        .as_ref()
         .filter(|s| !s.is_empty())
         .cloned(),
     }

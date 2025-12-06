@@ -8,10 +8,8 @@ use crate::{
 };
 
 pub use super::_entities::patients::{ActiveModel, Entity, Model};
-use loco_rs::model::ModelResult;
 use sea_orm::{entity::prelude::*, ActiveValue, IntoActiveModel};
 use serde::{Deserialize, Serialize};
-pub type Patients = Entity;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CreatePatientParams {
@@ -91,7 +89,7 @@ impl ActiveModel {
     db: &T,
     params: &CreatePatientParams,
     linked_to_user_id: i32,
-  ) -> ModelResult<Model, MyErrors> {
+  ) -> Result<Model, MyErrors> {
     if !is_address_valid(&params.address_line_1, &params.address_zip_code) {
       return Err(ApplicationError::UNPROCESSABLE_ENTITY());
     }
@@ -122,7 +120,7 @@ impl ActiveModel {
     db: &T,
     patient_id: i32,
     params: &CreatePatientParams,
-  ) -> ModelResult<(), MyErrors> {
+  ) -> Result<(), MyErrors> {
     let mut patient = Entity::find_by_id(patient_id)
       .one(db)
       .await?
