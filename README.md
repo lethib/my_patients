@@ -44,11 +44,11 @@ This is a personal project built to explore modern web technologies including Ru
 
 ### Backend
 - **[Rust](https://www.rust-lang.org/)** - Systems programming language for performance and safety
-- **[Loco](https://loco.rs/)** - Rails-inspired web framework for Rust
+- **[Axum](https://github.com/tokio-rs/axum)** - Ergonomic and modular web framework built on Tokio
 - **[SeaORM](https://www.sea-ql.org/SeaORM/)** - Async ORM for database operations
 - **PostgreSQL** - Primary database (SQLite supported for development)
-- **Background Workers** - Asynchronous job processing for email delivery and long-running tasks
-- **SMTP Integration** - Email delivery system for invoice distribution
+- **Background Workers** - Custom asynchronous job processing with Tokio channels for email delivery and long-running tasks
+- **SMTP Integration** - Email delivery system via Lettre for invoice distribution
 
 ### Frontend
 - **[TypeScript](https://www.typescriptlang.org/)** - Type-safe JavaScript
@@ -126,14 +126,14 @@ bun install
 
 4. **Run database migrations**
 ```bash
-cargo loco db migrate
+cargo run --bin migration up
 ```
 
 5. **Start the development servers**
 
 In one terminal (backend):
 ```bash
-cargo loco start --server-and-worker
+cargo run
 ```
 
 In another terminal (frontend):
@@ -150,13 +150,16 @@ The application will be available at `http://localhost:5173` (frontend) with API
 ```
 my_patients/
 ├── src/
-│   ├── app.rs              # Application setup & routing
+│   ├── main.rs             # Application entry point & setup
+│   ├── app_state.rs        # Shared application state
+│   ├── router.rs           # HTTP routing configuration
 │   ├── controllers/        # HTTP request handlers
 │   ├── models/             # Database models & business logic
 │   ├── services/           # Business services (crypto, invoice, etc.)
 │   ├── validators/         # Request validation logic
-│   ├── workers/            # Background job workers
-│   └── middlewares/        # Custom middleware
+│   ├── workers/            # Background job workers (Tokio channels)
+│   ├── middleware/         # Custom middleware (auth, etc.)
+│   └── config/             # Configuration structs
 ├── frontend/
 │   ├── src/
 │   │   ├── routes/         # TanStack Router routes
@@ -165,8 +168,8 @@ my_patients/
 │   │   ├── hooks/          # Custom React hooks
 │   │   └── i18n/           # Translations
 │   └── public/             # Static assets
-├── migration/              # Database migrations
-├── config/                 # Environment configurations
+├── migration/              # Database migrations (SeaORM)
+├── config/                 # YAML environment configurations
 └── dockerfile              # Multi-stage production build
 ```
 
@@ -174,17 +177,17 @@ my_patients/
 
 Create a new migration:
 ```bash
-cargo loco db generate migration_name
+sea-orm-cli migrate generate migration_name
 ```
 
 Run migrations:
 ```bash
-cargo loco db migrate
+cargo run --bin migration up
 ```
 
 Rollback last migration:
 ```bash
-cargo loco db down
+cargo run --bin migration down
 ```
 
 ### Code Quality
@@ -269,8 +272,8 @@ Then proceed to the container configuration.
 
 **Container Configuration**:
 
-- **Container port**: set the Google Cloud Run default port (8080). **⚠️ The `server.port` value must be read from the PORT Google Cloud Run env variable**. Otherwise, you app would not be able to restart properly after a cold start. To do that change the hardcoded from to `{{ get_env(name="PORT", default="5150") }}`. 
-- **Environment variables**: you can set environment variables for your application (e.g., `DATABASE_URL`, `JWT_SECRET`, `LOCO_ENV` etc.).
+- **Container port**: set the Google Cloud Run default port (8080). **⚠️ The `server.port` value must be read from the PORT Google Cloud Run env variable**. Otherwise, you app would not be able to restart properly after a cold start. To do that change the hardcoded from to `{{ get_env(name="PORT", default="5150") }}`.
+- **Environment variables**: you can set environment variables for your application (e.g., `DATABASE_URL`, `JWT_SECRET`, `ENVIRONMENT` etc.).
 - **Health checks**: you can enable health checks to ensure your service is running correctly. In our case, select HTTP and the path to your health check endpoint. Don't forget to **add a small delay** because your application might take some time to start up (e.g., 10 seconds).
 
 Then proceed to the last steps.
