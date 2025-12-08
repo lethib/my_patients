@@ -19,12 +19,4 @@ impl ApplicationError {
       msg: "resource_not_found".into(),
     }
   }
-
-  #[allow(dead_code)]
-  pub fn new(msg: String) -> MyErrors {
-    MyErrors {
-      code: StatusCode::BAD_REQUEST,
-      msg,
-    }
-  }
 }

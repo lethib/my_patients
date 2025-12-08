@@ -1,5 +1,4 @@
 # Configuration file for development environment
-# This uses the config crate (not Loco) for configuration management
 # Environment variables with APP__ prefix will override these values
 # Example: APP__DATABASE__URL=postgres://... will override database.url
 

@@ -7,13 +7,12 @@ mod config;
 mod controllers;
 mod initializers;
 mod middleware;
-mod middlewares;
 mod models;
 mod router;
 mod services;
 mod validators;
 mod views;
-mod workers; // Keep for backward compatibility during transition
+mod workers;
 
 use app_state::AppState;
 use config::Config;
@@ -40,7 +39,7 @@ async fn main() -> anyhow::Result<()> {
   let (worker_transmitter, worker_receiver) = workers::create_worker_channel();
   let state = AppState::new(db.clone(), config.clone(), worker_transmitter);
 
-  // Initialize global services (for backward compatibility with existing code)
+  // Initialize global services
   initializers::app_services::init_services(&db);
 
   let worker_config = state.config.clone();
