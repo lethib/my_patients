@@ -1,4 +1,3 @@
-use migration::MigratorTrait;
 use tokio::signal;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -37,11 +36,6 @@ async fn main() -> anyhow::Result<()> {
     .await
     .expect("Failed to connect to database");
   tracing::info!("Connected to database");
-
-  migration::Migrator::up(&db, None)
-    .await
-    .expect("Failed to run database migrations");
-  tracing::info!("Database migrations completed");
 
   let (worker_transmitter, worker_receiver) = workers::create_worker_channel();
   let state = AppState::new(db.clone(), config.clone(), worker_transmitter);

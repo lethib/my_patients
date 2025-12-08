@@ -111,11 +111,16 @@ COPY src/ src/
 # Build application with optimizations
 # Using explicit target for consistent builds across architectures
 RUN cargo build --release --target x86_64-unknown-linux-gnu && \
-    # Strip binary to reduce size (remove debug symbols)
+    # Build migrate binary
+    cargo build --release --bin migrate --target x86_64-unknown-linux-gnu && \
+    # Strip binaries to reduce size (remove debug symbols)
     strip target/x86_64-unknown-linux-gnu/release/my_patients && \
-    # Verify binary was built successfully
+    strip target/x86_64-unknown-linux-gnu/release/migrate && \
+    # Verify binaries were built successfully
     [ -f "target/x86_64-unknown-linux-gnu/release/my_patients" ] || \
-        (echo "Rust build failed - binary not found" && exit 1)
+        (echo "Rust build failed - binary not found" && exit 1) && \
+    [ -f "target/x86_64-unknown-linux-gnu/release/migrate" ] || \
+        (echo "Migrate binary build failed - binary not found" && exit 1)
 
 # ------------------------------------------------------------------------------
 # STAGE 7: Final Runtime Image (Distroless for Security & Size)
@@ -136,6 +141,8 @@ WORKDIR /app
 COPY --from=frontend-builder --chown=65532:65532 /app/dist ./frontend/dist/
 COPY --from=rust-builder --chown=65532:65532 \
     /app/target/x86_64-unknown-linux-gnu/release/my_patients ./my_patients
+COPY --from=rust-builder --chown=65532:65532 \
+    /app/target/x86_64-unknown-linux-gnu/release/migrate ./migrate
 COPY --chown=65532:65532 config/ ./config/
 
 # Set optimal defaults for production
