@@ -26,32 +26,6 @@ pub struct InvoiceGenerationResult {
   pub error: Option<String>,
 }
 
-/// Process invoice generation as a background job
-#[allow(dead_code)]
-pub async fn process_invoice(
-  args: InvoiceGeneratorArgs,
-  db: &DatabaseConnection,
-) -> anyhow::Result<()> {
-  tracing::info!(
-    "Starting invoice generation for patient: {} {}",
-    args.patient.first_name,
-    args.patient.last_name
-  );
-
-  let result = generate_invoice_pdf(db, &args).await;
-
-  match result {
-    Ok(_) => {
-      tracing::info!("Invoice generated successfully");
-      Ok(())
-    }
-    Err(e) => {
-      tracing::error!("Invoice generation failed: {:?}", e);
-      Err(anyhow::anyhow!("Invoice generation failed: {:?}", e))
-    }
-  }
-}
-
 /// Generate an invoice PDF based on the French invoice template
 pub async fn generate_invoice_pdf(
   db: &DatabaseConnection,

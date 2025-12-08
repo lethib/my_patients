@@ -1,5 +1,4 @@
 # Configuration file for test environment
-# This uses the config crate (not Loco) for configuration management
 
 # Logging configuration
 logger:

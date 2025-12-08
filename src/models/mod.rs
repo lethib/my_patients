@@ -7,7 +7,6 @@ pub mod user_business_informations;
 pub mod user_practitioner_offices;
 pub mod users;
 
-// Type aliases for model operations (replacing loco_rs::model types)
 pub type ModelResult<T> = Result<T, ModelError>;
 
 #[derive(Debug)]
