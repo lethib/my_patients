@@ -6,3 +6,8 @@ export const logout = () => {
   queryClient.clear();
   router.navigate({ to: "/" });
 };
+
+export const login = (token: string) => {
+  localStorage.setItem("accessToken", token);
+  router.navigate({ to: "/", replace: true });
+};

@@ -31,6 +31,11 @@ export type MeResponse = {
   } | null;
 };
 
+type CheckAccessKeyParams = {
+  access_key: string;
+  user_email: string;
+};
+
 export const authSchema = {
   login: mutationEndpoint<LoginParams, AuthResponse>({
     type: "POST",
@@ -43,5 +48,9 @@ export const authSchema = {
   me: queryEndpoint<null, MeResponse>({
     type: "GET",
     path: "/auth/me",
+  }),
+  checkAccessKey: mutationEndpoint<CheckAccessKeyParams, { token: string }>({
+    type: "POST",
+    path: "/auth/_check_access_key",
   }),
 };

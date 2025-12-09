@@ -17,7 +17,11 @@ pub fn create_router(state: AppState) -> Router {
     .route("/api/auth/register", post(controllers::auth::register))
     .route("/api/auth/login", post(controllers::auth::login))
     .route("/api/auth/forgot", post(controllers::auth::forgot))
-    .route("/api/auth/reset", post(controllers::auth::reset));
+    .route("/api/auth/reset", post(controllers::auth::reset))
+    .route(
+      "/api/auth/_check_access_key",
+      post(controllers::auth::check_access_key),
+    );
 
   // Protected routes (require authentication)
   let protected_routes = Router::new()

@@ -22,6 +22,7 @@ mod m20251122_092542_add_user_id_to_patients;
 mod m20251123_103746_create_medicale_appointments_table;
 mod m20251129_135113_add_default_timestamps_to_medical_appointments;
 mod m20251201_220702_drop_patient_user_table;
+mod m20251208_221001_add_access_key_to_user;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -48,7 +49,7 @@ impl MigratorTrait for Migrator {
       Box::new(m20251123_103746_create_medicale_appointments_table::Migration),
       Box::new(m20251129_135113_add_default_timestamps_to_medical_appointments::Migration),
       Box::new(m20251201_220702_drop_patient_user_table::Migration),
-      // inject-above (do not remove this comment)
+      Box::new(m20251208_221001_add_access_key_to_user::Migration),
     ]
   }
 }

@@ -165,4 +165,11 @@ impl Model {
   }
 }
 
-impl ActiveModel {}
+impl ActiveModel {
+  pub async fn enable_access(&mut self, db: &DatabaseConnection) -> ModelResult<()> {
+    self.is_access_key_verified = ActiveValue::Set(true);
+    self.clone().update(db).await?;
+
+    Ok(())
+  }
+}

@@ -35,7 +35,13 @@ class MyPatientsAPI {
       (response) => response,
       (error: AxiosError<APIError>) => {
         if (error.response?.status === 401) {
-          logout();
+          if (
+            !["invalid_credentials", "access_key_not_verified"].includes(
+              error.response.data.msg,
+            )
+          ) {
+            logout();
+          }
         }
 
         throw error;

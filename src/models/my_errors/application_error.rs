@@ -19,4 +19,11 @@ impl ApplicationError {
       msg: "resource_not_found".into(),
     }
   }
+
+  pub fn new(msg: String) -> MyErrors {
+    MyErrors {
+      code: StatusCode::NOT_FOUND,
+      msg,
+    }
+  }
 }
