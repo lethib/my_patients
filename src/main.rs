@@ -31,7 +31,10 @@ async fn main() -> anyhow::Result<()> {
     environment
   );
 
-  let db = sea_orm::Database::connect(&config.database.url)
+  let mut db_options = sea_orm::ConnectOptions::new(&config.database.url);
+  db_options.sqlx_logging(config.database.enable_logging);
+
+  let db = sea_orm::Database::connect(db_options)
     .await
     .expect("Failed to connect to database");
   tracing::info!("Connected to database");
@@ -74,13 +77,8 @@ async fn main() -> anyhow::Result<()> {
 fn setup_logging(level: &str) {
   tracing_subscriber::registry()
     .with(
-      tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-        format!(
-          "my_patients={},tower_http=debug,sea_orm=warn,sqlx=warn",
-          level
-        )
-        .into()
-      }),
+      tracing_subscriber::EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| format!("my_patients={},tower_http={},sqlx=info", level, level).into()),
     )
     .with(tracing_subscriber::fmt::layer())
     .init();
