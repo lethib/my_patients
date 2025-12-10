@@ -9,11 +9,13 @@ use validator::Validate;
 use crate::{
   auth::password,
   models::{
+    ModelError, ModelResult,
     _entities::{
       prelude::UserBusinessInformations, user_business_informations, user_practitioner_offices,
     },
-    practitioner_offices, ModelError, ModelResult,
+    practitioner_offices,
   },
+  services,
 };
 
 pub use super::_entities::users::{self, ActiveModel, Model};
@@ -148,12 +150,16 @@ impl Model {
 
     let password_hash = password::hash_password(&params.password)
       .map_err(|e| ModelError::Any(format!("Password hash error: {}", e).into()))?;
+
+    let access_key = services::user::generate_access_key();
+
     let user = users::ActiveModel {
       email: ActiveValue::set(params.email.to_string()),
       password: ActiveValue::set(password_hash),
       first_name: ActiveValue::set(params.first_name.clone()),
       last_name: ActiveValue::set(params.last_name.clone()),
       phone_number: ActiveValue::set(params.phone_number.clone()),
+      access_key: ActiveValue::set(Some(access_key)),
       ..Default::default()
     }
     .insert(&txn)
