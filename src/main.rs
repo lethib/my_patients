@@ -24,7 +24,7 @@ async fn main() -> anyhow::Result<()> {
   let environment = std::env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
   let config = Config::load(&environment).expect("Failed to load configuration");
 
-  setup_logging(&config.logger.level, &environment);
+  setup_logging(&config.logger.level);
 
   tracing::info!(
     "Starting my_patients application (environment: {})",
@@ -74,22 +74,11 @@ async fn main() -> anyhow::Result<()> {
   Ok(())
 }
 
-fn setup_logging(level: &str, environment: &str) {
-  let sqlx_level = if environment == "development" {
-    "info"
-  } else {
-    "warn"
-  };
-
+fn setup_logging(level: &str) {
   tracing_subscriber::registry()
     .with(
-      tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-        format!(
-          "my_patients={},tower_http=debug,sea_orm={},sqlx={}",
-          level, sqlx_level, sqlx_level
-        )
-        .into()
-      }),
+      tracing_subscriber::EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| format!("my_patients={},tower_http={},sqlx=info", level, level).into()),
     )
     .with(tracing_subscriber::fmt::layer())
     .init();

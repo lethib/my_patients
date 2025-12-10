@@ -26,7 +26,7 @@ pub struct DatabaseConfig {
 }
 
 fn default_db_logging() -> bool {
-  true
+  false
 }
 
 #[derive(Debug, Clone, Deserialize)]
