@@ -17,6 +17,7 @@ server:
 # Database configuration
 database:
   url: postgres://loco:loco@localhost:5430/main
+  enable_logging: false
 
 # JWT authentication configuration
 jwt:

@@ -21,6 +21,12 @@ pub struct ServerConfig {
 #[derive(Debug, Clone, Deserialize)]
 pub struct DatabaseConfig {
   pub url: String,
+  #[serde(default = "default_db_logging")]
+  pub enable_logging: bool,
+}
+
+fn default_db_logging() -> bool {
+  true
 }
 
 #[derive(Debug, Clone, Deserialize)]

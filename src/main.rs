@@ -24,14 +24,17 @@ async fn main() -> anyhow::Result<()> {
   let environment = std::env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
   let config = Config::load(&environment).expect("Failed to load configuration");
 
-  setup_logging(&config.logger.level);
+  setup_logging(&config.logger.level, &environment);
 
   tracing::info!(
     "Starting my_patients application (environment: {})",
     environment
   );
 
-  let db = sea_orm::Database::connect(&config.database.url)
+  let mut db_options = sea_orm::ConnectOptions::new(&config.database.url);
+  db_options.sqlx_logging(config.database.enable_logging);
+
+  let db = sea_orm::Database::connect(db_options)
     .await
     .expect("Failed to connect to database");
   tracing::info!("Connected to database");
@@ -71,13 +74,19 @@ async fn main() -> anyhow::Result<()> {
   Ok(())
 }
 
-fn setup_logging(level: &str) {
+fn setup_logging(level: &str, environment: &str) {
+  let sqlx_level = if environment == "development" {
+    "info"
+  } else {
+    "warn"
+  };
+
   tracing_subscriber::registry()
     .with(
       tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
         format!(
-          "my_patients={},tower_http=debug,sea_orm=warn,sqlx=warn",
-          level
+          "my_patients={},tower_http=debug,sea_orm={},sqlx={}",
+          level, sqlx_level, sqlx_level
         )
         .into()
       }),
