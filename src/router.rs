@@ -91,7 +91,6 @@ pub fn create_router(state: AppState) -> Router {
     .iter()
     .filter_map(|method| method.parse().ok())
     .collect();
-  println!("{:?}", methods);
   cors_layer = cors_layer.allow_methods(methods);
 
   let headers: Vec<HeaderName> = cors_config
