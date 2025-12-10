@@ -98,10 +98,8 @@ export const AccessKeyModal = ({
                   checkAccessKeyForm.watch("accessKey") || "",
                 )}
                 onChange={(e) => {
-                  const rawValue = e.target.value
-                    .replace(/[^a-zA-Z0-9-]/g, "")
-                    .toUpperCase();
-                  checkAccessKeyForm.setValue("accessKey", rawValue);
+                  const formatted = formatAccessKey(e.target.value);
+                  checkAccessKeyForm.setValue("accessKey", formatted);
                 }}
               />
             </div>
