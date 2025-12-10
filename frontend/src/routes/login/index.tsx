@@ -54,7 +54,7 @@ function Login() {
         login(res.token);
       },
       onError: (error) => {
-        if (error.response?.data.msg === "access_key_not_verified") {
+        if (error.response?.data.msg === "access_key_needs_to_be_verified") {
           setUserEmail(data.email);
           setIsAccessKeyModalOpen(true);
           return;

@@ -85,7 +85,10 @@ pub async fn login(
   }
 
   if !user.is_access_key_verified {
-    return Err(AuthenticationError::ACCESS_KEY_NOT_VERIFIED());
+    return Err(MyErrors {
+      code: StatusCode::SEE_OTHER,
+      msg: "access_key_needs_to_be_verified".to_string(),
+    });
   }
 
   let jwt_service = JwtService::new(&state.config.jwt.secret);
