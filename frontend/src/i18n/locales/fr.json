@@ -76,6 +76,10 @@
     "noPatients": "Aucun patient trouvé",
     "loading": "Chargement...",
     "error": "Erreur lors du chargement des patients",
+    "deleteModal": {
+      "title": "Suppression du patient",
+      "description": "La suppression du patient entraîne la perte de toutes les consultations avec {{firstName}} {{lastName}}. Voulez-vous continuez?"
+    },
     "form": {
       "title": {
         "create": "Ajouter un patient",

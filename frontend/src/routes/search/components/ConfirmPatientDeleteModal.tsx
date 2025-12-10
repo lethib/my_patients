@@ -40,11 +40,12 @@ export const ConfirmPatientDeleteModal = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Suppression du patient</DialogTitle>
+          <DialogTitle>{t("patients.deleteModal.title")}</DialogTitle>
           <DialogDescription>
-            La suppression du patient entraîne la perte de toutes les
-            consultations avec {patient.first_name} {patient.last_name}.
-            Voulez-vous continuez?
+            {t("patients.deleteModal.description", {
+              firstName: patient.first_name,
+              lastName: patient.last_name
+            })}
           </DialogDescription>
         </DialogHeader>
 
