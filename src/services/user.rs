@@ -43,3 +43,28 @@ pub fn check_access_key(concerned_user: &users::Model, access_key: String) -> bo
     Some(user_access_key) => *user_access_key == access_key,
   }
 }
+
+/// Generate a random access key in the format XXX-XXX-XXX-XXX
+pub fn generate_access_key() -> String {
+  use rand::Rng;
+  const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const GROUP_LENGTH: usize = 3;
+  const NUM_GROUPS: usize = 4;
+
+  let mut rng = rand::thread_rng();
+
+  let mut key = String::with_capacity(GROUP_LENGTH * NUM_GROUPS + NUM_GROUPS - 1);
+
+  for i in 0..NUM_GROUPS {
+    for _ in 0..GROUP_LENGTH {
+      let idx = rng.gen_range(0..CHARSET.len());
+      key.push(CHARSET[idx] as char);
+    }
+
+    if i < NUM_GROUPS - 1 {
+      key.push('-');
+    }
+  }
+
+  key
+}

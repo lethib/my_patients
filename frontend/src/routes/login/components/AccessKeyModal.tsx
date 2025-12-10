@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
 import { APIHooks } from "@/api/hooks";
-import { FormInput } from "@/components/form/FormInput";
 import { FormProvider } from "@/components/form/FormProvider";
 import { Button, Label } from "@/components/ui";
 import {
@@ -14,7 +13,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { login } from "@/lib/authUtils";
+import { formatAccessKey } from "@/lib/utils";
 
 interface AccessKeyModalProps {
   userEmail: string;
@@ -64,6 +65,8 @@ export const AccessKeyModal = ({
     );
   });
 
+  console.log(checkAccessKeyForm.watch("accessKey"));
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-white dark:bg-gray-900 shadow-lg border-0 backdrop-blur-sm">
@@ -85,16 +88,26 @@ export const AccessKeyModal = ({
             <Label htmlFor="accessKey" className="text-sm font-medium">
               {t("auth.accessKey.accessKey")}
             </Label>
-            <FormInput
-              id="accessKey"
-              name="accessKey"
-              type="text"
-              placeholder={t("auth.accessKey.accessKeyPlaceholder")}
-              className="pl-10 h-11"
-              icon={
-                <Key className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              }
-            />
+            <div className="relative">
+              <Key className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder={t("auth.accessKey.accessKeyPlaceholder")}
+                className="pl-10 h-11"
+                value={formatAccessKey(
+                  checkAccessKeyForm.watch("accessKey") || "",
+                )}
+                onChange={(e) => {
+                  const formatted = formatAccessKey(e.target.value);
+                  checkAccessKeyForm.setValue("accessKey", formatted);
+                }}
+              />
+            </div>
+            {checkAccessKeyForm.formState.errors.accessKey && (
+              <p className="text-sm font-medium text-destructive">
+                {checkAccessKeyForm.formState.errors.accessKey.message}
+              </p>
+            )}
           </div>
 
           <div className="flex gap-3 pt-4">
