@@ -65,8 +65,6 @@ export const AccessKeyModal = ({
     );
   });
 
-  console.log(checkAccessKeyForm.watch("accessKey"));
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-white dark:bg-gray-900 shadow-lg border-0 backdrop-blur-sm">

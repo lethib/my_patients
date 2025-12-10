@@ -58,6 +58,10 @@ export const patientSchema = {
     type: "PUT",
     path: "/patient/{patient_id}",
   }),
+  deletePatient: mutationEndpoint<null, null>({
+    type: "DELETE",
+    path: "/patient/{patient_id}",
+  }),
   searchBySSN: queryEndpoint<{ ssn: string }, SearchBySSNPatientResponse[]>({
     type: "GET",
     path: "/patient/_search_by_ssn",

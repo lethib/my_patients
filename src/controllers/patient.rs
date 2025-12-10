@@ -1,10 +1,11 @@
 use axum::{
   debug_handler,
   extract::{Path, Query, State},
+  http::status,
   Json,
 };
 use base64::Engine;
-use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{ColumnTrait, EntityTrait, ModelTrait, QueryFilter};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -56,6 +57,23 @@ pub async fn update(
   services::patients::update(&patient, &patient_params).await?;
 
   Ok(Json(serde_json::json!({ "success": true })))
+}
+
+#[debug_handler]
+pub async fn delete(
+  State(state): State<AppState>,
+  CurrentUserExt(current_user, _): CurrentUserExt,
+  Path(patient_id): Path<i32>,
+) -> Result<status::StatusCode, MyErrors> {
+  let patient = patients::Entity::find_by_id(patient_id)
+    .filter(patients::Column::UserId.eq(current_user.id))
+    .one(&state.db)
+    .await?
+    .ok_or(ApplicationError::NOT_FOUND())?;
+
+  patient.delete(&state.db).await?;
+
+  Ok(status::StatusCode::NO_CONTENT)
 }
 
 #[debug_handler]
