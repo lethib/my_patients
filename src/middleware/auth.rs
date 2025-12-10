@@ -44,6 +44,10 @@ pub async fn auth_middleware(
       AuthenticationError::INVALID_CLAIMS()
     })?;
 
+  if !user_result.0.is_access_key_verified {
+    return Err(AuthenticationError::ACCESS_KEY_NOT_VERIFIED());
+  }
+
   // Insert user into request extensions
   request
     .extensions_mut()
