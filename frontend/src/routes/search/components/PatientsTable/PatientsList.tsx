@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { SearchPatientResponse } from "@/api/hooks/patient";
 import { CenteredSpineer } from "@/components/ui/spinner";
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { ConfirmPatientDeleteModal } from "../ConfirmPatientDeleteModal";
 import { InvoiceModal } from "../InvoiceModal/InvoiceModal";
 import { PatientRow } from "./PatientRow";
 
@@ -16,18 +17,32 @@ export const PatientList = ({
   isDataFetching,
   onClickRow,
 }: Props) => {
-  const [selectedPatient, setSelectedPatient] =
+  const [patientToUpdate, setPatientToUpdate] =
+    useState<SearchPatientResponse | null>(null);
+  const [patientToDelete, setPatientToDelete] =
     useState<SearchPatientResponse | null>(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const [isConfirmDeletePatientModalOpen, setIsConfirmDeletePatientModalOpen] =
+    useState(false);
 
   const handleGenerateInvoice = (patient: SearchPatientResponse) => {
-    setSelectedPatient(patient);
+    setPatientToUpdate(patient);
     setIsInvoiceModalOpen(true);
   };
 
   const handleCloseInvoiceModal = () => {
     setIsInvoiceModalOpen(false);
-    setSelectedPatient(null);
+    setPatientToUpdate(null);
+  };
+
+  const handleDeletePatient = (patient: SearchPatientResponse) => {
+    setPatientToDelete(patient);
+    setIsConfirmDeletePatientModalOpen(true);
+  };
+
+  const handleCloseConfirmPatientDelete = () => {
+    setIsConfirmDeletePatientModalOpen(false);
+    setPatientToDelete(null);
   };
 
   if (patientsList?.length === 0) {
@@ -55,16 +70,25 @@ export const PatientList = ({
             index={index}
             key={patient.id}
             onGenerateInvoice={handleGenerateInvoice}
+            onDeletePatient={handleDeletePatient}
             onClickRow={onClickRow}
           />
         ))}
       </TableBody>
 
-      {selectedPatient && (
+      {patientToUpdate && (
         <InvoiceModal
           isOpen={isInvoiceModalOpen}
           onClose={handleCloseInvoiceModal}
-          patient={selectedPatient}
+          patient={patientToUpdate}
+        />
+      )}
+
+      {patientToDelete && (
+        <ConfirmPatientDeleteModal
+          isOpen={isConfirmDeletePatientModalOpen}
+          onClose={handleCloseConfirmPatientDelete}
+          patient={patientToDelete}
         />
       )}
     </>

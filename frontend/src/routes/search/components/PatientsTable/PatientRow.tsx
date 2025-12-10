@@ -1,4 +1,4 @@
-import { FileText, User } from "lucide-react";
+import { FileText, Trash2, User } from "lucide-react";
 import type { SearchPatientResponse } from "@/api/hooks/patient";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -7,6 +7,7 @@ interface Props {
   patient: SearchPatientResponse;
   index: number;
   onGenerateInvoice: (patient: SearchPatientResponse) => void;
+  onDeletePatient: (patient: SearchPatientResponse) => void;
   onClickRow: (patient: SearchPatientResponse) => void;
 }
 
@@ -14,6 +15,7 @@ export const PatientRow = ({
   patient,
   index,
   onGenerateInvoice,
+  onDeletePatient,
   onClickRow,
 }: Props) => {
   const formattedSSN = `${patient.ssn[0]} ${patient.ssn.slice(1, 3)} ${patient.ssn.slice(3, 5)} ${patient.ssn.slice(5, 7)} ${patient.ssn.slice(7, 10)} ${patient.ssn.slice(10, 13)} ${patient.ssn.slice(13, 15)}`;
@@ -52,7 +54,7 @@ export const PatientRow = ({
       <TableCell className="px-4 py-4 text-muted-foreground">
         <span className="text-sm">{patient.address_city}</span>
       </TableCell>
-      <TableCell className="px-4 py-4 text-right">
+      <TableCell className="space-x-1">
         <Button
           variant="outline"
           size="sm"
@@ -64,6 +66,17 @@ export const PatientRow = ({
           title="Generate Invoice"
         >
           <FileText className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost_destructive"
+          size="sm"
+          className="h-8 w-8 p-0"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDeletePatient(patient);
+          }}
+        >
+          <Trash2 />
         </Button>
       </TableCell>
     </TableRow>

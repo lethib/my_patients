@@ -59,10 +59,9 @@ export const PatientsTable = ({ searchQuery, onClickRow }: Props) => {
               <TableHead className="h-12 px-4 font-semibold text-foreground">
                 {t("patients.table.city")}
               </TableHead>
-              <TableHead className="h-12 px-4 font-semibold text-foreground text-right">
+              <TableHead className="h-12 px-4 font-semibold text-foreground">
                 {t("patients.table.actions", "Actions")}
               </TableHead>
-              <TableHead></TableHead>
             </TableRow>
           </TableHeader>
 
