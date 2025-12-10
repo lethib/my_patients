@@ -12,6 +12,11 @@ export type APIError = {
   msg: string;
 };
 
+const AUTH_ERRORS_WITHOUT_LOGOUT = [
+  "invalid_credentials",
+  "access_key_not_verified",
+];
+
 class MyPatientsAPI {
   client: AxiosInstance;
   hooks: typeof APIHooks;
@@ -35,11 +40,7 @@ class MyPatientsAPI {
       (response) => response,
       (error: AxiosError<APIError>) => {
         if (error.response?.status === 401) {
-          if (
-            !["invalid_credentials", "access_key_not_verified"].includes(
-              error.response.data.msg,
-            )
-          ) {
+          if (!AUTH_ERRORS_WITHOUT_LOGOUT.includes(error.response.data.msg)) {
             logout();
           }
         }
