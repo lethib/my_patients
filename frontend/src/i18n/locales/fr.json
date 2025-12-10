@@ -48,6 +48,19 @@
         "passwordsDontMatch": "Les mots de passe ne correspondent pas"
       }
     },
+    "accessKey": {
+      "title": "Vérification de la clé d'accès",
+      "description": "Veuillez saisir votre clé d'accès pour activer votre compte",
+      "accessKey": "Clé d'accès",
+      "accessKeyPlaceholder": "Saisissez votre clé d'accès",
+      "cancel": "Annuler",
+      "verifying": "Vérification...",
+      "verify": "Vérifier",
+      "validation": {
+        "accessKeyRequired": "La clé d'accès est requise"
+      },
+      "success": "Votre clé d'accès a bien été vérifiée. Vous pouvez vous connecter."
+    },
     "logout": "Déconnexion"
   },
   "navigation": {

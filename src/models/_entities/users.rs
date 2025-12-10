@@ -17,6 +17,8 @@ pub struct Model {
   pub phone_number: String,
   pub first_name: String,
   pub last_name: String,
+  pub access_key: Option<String>,
+  pub is_access_key_verified: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

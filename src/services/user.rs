@@ -36,3 +36,10 @@ pub async fn save_business_information(
     }
   }
 }
+
+pub fn check_access_key(concerned_user: &users::Model, access_key: String) -> bool {
+  match &concerned_user.access_key {
+    None => false,
+    Some(user_access_key) => *user_access_key == access_key,
+  }
+}

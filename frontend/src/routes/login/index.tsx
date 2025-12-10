@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, Navigate, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -17,6 +17,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { login } from "@/lib/authUtils";
+import { AccessKeyModal } from "./components/AccessKeyModal";
 import { RegisterModal } from "./components/RegisterModal";
 
 export const Route = createFileRoute("/login/")({
@@ -25,10 +27,11 @@ export const Route = createFileRoute("/login/")({
 
 function Login() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { currentUser } = useCurrentUser();
   const [showPassword, setShowPassword] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [isAccessKeyModalOpen, setIsAccessKeyModalOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
 
   const loginMutation = APIClient.hooks.auth.login.useMutation();
 
@@ -48,10 +51,17 @@ function Login() {
   const onSubmit = async (data: z.infer<typeof loginFormSchema>) => {
     loginMutation.mutateAsync(data, {
       onSuccess: (res) => {
-        localStorage.setItem("accessToken", res.token);
-        navigate({ to: "/", replace: true });
+        login(res.token);
       },
       onError: (error) => {
+        if (error.response?.data.msg === "access_key_not_verified") {
+          setUserEmail(data.email);
+          setIsAccessKeyModalOpen(true);
+          return;
+        } else if (error.response?.data.msg === "invalid_credentials") {
+          loginForm.setError("password", { message: "invalid credentials" });
+          return;
+        }
         alert(`${t("auth.login.error")}: ${error.message}`);
       },
     });
@@ -166,6 +176,12 @@ function Login() {
       <RegisterModal
         open={isRegisterModalOpen}
         onOpenChange={setIsRegisterModalOpen}
+      />
+
+      <AccessKeyModal
+        userEmail={userEmail}
+        open={isAccessKeyModalOpen}
+        onOpenChange={setIsAccessKeyModalOpen}
       />
     </>
   );
