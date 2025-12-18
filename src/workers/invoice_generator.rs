@@ -19,13 +19,6 @@ pub struct InvoiceGeneratorArgs {
   pub practitioner_office: practitioner_offices::Model,
 }
 
-#[derive(Debug, Serialize)]
-pub struct InvoiceGenerationResult {
-  pub success: bool,
-  pub pdf_data: Option<Vec<u8>>,
-  pub error: Option<String>,
-}
-
 /// Generate an invoice PDF based on the French invoice template
 pub async fn generate_invoice_pdf(
   db: &DatabaseConnection,
