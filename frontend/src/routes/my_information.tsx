@@ -98,6 +98,7 @@ function MyInformation() {
     uploadSignatureMutation
       .mutateAsync(selectedFile)
       .then(() => {
+        queryClient.invalidateQueries({ queryKey: ["/auth/me"] });
         setUploadStatus("success");
         setSelectedFile(null);
         if (fileInputRef.current) {
@@ -189,6 +190,17 @@ function MyInformation() {
           <CardDescription>{t("signature.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {currentUser?.business_information?.signature_filename && (
+            <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
+              <Label className="text-sm font-medium">
+                {t("signature.currentFile")}
+              </Label>
+              <p className="mt-1 text-sm text-gray-600">
+                {currentUser.business_information.signature_filename}
+              </p>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="signature" className="text-sm font-medium">
               {t("signature.selectFile")}

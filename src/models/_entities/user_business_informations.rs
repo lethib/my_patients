@@ -15,7 +15,7 @@ pub struct Model {
   pub siret_number: String,
   #[sea_orm(unique)]
   pub user_id: i32,
-  pub signature_file_name: String,
+  pub signature_file_name: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

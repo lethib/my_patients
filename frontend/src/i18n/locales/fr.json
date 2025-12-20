@@ -206,6 +206,7 @@
   "signature": {
     "title": "Signature",
     "subtitle": "Téléchargez votre signature pour l'inclure dans les factures",
+    "currentFile": "Fichier actuel",
     "selectFile": "Fichier de signature",
     "chooseFile": "Choisir un fichier",
     "upload": "Envoyer",

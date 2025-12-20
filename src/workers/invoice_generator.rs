@@ -5,7 +5,7 @@ use std::io::BufWriter;
 
 use crate::models::{
   _entities::{patients, practitioner_offices, user_business_informations, users},
-  my_errors::MyErrors,
+  my_errors::{application_error::ApplicationError, MyErrors},
 };
 use crate::services::storage::StorageService;
 use sea_orm::{prelude::Date, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
@@ -49,7 +49,12 @@ pub async fn generate_invoice_pdf(
   // Try to fetch signature if storage service is available
   let signature_data = match &storage_service {
     Some(service) => match service
-      .fetch_signature(&business_info.signature_file_name)
+      .fetch_signature(
+        &business_info
+          .signature_file_name
+          .clone()
+          .ok_or(ApplicationError::UNPROCESSABLE_ENTITY())?,
+      )
       .await
     {
       Ok(data) => {

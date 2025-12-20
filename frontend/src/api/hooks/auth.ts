@@ -28,6 +28,7 @@ export type MeResponse = {
     rpps_number: string;
     siret_number: string;
     adeli_number: string | null;
+    signature_filename: string | null;
   } | null;
 };
 
