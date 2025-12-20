@@ -13,6 +13,7 @@ use axum::{
   http::status,
   Json,
 };
+use image::{imageops::FilterType, ImageFormat};
 
 #[debug_handler]
 pub async fn save_business_info(
@@ -57,23 +58,29 @@ pub async fn upload_signature(
     return Err(ApplicationError::BAD_REQUEST());
   }
 
-  let content_type = field
-    .content_type()
-    .map(|ct| ct.to_string())
-    .unwrap_or_else(|| "image/png".to_string());
-
   let signature_data = field
     .bytes()
     .await
     .map_err(|_| ApplicationError::UNPROCESSABLE_ENTITY())?;
 
+  let img = image::load_from_memory(&signature_data).map_err(|e| {
+    tracing::error!("Failed to load image: {}", e);
+    ApplicationError::UNPROCESSABLE_ENTITY()
+  })?;
+
+  let resized = img.resize_exact(314, 156, FilterType::Lanczos3);
+
+  let mut png_bytes: Vec<u8> = Vec::new();
+  resized
+    .write_to(&mut std::io::Cursor::new(&mut png_bytes), ImageFormat::Png)
+    .map_err(|e| {
+      tracing::error!("Failed to encode image: {}", e);
+      ApplicationError::UNPROCESSABLE_ENTITY()
+    })?;
+
   let storage_service = services::storage::StorageService::new()?;
   storage_service
-    .upload_signature(
-      &signature_data,
-      &user.last_name.to_lowercase(),
-      &content_type,
-    )
+    .upload_signature(&png_bytes, &user.last_name.to_lowercase(), "image/png")
     .await?;
 
   Ok(status::StatusCode::NO_CONTENT)
