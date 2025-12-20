@@ -1,6 +1,7 @@
 use crate::{
   app_state::{AppState, CurrentUserExt},
   models::{
+    _entities::prelude::UserBusinessInformations,
     my_errors::{application_error::ApplicationError, MyErrors},
     user_business_informations::CreateBusinessInfomation,
   },
@@ -14,6 +15,7 @@ use axum::{
   Json,
 };
 use image::{imageops::FilterType, ImageFormat};
+use sea_orm::{ActiveModelTrait, ActiveValue, IntoActiveModel, ModelTrait};
 
 #[debug_handler]
 pub async fn save_business_info(
@@ -43,7 +45,7 @@ pub async fn my_offices(
 
 #[debug_handler]
 pub async fn upload_signature(
-  State(_state): State<AppState>,
+  State(state): State<AppState>,
   CurrentUserExt(user, _): CurrentUserExt,
   mut multipart: Multipart,
 ) -> Result<status::StatusCode, MyErrors> {
@@ -89,6 +91,16 @@ pub async fn upload_signature(
   storage_service
     .upload_signature(&png_bytes, &filename, "image/png")
     .await?;
+
+  let mut business_information = user
+    .find_related(UserBusinessInformations)
+    .one(&state.db)
+    .await?
+    .ok_or(ApplicationError::UNPROCESSABLE_ENTITY())?
+    .into_active_model();
+
+  business_information.signature_file_name = ActiveValue::Set(Some(filename));
+  business_information.update(&state.db).await?;
 
   Ok(status::StatusCode::NO_CONTENT)
 }

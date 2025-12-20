@@ -7,6 +7,7 @@ pub struct BusinessInformation {
   pub rpps_number: String,
   pub siret_number: String,
   pub adeli_number: Option<String>,
+  pub signature_filename: Option<String>,
 }
 
 impl BusinessInformation {
@@ -20,6 +21,7 @@ impl BusinessInformation {
         .as_ref()
         .filter(|s| !s.is_empty())
         .cloned(),
+      signature_filename: business_information.signature_file_name.clone(),
     }
   }
 }
