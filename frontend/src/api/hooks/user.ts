@@ -22,24 +22,30 @@ export const userSchema = {
     type: "GET",
     path: "/user/my_offices",
   }),
-  uploadSignature: {
-    useMutation: () => {
-      return useMutation<void, AxiosError<APIError>, File>({
-        mutationFn: async (file: File) => {
-          const formData = new FormData();
-          formData.append("signature", file);
+  signature: {
+    getURL: mutationEndpoint<null, string>({
+      type: "POST",
+      path: "/user/signature/_get_url",
+    }),
+    upload: {
+      useMutation: () => {
+        return useMutation<void, AxiosError<APIError>, File>({
+          mutationFn: async (file: File) => {
+            const formData = new FormData();
+            formData.append("signature", file);
 
-          return await APIClient.post<FormData, void>(
-            "/user/_upload_signature",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
+            return await APIClient.post<FormData, void>(
+              "/user/signature/_upload",
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
               },
-            }
-          );
-        },
-      });
+            );
+          },
+        });
+      },
     },
   },
 };
