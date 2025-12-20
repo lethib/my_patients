@@ -78,9 +78,16 @@ pub async fn upload_signature(
       ApplicationError::UNPROCESSABLE_ENTITY()
     })?;
 
+  let filename = format!(
+    "{}_{}_{}",
+    &user.first_name.to_lowercase(),
+    &user.last_name.to_lowercase(),
+    &user.id.to_string()
+  );
+
   let storage_service = services::storage::StorageService::new()?;
   storage_service
-    .upload_signature(&png_bytes, &user.last_name.to_lowercase(), "image/png")
+    .upload_signature(&png_bytes, &filename, "image/png")
     .await?;
 
   Ok(status::StatusCode::NO_CONTENT)

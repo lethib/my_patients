@@ -36,7 +36,9 @@ function MyInformation() {
   const { currentUser } = useCurrentUser();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadStatus, setUploadStatus] = useState<"idle" | "success" | "error">("idle");
+  const [uploadStatus, setUploadStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
   const saveBusinessInformationMutation =
     APIHooks.user.saveBusinessInformation.useMutation();
@@ -72,7 +74,6 @@ function MyInformation() {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Validate file type
       const validTypes = ["image/png", "image/jpeg", "image/jpg"];
       if (!validTypes.includes(file.type)) {
         alert(t("signature.invalidFileType"));
@@ -94,17 +95,18 @@ function MyInformation() {
   const handleUploadSignature = async () => {
     if (!selectedFile) return;
 
-    try {
-      await uploadSignatureMutation.mutateAsync(selectedFile);
-      setUploadStatus("success");
-      setSelectedFile(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    } catch (error) {
-      setUploadStatus("error");
-      console.error("Upload error:", error);
-    }
+    uploadSignatureMutation
+      .mutateAsync(selectedFile)
+      .then(() => {
+        setUploadStatus("success");
+        setSelectedFile(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      })
+      .catch(() => {
+        setUploadStatus("error");
+      });
   };
 
   return (
