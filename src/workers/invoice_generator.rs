@@ -50,9 +50,9 @@ pub async fn generate_invoice_pdf(
   let signature_data = match &storage_service {
     Some(service) => match service
       .fetch_signature(
-        &business_info
+        business_info
           .signature_file_name
-          .clone()
+          .as_ref()
           .ok_or(ApplicationError::UNPROCESSABLE_ENTITY())?,
       )
       .await
