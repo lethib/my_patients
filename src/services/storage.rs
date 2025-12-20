@@ -38,6 +38,13 @@ impl StorageService {
     })
   }
 
+  pub fn signature_url(&self, signature_filename: &str) -> String {
+    format!(
+      "{}/storage/v1/object/public/{}/{}",
+      self.supabase_url, self.bucket_name, signature_filename
+    )
+  }
+
   /// Fetch a signature image from Supabase storage
   ///
   /// # Arguments
@@ -46,10 +53,7 @@ impl StorageService {
   /// # Returns
   /// * `Result<Vec<u8>, MyErrors>` - The image bytes or an error
   pub async fn fetch_signature(&self, signature_file_name: &str) -> Result<Vec<u8>, MyErrors> {
-    let url = format!(
-      "{}/storage/v1/object/public/{}/{}",
-      self.supabase_url, self.bucket_name, signature_file_name
-    );
+    let url = self.signature_url(signature_file_name);
 
     info!("Fetching signature from: {}", url);
 

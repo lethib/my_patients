@@ -2,10 +2,10 @@ use crate::{
   app_state::{AppState, CurrentUserExt},
   models::{
     _entities::prelude::UserBusinessInformations,
-    my_errors::{application_error::ApplicationError, MyErrors},
+    my_errors::{application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors},
     user_business_informations::CreateBusinessInfomation,
   },
-  services,
+  services::{self, storage::StorageService},
   views::practitioner_office::PractitionerOffice,
 };
 use axum::{
@@ -41,6 +41,20 @@ pub async fn my_offices(
     .collect();
 
   Ok(Json(serialized_offices))
+}
+
+#[debug_handler]
+pub async fn get_signature_url(
+  State(_state): State<AppState>,
+  CurrentUserExt(_user, user_bi): CurrentUserExt,
+) -> Result<String, MyErrors> {
+  let storage = StorageService::new()?;
+  let signature_filename = user_bi
+    .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())?
+    .signature_file_name
+    .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())?;
+
+  Ok(storage.signature_url(&signature_filename))
 }
 
 #[debug_handler]

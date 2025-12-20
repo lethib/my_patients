@@ -42,7 +42,8 @@ function MyInformation() {
 
   const saveBusinessInformationMutation =
     APIHooks.user.saveBusinessInformation.useMutation();
-  const uploadSignatureMutation = APIHooks.user.uploadSignature.useMutation();
+  const getSignatureURLMutation = APIHooks.user.signature.getURL.useMutation();
+  const uploadSignatureMutation = APIHooks.user.signature.upload.useMutation();
 
   const businessForm = useForm({
     resolver: zodResolver(businessInfoSchema),
@@ -108,6 +109,12 @@ function MyInformation() {
       .catch(() => {
         setUploadStatus("error");
       });
+  };
+
+  const displaySignatureInNewTab = () => {
+    getSignatureURLMutation.mutateAsync(null).then((url) => {
+      window.open(url, "_blank");
+    });
   };
 
   return (
@@ -191,8 +198,11 @@ function MyInformation() {
         </CardHeader>
         <CardContent className="space-y-4">
           {currentUser?.business_information?.signature_filename && (
-            <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
-              <Label className="text-sm font-medium">
+            <div
+              className="rounded-md border border-gray-200 bg-gray-50 p-3 hover:cursor-pointer hover:bg-gray-100 transition-colors"
+              onClick={displaySignatureInNewTab}
+            >
+              <Label className="text-sm font-medium hover:cursor-pointer">
                 {t("signature.currentFile")}
               </Label>
               <p className="mt-1 text-sm text-gray-600">

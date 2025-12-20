@@ -53,7 +53,11 @@ pub fn create_router(state: AppState) -> Router {
     )
     .route("/api/user/my_offices", get(controllers::user::my_offices))
     .route(
-      "/api/user/_upload_signature",
+      "/api/user/signature/_get_url",
+      post(controllers::user::get_signature_url),
+    )
+    .route(
+      "/api/user/signature/_upload",
       post(controllers::user::upload_signature),
     )
     // Practitioner office routes
