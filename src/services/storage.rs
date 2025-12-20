@@ -1,4 +1,4 @@
-use crate::models::my_errors::MyErrors;
+use crate::models::my_errors::{unexpected_error::UnexpectedError, MyErrors};
 use axum::http::StatusCode;
 use reqwest::Client;
 use std::env;
@@ -99,5 +99,63 @@ impl StorageService {
       image_bytes.len()
     );
     Ok(image_bytes.to_vec())
+  }
+
+  /// Upload a signature image to Supabase storage
+  ///
+  /// # Arguments
+  /// * `signature_data` - The image bytes to upload
+  /// * `filename` - The filename to use for the signature
+  /// * `content_type` - The MIME type of the file (e.g., "image/png", "image/jpeg")
+  ///
+  /// # Returns
+  /// * `Result<(), MyErrors>` - Success or an error
+  pub async fn upload_signature(
+    &self,
+    signature_data: &[u8],
+    filename: &str,
+    content_type: &str,
+  ) -> Result<(), MyErrors> {
+    let url = format!(
+      "{}/storage/v1/object/{}/{}",
+      self.supabase_url, self.bucket_name, filename
+    );
+
+    info!(
+      "Uploading signature to: /storage/v1/object/{}/{}, size: {} bytes, content_type: {}",
+      self.bucket_name,
+      filename,
+      signature_data.len(),
+      content_type
+    );
+
+    let response = self
+      .client
+      .post(&url)
+      .header("Authorization", format!("Bearer {}", self.supabase_key))
+      .header("Content-Type", content_type)
+      .body(signature_data.to_vec())
+      .send()
+      .await
+      .map_err(|e| {
+        error!("Failed to send upload request: {}", e);
+        UnexpectedError::new("failed_to_upload_signature".to_string())
+      })?;
+
+    if response.status().is_success() {
+      info!("Successfully uploaded signature: {}", filename);
+      Ok(())
+    } else {
+      let status = response.status();
+      let error_text = response.text().await.unwrap_or_default();
+      error!(
+        "Failed to upload to Supabase storage ({}): {}",
+        status, error_text
+      );
+      Err(UnexpectedError::new(format!(
+        "Storage upload failed: {} - {}",
+        status, error_text
+      )))
+    }
   }
 }

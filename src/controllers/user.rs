@@ -1,12 +1,16 @@
 use crate::{
   app_state::{AppState, CurrentUserExt},
-  models::{my_errors::MyErrors, user_business_informations::CreateBusinessInfomation},
+  models::{
+    my_errors::{application_error::ApplicationError, MyErrors},
+    user_business_informations::CreateBusinessInfomation,
+  },
   services,
   views::practitioner_office::PractitionerOffice,
 };
 use axum::{
   debug_handler,
   extract::{Multipart, State},
+  http::status,
   Json,
 };
 
@@ -41,46 +45,36 @@ pub async fn upload_signature(
   State(_state): State<AppState>,
   CurrentUserExt(user, _): CurrentUserExt,
   mut multipart: Multipart,
-) -> Result<Json<serde_json::Value>, MyErrors> {
-  let mut signature_data: Option<Vec<u8>> = None;
-  let mut filename: Option<String> = None;
-  let mut content_type: Option<String> = None;
+) -> Result<status::StatusCode, MyErrors> {
+  let field = multipart
+    .next_field()
+    .await
+    .map_err(|_| ApplicationError::BAD_REQUEST())?
+    .ok_or(ApplicationError::BAD_REQUEST())?;
 
-  while let Some(field) = multipart.next_field().await.map_err(|_| MyErrors {
-    code: axum::http::StatusCode::BAD_REQUEST,
-    msg: "Invalid multipart data".to_string(),
-  })? {
-    let field_name = field.name().unwrap_or("").to_string();
-
-    if field_name == "signature" {
-      filename = field.file_name().map(|f| f.to_string());
-      content_type = field.content_type().map(|ct| ct.to_string());
-
-      tracing::info!("filename={:?}, content_type={:?}", filename, content_type);
-
-      let data = field.bytes().await.map_err(|_| MyErrors {
-        code: axum::http::StatusCode::BAD_REQUEST,
-        msg: "Failed to read file data".to_string(),
-      })?;
-
-      signature_data = Some(data.to_vec());
-    }
+  let field_name = field.name().ok_or(ApplicationError::BAD_REQUEST())?;
+  if field_name != "signature" {
+    return Err(ApplicationError::BAD_REQUEST());
   }
 
-  let signature_data = signature_data.ok_or_else(|| MyErrors {
-    code: axum::http::StatusCode::BAD_REQUEST,
-    msg: "No signature file provided".to_string(),
-  })?;
+  let content_type = field
+    .content_type()
+    .map(|ct| ct.to_string())
+    .unwrap_or_else(|| "image/png".to_string());
 
-  let filename = filename.unwrap_or_else(|| format!("signature_{}.png", user.id));
-  let content_type = content_type.unwrap_or_else(|| "image/png".to_string());
+  let signature_data = field
+    .bytes()
+    .await
+    .map_err(|_| ApplicationError::UNPROCESSABLE_ENTITY())?;
 
-  services::invoice::upload_signature_for_user(&user, &signature_data, &filename, &content_type)
+  let storage_service = services::storage::StorageService::new()?;
+  storage_service
+    .upload_signature(
+      &signature_data,
+      &user.last_name.to_lowercase(),
+      &content_type,
+    )
     .await?;
 
-  Ok(Json(serde_json::json!({
-    "success": true,
-    "message": "Signature uploaded successfully",
-    "filename": filename
-  })))
+  Ok(status::StatusCode::NO_CONTENT)
 }

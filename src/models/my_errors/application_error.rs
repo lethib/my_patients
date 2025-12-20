@@ -20,6 +20,14 @@ impl ApplicationError {
     }
   }
 
+  #[allow(non_snake_case)]
+  pub fn BAD_REQUEST() -> MyErrors {
+    MyErrors {
+      code: StatusCode::BAD_REQUEST,
+      msg: "bad_request".into(),
+    }
+  }
+
   pub fn new(msg: String) -> MyErrors {
     MyErrors {
       code: StatusCode::NOT_FOUND,
