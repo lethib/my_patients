@@ -16,6 +16,50 @@ use crate::{
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 use serde::{Deserialize, Serialize};
 
+// Supabase Storage helpers
+async fn upload_to_supabase_storage(
+  file_data: &[u8],
+  filename: &str,
+  bucket_name: &str,
+  content_type: &str,
+) -> Result<(), MyErrors> {
+  let supabase_url =
+    std::env::var("SUPABASE_URL").map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN())?;
+  let supabase_key =
+    std::env::var("SUPABASE_SERVICE_ROLE_KEY").map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN())?;
+
+  let client = reqwest::Client::new();
+  let url = format!(
+    "{}/storage/v1/object/{}/{}",
+    supabase_url, bucket_name, filename
+  );
+
+  let response = client
+    .post(&url)
+    .header("Authorization", format!("Bearer {}", supabase_key))
+    .header("Content-Type", content_type)
+    .body(file_data.to_vec())
+    .send()
+    .await
+    .map_err(|e| {
+      tracing::error!("Failed to send upload request: {}", e);
+      UnexpectedError::SHOULD_NOT_HAPPEN()
+    })?;
+
+  if response.status().is_success() {
+    Ok(())
+  } else {
+    let status = response.status();
+    let error_text = response.text().await.unwrap_or_default();
+    tracing::error!(
+      "Failed to upload to Supabase storage ({}): {}",
+      status,
+      error_text
+    );
+    Err(UnexpectedError::SHOULD_NOT_HAPPEN().into())
+  }
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct GenerateInvoiceParams {
   pub amount: String,
@@ -29,6 +73,18 @@ pub struct GenerateInvoiceResponse {
   pub filename: String,
   patient_email: String,
   invoice_date: chrono::NaiveDate,
+}
+
+pub async fn upload_signature_for_user(
+  _user: &users::Model,
+  signature_data: &[u8],
+  filename: &str,
+  content_type: &str,
+) -> Result<(), MyErrors> {
+  let bucket_name =
+    std::env::var("SUPABASE_SIGNATURE_BUCKET").map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN())?;
+
+  upload_to_supabase_storage(signature_data, filename, &bucket_name, content_type).await
 }
 
 pub async fn send_invoice(

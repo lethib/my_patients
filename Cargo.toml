@@ -16,7 +16,7 @@ tokio = { version = "1.45", default-features = false, features = [
   "sync",
 ] }
 async-trait = { version = "0.1" }
-axum = { version = "0.8", features = ["macros"] }
+axum = { version = "0.8", features = ["macros", "multipart"] }
 tracing = { version = "0.1" }
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 tower = "0.5"
@@ -35,7 +35,6 @@ chrono = { version = "0.4" }
 validator = { version = "0.20", features = ["derive"] }
 uuid = { version = "1.6", features = ["v4"] }
 include_dir = { version = "0.7" }
-axum-extra = { version = "0.10", features = ["form"] }
 aes-gcm = "0.10.3"
 base64 = "0.22.1"
 argon2 = "0.5"
@@ -49,7 +48,6 @@ lettre = { version = "0.11", features = [
 ] }
 # Using printpdf for native Rust PDF generation
 printpdf = "0.7"
-lopdf = "0.32"
 # HTTP client for Supabase storage
 reqwest = { version = "0.12", features = ["json", "stream"] }
 # Image processing for signature embedding
