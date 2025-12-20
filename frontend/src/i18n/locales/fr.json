@@ -203,6 +203,19 @@
     "successMessage": "Informations professionnelles enregistrées avec succès !",
     "required": "obligatoire"
   },
+  "signature": {
+    "title": "Signature",
+    "subtitle": "Téléchargez votre signature pour l'inclure dans les factures",
+    "selectFile": "Fichier de signature",
+    "chooseFile": "Choisir un fichier",
+    "upload": "Envoyer",
+    "uploading": "Envoi en cours...",
+    "fileRequirements": "PNG ou JPG, maximum 200 Ko. L'image sera redimensionnée à 314x156 pixels.",
+    "invalidFileType": "Format de fichier invalide. Veuillez sélectionner une image PNG ou JPG.",
+    "fileTooLarge": "Le fichier est trop volumineux. La taille maximale est de 200 Ko.",
+    "uploadSuccess": "Signature téléchargée avec succès !",
+    "uploadError": "Erreur lors du téléchargement de la signature. Veuillez réessayer."
+  },
   "common": {
     "save": "Enregistrer",
     "cancel": "Annuler",

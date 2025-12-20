@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Building2, FileText, Users } from "lucide-react";
-import { useEffect } from "react";
+import { Building2, FileText, PenTool, Upload, Users } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
@@ -34,9 +34,15 @@ function MyInformation() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { currentUser } = useCurrentUser();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
   const saveBusinessInformationMutation =
     APIHooks.user.saveBusinessInformation.useMutation();
+  const uploadSignatureMutation = APIHooks.user.uploadSignature.useMutation();
 
   const businessForm = useForm({
     resolver: zodResolver(businessInfoSchema),
@@ -64,6 +70,44 @@ function MyInformation() {
       navigate({ to: "/search" });
     });
   });
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const validTypes = ["image/png", "image/jpeg", "image/jpg"];
+      if (!validTypes.includes(file.type)) {
+        alert(t("signature.invalidFileType"));
+        return;
+      }
+
+      // Validate file size (max 200KB)
+      const maxSize = 200 * 1024;
+      if (file.size > maxSize) {
+        alert(t("signature.fileTooLarge"));
+        return;
+      }
+
+      setSelectedFile(file);
+      setUploadStatus("idle");
+    }
+  };
+
+  const handleUploadSignature = async () => {
+    if (!selectedFile) return;
+
+    uploadSignatureMutation
+      .mutateAsync(selectedFile)
+      .then(() => {
+        setUploadStatus("success");
+        setSelectedFile(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      })
+      .catch(() => {
+        setUploadStatus("error");
+      });
+  };
 
   return (
     <div className="container mx-auto p-6 max-w-2xl">
@@ -133,6 +177,69 @@ function MyInformation() {
               {t("businessInfo.save")}
             </Button>
           </FormProvider>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <PenTool className="h-5 w-5" />
+            {t("signature.title")}
+          </CardTitle>
+          <CardDescription>{t("signature.subtitle")}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="signature" className="text-sm font-medium">
+              {t("signature.selectFile")}
+            </Label>
+            <input
+              ref={fileInputRef}
+              id="signature"
+              type="file"
+              accept="image/png,image/jpeg,image/jpg"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1"
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                {selectedFile ? selectedFile.name : t("signature.chooseFile")}
+              </Button>
+              {selectedFile && (
+                <Button
+                  type="button"
+                  onClick={handleUploadSignature}
+                  disabled={uploadSignatureMutation.isPending}
+                  className="px-8"
+                >
+                  {uploadSignatureMutation.isPending
+                    ? t("signature.uploading")
+                    : t("signature.upload")}
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {t("signature.fileRequirements")}
+            </p>
+          </div>
+
+          {uploadStatus === "success" && (
+            <div className="rounded-md bg-green-50 p-3 text-sm text-green-800">
+              {t("signature.uploadSuccess")}
+            </div>
+          )}
+
+          {uploadStatus === "error" && (
+            <div className="rounded-md bg-red-50 p-3 text-sm text-red-800">
+              {t("signature.uploadError")}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -1,3 +1,6 @@
+import { useMutation } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
+import { APIClient, type APIError } from "../api";
 import { mutationEndpoint, queryEndpoint } from "../endpointGenerator";
 import type { PractitionerOffice } from "./practitioner_office";
 
@@ -19,4 +22,24 @@ export const userSchema = {
     type: "GET",
     path: "/user/my_offices",
   }),
+  uploadSignature: {
+    useMutation: () => {
+      return useMutation<void, AxiosError<APIError>, File>({
+        mutationFn: async (file: File) => {
+          const formData = new FormData();
+          formData.append("signature", file);
+
+          return await APIClient.post<FormData, void>(
+            "/user/_upload_signature",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+        },
+      });
+    },
+  },
 };
