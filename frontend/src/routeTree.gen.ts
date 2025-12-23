@@ -13,6 +13,7 @@ import { Route as My_informationRouteImport } from './routes/my_information'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SearchIndexRouteImport } from './routes/search/index'
 import { Route as OfficesIndexRouteImport } from './routes/offices/index'
+import { Route as My_informationIndexRouteImport } from './routes/my_information/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 
 const My_informationRoute = My_informationRouteImport.update({
@@ -35,6 +36,11 @@ const OfficesIndexRoute = OfficesIndexRouteImport.update({
   path: '/offices/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const My_informationIndexRoute = My_informationIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => My_informationRoute,
+} as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
   id: '/login/',
   path: '/login/',
@@ -43,43 +49,52 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/my_information': typeof My_informationRoute
+  '/my_information': typeof My_informationRouteWithChildren
   '/login': typeof LoginIndexRoute
+  '/my_information/': typeof My_informationIndexRoute
   '/offices': typeof OfficesIndexRoute
   '/search': typeof SearchIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/my_information': typeof My_informationRoute
   '/login': typeof LoginIndexRoute
+  '/my_information': typeof My_informationIndexRoute
   '/offices': typeof OfficesIndexRoute
   '/search': typeof SearchIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/my_information': typeof My_informationRoute
+  '/my_information': typeof My_informationRouteWithChildren
   '/login/': typeof LoginIndexRoute
+  '/my_information/': typeof My_informationIndexRoute
   '/offices/': typeof OfficesIndexRoute
   '/search/': typeof SearchIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/my_information' | '/login' | '/offices' | '/search'
+  fullPaths:
+    | '/'
+    | '/my_information'
+    | '/login'
+    | '/my_information/'
+    | '/offices'
+    | '/search'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/my_information' | '/login' | '/offices' | '/search'
+  to: '/' | '/login' | '/my_information' | '/offices' | '/search'
   id:
     | '__root__'
     | '/'
     | '/my_information'
     | '/login/'
+    | '/my_information/'
     | '/offices/'
     | '/search/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  My_informationRoute: typeof My_informationRoute
+  My_informationRoute: typeof My_informationRouteWithChildren
   LoginIndexRoute: typeof LoginIndexRoute
   OfficesIndexRoute: typeof OfficesIndexRoute
   SearchIndexRoute: typeof SearchIndexRoute
@@ -115,6 +130,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OfficesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my_information/': {
+      id: '/my_information/'
+      path: '/'
+      fullPath: '/my_information/'
+      preLoaderRoute: typeof My_informationIndexRouteImport
+      parentRoute: typeof My_informationRoute
+    }
     '/login/': {
       id: '/login/'
       path: '/login'
@@ -125,9 +147,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface My_informationRouteChildren {
+  My_informationIndexRoute: typeof My_informationIndexRoute
+}
+
+const My_informationRouteChildren: My_informationRouteChildren = {
+  My_informationIndexRoute: My_informationIndexRoute,
+}
+
+const My_informationRouteWithChildren = My_informationRoute._addFileChildren(
+  My_informationRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  My_informationRoute: My_informationRoute,
+  My_informationRoute: My_informationRouteWithChildren,
   LoginIndexRoute: LoginIndexRoute,
   OfficesIndexRoute: OfficesIndexRoute,
   SearchIndexRoute: SearchIndexRoute,
