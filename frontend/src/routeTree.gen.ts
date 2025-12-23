@@ -9,18 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as My_informationRouteImport } from './routes/my_information'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SearchIndexRouteImport } from './routes/search/index'
 import { Route as OfficesIndexRouteImport } from './routes/offices/index'
 import { Route as My_informationIndexRouteImport } from './routes/my_information/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 
-const My_informationRoute = My_informationRouteImport.update({
-  id: '/my_information',
-  path: '/my_information',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,9 +31,9 @@ const OfficesIndexRoute = OfficesIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const My_informationIndexRoute = My_informationIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => My_informationRoute,
+  id: '/my_information/',
+  path: '/my_information/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
   id: '/login/',
@@ -49,9 +43,8 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/my_information': typeof My_informationRouteWithChildren
   '/login': typeof LoginIndexRoute
-  '/my_information/': typeof My_informationIndexRoute
+  '/my_information': typeof My_informationIndexRoute
   '/offices': typeof OfficesIndexRoute
   '/search': typeof SearchIndexRoute
 }
@@ -65,7 +58,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/my_information': typeof My_informationRouteWithChildren
   '/login/': typeof LoginIndexRoute
   '/my_information/': typeof My_informationIndexRoute
   '/offices/': typeof OfficesIndexRoute
@@ -73,19 +65,12 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/my_information'
-    | '/login'
-    | '/my_information/'
-    | '/offices'
-    | '/search'
+  fullPaths: '/' | '/login' | '/my_information' | '/offices' | '/search'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/login' | '/my_information' | '/offices' | '/search'
   id:
     | '__root__'
     | '/'
-    | '/my_information'
     | '/login/'
     | '/my_information/'
     | '/offices/'
@@ -94,21 +79,14 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  My_informationRoute: typeof My_informationRouteWithChildren
   LoginIndexRoute: typeof LoginIndexRoute
+  My_informationIndexRoute: typeof My_informationIndexRoute
   OfficesIndexRoute: typeof OfficesIndexRoute
   SearchIndexRoute: typeof SearchIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/my_information': {
-      id: '/my_information'
-      path: '/my_information'
-      fullPath: '/my_information'
-      preLoaderRoute: typeof My_informationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -132,10 +110,10 @@ declare module '@tanstack/react-router' {
     }
     '/my_information/': {
       id: '/my_information/'
-      path: '/'
-      fullPath: '/my_information/'
+      path: '/my_information'
+      fullPath: '/my_information'
       preLoaderRoute: typeof My_informationIndexRouteImport
-      parentRoute: typeof My_informationRoute
+      parentRoute: typeof rootRouteImport
     }
     '/login/': {
       id: '/login/'
@@ -147,22 +125,10 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface My_informationRouteChildren {
-  My_informationIndexRoute: typeof My_informationIndexRoute
-}
-
-const My_informationRouteChildren: My_informationRouteChildren = {
-  My_informationIndexRoute: My_informationIndexRoute,
-}
-
-const My_informationRouteWithChildren = My_informationRoute._addFileChildren(
-  My_informationRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  My_informationRoute: My_informationRouteWithChildren,
   LoginIndexRoute: LoginIndexRoute,
+  My_informationIndexRoute: My_informationIndexRoute,
   OfficesIndexRoute: OfficesIndexRoute,
   SearchIndexRoute: SearchIndexRoute,
 }
