@@ -9,17 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as My_informationRouteImport } from './routes/my_information'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SearchIndexRouteImport } from './routes/search/index'
 import { Route as OfficesIndexRouteImport } from './routes/offices/index'
+import { Route as My_informationIndexRouteImport } from './routes/my_information/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 
-const My_informationRoute = My_informationRouteImport.update({
-  id: '/my_information',
-  path: '/my_information',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -35,6 +30,11 @@ const OfficesIndexRoute = OfficesIndexRouteImport.update({
   path: '/offices/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const My_informationIndexRoute = My_informationIndexRouteImport.update({
+  id: '/my_information/',
+  path: '/my_information/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
   id: '/login/',
   path: '/login/',
@@ -43,57 +43,50 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/my_information': typeof My_informationRoute
   '/login': typeof LoginIndexRoute
+  '/my_information': typeof My_informationIndexRoute
   '/offices': typeof OfficesIndexRoute
   '/search': typeof SearchIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/my_information': typeof My_informationRoute
   '/login': typeof LoginIndexRoute
+  '/my_information': typeof My_informationIndexRoute
   '/offices': typeof OfficesIndexRoute
   '/search': typeof SearchIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/my_information': typeof My_informationRoute
   '/login/': typeof LoginIndexRoute
+  '/my_information/': typeof My_informationIndexRoute
   '/offices/': typeof OfficesIndexRoute
   '/search/': typeof SearchIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/my_information' | '/login' | '/offices' | '/search'
+  fullPaths: '/' | '/login' | '/my_information' | '/offices' | '/search'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/my_information' | '/login' | '/offices' | '/search'
+  to: '/' | '/login' | '/my_information' | '/offices' | '/search'
   id:
     | '__root__'
     | '/'
-    | '/my_information'
     | '/login/'
+    | '/my_information/'
     | '/offices/'
     | '/search/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  My_informationRoute: typeof My_informationRoute
   LoginIndexRoute: typeof LoginIndexRoute
+  My_informationIndexRoute: typeof My_informationIndexRoute
   OfficesIndexRoute: typeof OfficesIndexRoute
   SearchIndexRoute: typeof SearchIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/my_information': {
-      id: '/my_information'
-      path: '/my_information'
-      fullPath: '/my_information'
-      preLoaderRoute: typeof My_informationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -115,6 +108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OfficesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my_information/': {
+      id: '/my_information/'
+      path: '/my_information'
+      fullPath: '/my_information'
+      preLoaderRoute: typeof My_informationIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login/': {
       id: '/login/'
       path: '/login'
@@ -127,8 +127,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  My_informationRoute: My_informationRoute,
   LoginIndexRoute: LoginIndexRoute,
+  My_informationIndexRoute: My_informationIndexRoute,
   OfficesIndexRoute: OfficesIndexRoute,
   SearchIndexRoute: SearchIndexRoute,
 }
