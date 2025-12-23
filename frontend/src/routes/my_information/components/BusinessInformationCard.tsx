@@ -51,7 +51,7 @@ export const BusinessInformationCard = () => {
         adeli_number: currentUser.business_information.adeli_number || "",
       });
     }
-  }, [currentUser, businessForm]);
+  }, [currentUser]);
 
   const onSubmit = businessForm.handleSubmit(async (values) => {
     saveBusinessInformationMutation.mutateAsync(values).then(() => {

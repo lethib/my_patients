@@ -14,7 +14,7 @@ import {
 } from "@/components/ui";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
-export const SignatureModal = () => {
+export const SignatureCard = () => {
   const { t } = useTranslation();
   const { currentUser } = useCurrentUser();
   const fileInputRef = useRef<HTMLInputElement>(null);
