@@ -113,14 +113,19 @@ COPY src/ src/
 RUN cargo build --release --target x86_64-unknown-linux-gnu && \
     # Build migrate binary
     cargo build --release --bin migrate --target x86_64-unknown-linux-gnu && \
+    # Build send_access_token binary
+    cargo build --release --bin send_access_token --target x86_64-unknown-linux-gnu && \
     # Strip binaries to reduce size (remove debug symbols)
     strip target/x86_64-unknown-linux-gnu/release/my_patients && \
     strip target/x86_64-unknown-linux-gnu/release/migrate && \
+    strip target/x86_64-unknown-linux-gnu/release/send_access_token && \
     # Verify binaries were built successfully
     [ -f "target/x86_64-unknown-linux-gnu/release/my_patients" ] || \
         (echo "Rust build failed - binary not found" && exit 1) && \
     [ -f "target/x86_64-unknown-linux-gnu/release/migrate" ] || \
-        (echo "Migrate binary build failed - binary not found" && exit 1)
+        (echo "Migrate binary build failed - binary not found" && exit 1) && \
+    [ -f "target/x86_64-unknown-linux-gnu/release/send_access_token" ] || \
+        (echo "Send access token binary build failed - binary not found" && exit 1)
 
 # ------------------------------------------------------------------------------
 # STAGE 7: Final Runtime Image (Distroless for Security & Size)
@@ -143,6 +148,8 @@ COPY --from=rust-builder --chown=65532:65532 \
     /app/target/x86_64-unknown-linux-gnu/release/my_patients ./my_patients
 COPY --from=rust-builder --chown=65532:65532 \
     /app/target/x86_64-unknown-linux-gnu/release/migrate ./migrate
+COPY --from=rust-builder --chown=65532:65532 \
+    /app/target/x86_64-unknown-linux-gnu/release/send_access_token ./send_access_token
 COPY --chown=65532:65532 config/ ./config/
 
 # Set optimal defaults for production
