@@ -64,3 +64,7 @@ insta = { version = "1.34", features = ["redactions", "yaml", "filters"] }
 [[bin]]
 name = "migrate"
 path = "src/bin/migrate.rs"
+
+[[bin]]
+name = "send_access_token"
+path = "src/bin/send_access_token.rs"
