@@ -41,10 +41,6 @@ type ForgotPasswordParams = {
   email: string;
 };
 
-type ForgotPasswordResponse = {
-  reset_password_url: string;
-};
-
 type ResetPasswordParams = {
   token: string;
   password: string;
@@ -67,7 +63,7 @@ export const authSchema = {
     type: "POST",
     path: "/auth/_check_access_key",
   }),
-  forgot: mutationEndpoint<ForgotPasswordParams, ForgotPasswordResponse>({
+  forgot: mutationEndpoint<ForgotPasswordParams, null>({
     type: "POST",
     path: "/auth/forgot",
   }),
