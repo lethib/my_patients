@@ -61,6 +61,37 @@
       },
       "success": "Votre clé d'accès a bien été vérifiée. Vous pouvez vous connecter."
     },
+    "forgotPassword": {
+      "title": "Mot de passe oublié ?",
+      "description": "Saisissez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe",
+      "email": "Email",
+      "emailPlaceholder": "Saisissez votre email",
+      "cancel": "Annuler",
+      "sending": "Envoi...",
+      "send": "Envoyer le lien",
+      "success": "Un lien de réinitialisation a été envoyé à votre adresse email",
+      "backToLogin": "Retour à la connexion",
+      "validation": {
+        "invalidEmail": "Adresse email invalide"
+      }
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "description": "Saisissez votre nouveau mot de passe",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "newPasswordPlaceholder": "Saisissez votre nouveau mot de passe",
+      "confirmPasswordPlaceholder": "Confirmez votre nouveau mot de passe",
+      "resetting": "Réinitialisation...",
+      "reset": "Réinitialiser le mot de passe",
+      "success": "Votre mot de passe a été réinitialisé avec succès",
+      "backToLogin": "Retour à la connexion",
+      "invalidToken": "Le lien de réinitialisation est invalide ou a expiré",
+      "validation": {
+        "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
+        "passwordsDontMatch": "Les mots de passe ne correspondent pas"
+      }
+    },
     "logout": "Déconnexion"
   },
   "navigation": {

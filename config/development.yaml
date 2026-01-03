@@ -14,6 +14,9 @@ server:
   port: 5150
   binding: localhost
 
+app:
+  base_url: http://localhost:5173
+
 # Database configuration
 database:
   url: postgres://loco:loco@localhost:5430/main

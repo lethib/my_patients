@@ -1,6 +1,6 @@
 use crate::{
-  app_state::{AppState, CurrentUserExt},
-  auth::jwt::JwtService,
+  app_state::{AppState, CurrentUserExt, WorkerJob},
+  auth::jwt::{JwtService, TOKEN_TYPE_AUTH, TOKEN_TYPE_PASSWORD_RESET},
   models::{
     _entities::users,
     my_errors::{
@@ -11,8 +11,14 @@ use crate::{
   },
   services,
   views::auth::{CurrentResponse, LoginResponse},
+  workers::mailer::args::EmailArgs,
 };
-use axum::{debug_handler, extract::State, http::StatusCode, Json};
+use axum::{
+  debug_handler,
+  extract::State,
+  http::{self, StatusCode},
+  Json,
+};
 use sea_orm::IntoActiveModel;
 use serde::{Deserialize, Serialize};
 
@@ -27,7 +33,6 @@ pub struct ResetParams {
   pub password: String,
 }
 
-/// Register function creates a new user with the given parameters
 #[debug_handler]
 pub async fn register(
   State(state): State<AppState>,
@@ -37,35 +42,71 @@ pub async fn register(
   Ok(Json(()))
 }
 
-/// In case the user forgot his password, this endpoint generates a forgot token
-/// and sends email to the user. In case the email is not found in our DB, we are
-/// returning a valid request for security reasons (not exposing users DB list).
 #[debug_handler]
 pub async fn forgot(
   State(state): State<AppState>,
   Json(params): Json<ForgotParams>,
-) -> Result<Json<()>, MyErrors> {
-  let Ok(_user) = users::Model::find_by_email(&state.db, &params.email).await else {
-    // we don't want to expose our users' emails. if the email is invalid we still
-    // return success to the caller
-    return Ok(Json(()));
+) -> Result<http::StatusCode, MyErrors> {
+  let Ok(user) = users::Model::find_by_email(&state.db, &params.email).await else {
+    return Ok(http::StatusCode::NO_CONTENT);
   };
 
-  // TODO: implement the forgot password logic
+  let jwt_service = JwtService::new(&state.config.jwt.secret);
+  let secured_token = jwt_service
+    .generate_token(
+      &user.pid.to_string(),
+      TOKEN_TYPE_PASSWORD_RESET,
+      state.config.jwt.expiration,
+    )
+    .map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN())?;
 
-  Ok(Json(()))
+  let secured_url = format!(
+    "{}/reset_password?access_token={}",
+    state.config.app.base_url, secured_token
+  );
+
+  let email_args = EmailArgs::new_text(
+    user.email,
+    "Réinitialisation du mot de passe".to_string(),
+    format!(
+      "Bonjour,\n\nVoici le lien pour réinitialiser votre mot de passe: {}",
+      secured_url
+    ),
+  );
+
+  state
+    .worker_transmitter
+    .send(WorkerJob::Email(email_args))
+    .await?;
+
+  Ok(http::StatusCode::NO_CONTENT)
 }
 
-/// Reset user password by the given parameters
 #[debug_handler]
 pub async fn reset(
-  State(_state): State<AppState>,
-  Json(_params): Json<ResetParams>,
+  State(state): State<AppState>,
+  Json(params): Json<ResetParams>,
 ) -> Result<Json<()>, MyErrors> {
-  return Err(MyErrors {
-    code: StatusCode::BAD_REQUEST,
-    msg: "not implemented".to_string(),
-  });
+  let jwt_service = JwtService::new(&state.config.jwt.secret);
+  let claims = jwt_service
+    .validate_token(&params.token)
+    .map_err(|_| AuthenticationError::INVALID_TOKEN())?;
+
+  if claims.token_type != TOKEN_TYPE_PASSWORD_RESET {
+    return Err(AuthenticationError::INVALID_TOKEN());
+  }
+
+  let user = users::Model::find_by_pid(&state.db, &claims.pid)
+    .await
+    .map_err(|_| AuthenticationError::INVALID_CLAIMS())?;
+
+  user
+    .0
+    .into_active_model()
+    .update_password(&state.db, &params.password)
+    .await?;
+
+  Ok(Json(()))
 }
 
 /// Creates a user login and returns a token
@@ -93,7 +134,11 @@ pub async fn login(
 
   let jwt_service = JwtService::new(&state.config.jwt.secret);
   let token = jwt_service
-    .generate_token(&user.pid.to_string(), state.config.jwt.expiration)
+    .generate_token(
+      &user.pid.to_string(),
+      TOKEN_TYPE_AUTH,
+      state.config.jwt.expiration,
+    )
     .map_err(|_| MyErrors {
       code: StatusCode::UNAUTHORIZED,
       msg: "Failed to generate token".to_string(),
@@ -130,7 +175,11 @@ pub async fn check_access_key(
 
     let jwt_service = JwtService::new(&state.config.jwt.secret);
     let token = jwt_service
-      .generate_token(&user.pid.to_string(), state.config.jwt.expiration)
+      .generate_token(
+        &user.pid.to_string(),
+        TOKEN_TYPE_AUTH,
+        state.config.jwt.expiration,
+      )
       .map_err(|error| UnexpectedError::new(error.to_string()))?;
 
     return Ok(Json(serde_json::json!({ "token": token })));

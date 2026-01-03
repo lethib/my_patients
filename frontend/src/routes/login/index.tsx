@@ -19,6 +19,7 @@ import {
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { login } from "@/lib/authUtils";
 import { AccessKeyModal } from "./components/AccessKeyModal";
+import { ForgotPasswordModal } from "./components/ForgotPasswordModal";
 import { RegisterModal } from "./components/RegisterModal";
 
 export const Route = createFileRoute("/login/")({
@@ -31,6 +32,8 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isAccessKeyModalOpen, setIsAccessKeyModalOpen] = useState(false);
+  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] =
+    useState(false);
   const [userEmail, setUserEmail] = useState("");
 
   const loginMutation = APIClient.hooks.auth.login.useMutation();
@@ -156,9 +159,12 @@ function Login() {
             </FormProvider>
 
             <div className="text-center space-y-2">
-              {/* <button className="text-sm text-primary hover:underline">
-                {t('auth.login.forgotPassword')}
-              </button> */}
+              <button
+                className="text-sm text-primary hover:underline"
+                onClick={() => setIsForgotPasswordModalOpen(true)}
+              >
+                {t("auth.login.forgotPassword")}
+              </button>
               <p className="text-sm text-muted-foreground">
                 {t("auth.login.noAccount")}{" "}
                 <button
@@ -182,6 +188,11 @@ function Login() {
         userEmail={userEmail}
         open={isAccessKeyModalOpen}
         onOpenChange={setIsAccessKeyModalOpen}
+      />
+
+      <ForgotPasswordModal
+        open={isForgotPasswordModalOpen}
+        onOpenChange={setIsForgotPasswordModalOpen}
       />
     </>
   );

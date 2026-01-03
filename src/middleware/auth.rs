@@ -1,6 +1,6 @@
 use crate::{
   app_state::{AppState, CurrentUserExt},
-  auth::jwt::JwtService,
+  auth::jwt::{JwtService, TOKEN_TYPE_AUTH},
   models::{
     _entities::users,
     my_errors::{authentication_error::AuthenticationError, MyErrors},
@@ -36,6 +36,14 @@ pub async fn auth_middleware(
     tracing::error!("JWT validation failed: {}", e);
     AuthenticationError::INVALID_TOKEN()
   })?;
+
+  if claims.token_type != TOKEN_TYPE_AUTH {
+    tracing::error!(
+      "Invalid token type: expected 'auth', got '{}'",
+      claims.token_type
+    );
+    return Err(AuthenticationError::INVALID_TOKEN());
+  }
 
   let user_result = users::Model::find_by_pid(&state.db, &claims.pid)
     .await

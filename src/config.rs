@@ -8,6 +8,7 @@ pub struct Config {
   pub jwt: JwtConfig,
   pub logger: LoggerConfig,
   pub cors: CorsConfig,
+  pub app: AppConfig,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -49,6 +50,11 @@ pub struct CorsConfig {
   pub allow_headers: Vec<String>,
   #[serde(default = "default_cors_allow_methods")]
   pub allow_methods: Vec<String>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct AppConfig {
+  pub base_url: String,
 }
 
 // Default value functions

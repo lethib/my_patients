@@ -37,6 +37,19 @@ type CheckAccessKeyParams = {
   user_email: string;
 };
 
+type ForgotPasswordParams = {
+  email: string;
+};
+
+type ForgotPasswordResponse = {
+  reset_password_url: string;
+};
+
+type ResetPasswordParams = {
+  token: string;
+  password: string;
+};
+
 export const authSchema = {
   login: mutationEndpoint<LoginParams, AuthResponse>({
     type: "POST",
@@ -53,5 +66,13 @@ export const authSchema = {
   checkAccessKey: mutationEndpoint<CheckAccessKeyParams, { token: string }>({
     type: "POST",
     path: "/auth/_check_access_key",
+  }),
+  forgot: mutationEndpoint<ForgotPasswordParams, ForgotPasswordResponse>({
+    type: "POST",
+    path: "/auth/forgot",
+  }),
+  reset: mutationEndpoint<ResetPasswordParams, null>({
+    type: "POST",
+    path: "/auth/reset",
   }),
 };
