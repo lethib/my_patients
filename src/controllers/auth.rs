@@ -53,11 +53,7 @@ pub async fn forgot(
 
   let jwt_service = JwtService::new(&state.config.jwt.secret);
   let secured_token = jwt_service
-    .generate_token(
-      &user.pid.to_string(),
-      TOKEN_TYPE_PASSWORD_RESET,
-      state.config.jwt.expiration,
-    )
+    .generate_token(&user.pid.to_string(), TOKEN_TYPE_PASSWORD_RESET, 900)
     .map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN())?;
 
   let secured_url = format!(
