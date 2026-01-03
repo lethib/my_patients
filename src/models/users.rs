@@ -178,4 +178,18 @@ impl ActiveModel {
 
     Ok(())
   }
+
+  pub async fn update_password(
+    mut self,
+    db: &DatabaseConnection,
+    new_password: &str,
+  ) -> ModelResult<Model> {
+    let password_hash = password::hash_password(new_password)
+      .map_err(|e| ModelError::Any(format!("Password hash error: {}", e).into()))?;
+
+    self.password = ActiveValue::Set(password_hash);
+    let updated_user = self.update(db).await?;
+
+    Ok(updated_user)
+  }
 }

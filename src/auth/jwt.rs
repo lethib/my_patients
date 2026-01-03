@@ -2,11 +2,15 @@ use chrono::{Duration, Utc};
 use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 
+pub const TOKEN_TYPE_AUTH: &str = "auth";
+pub const TOKEN_TYPE_PASSWORD_RESET: &str = "password_reset";
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
   pub pid: String,
   pub exp: i64,
   pub iat: i64,
+  pub token_type: String,
 }
 
 pub struct JwtService {
@@ -30,6 +34,7 @@ impl JwtService {
   pub fn generate_token(
     &self,
     pid: &str,
+    token_type: &str,
     expiration_seconds: u64,
   ) -> Result<String, jsonwebtoken::errors::Error> {
     let now = Utc::now();
@@ -39,6 +44,7 @@ impl JwtService {
       pid: pid.to_string(),
       exp: exp.timestamp(),
       iat: now.timestamp(),
+      token_type: token_type.to_string(),
     };
 
     encode(&Header::default(), &claims, &self.encoding_key)
