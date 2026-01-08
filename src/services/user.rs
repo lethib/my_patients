@@ -26,6 +26,7 @@ pub async fn save_business_information(
       business_information.rpps_number = Set(params.rpps_number.clone());
       business_information.siret_number = Set(params.siret_number.clone());
       business_information.adeli_number = Set(params.adeli_number.clone());
+      business_information.profession = Set(params.profession_enum()?);
 
       business_information.update(&services.db).await?;
       Ok(())
