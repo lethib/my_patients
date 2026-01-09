@@ -3,7 +3,7 @@ use crate::{
   models::{
     _entities::prelude::UserBusinessInformations,
     my_errors::{application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors},
-    user_business_informations::CreateBusinessInfomation,
+    user_business_informations::CreateBusinessInformation,
   },
   services::{self, storage::StorageService},
   views::practitioner_office::PractitionerOffice,
@@ -21,7 +21,7 @@ use sea_orm::{ActiveModelTrait, ActiveValue, IntoActiveModel, ModelTrait};
 pub async fn save_business_info(
   State(_state): State<AppState>,
   CurrentUserExt(user, _): CurrentUserExt,
-  Json(business_information): Json<CreateBusinessInfomation>,
+  Json(business_information): Json<CreateBusinessInformation>,
 ) -> Result<Json<serde_json::Value>, MyErrors> {
   services::user::save_business_information(&business_information, &user).await?;
 

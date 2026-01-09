@@ -6,14 +6,14 @@ use sea_orm::{entity::prelude::*, ActiveEnum, ActiveValue};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
-pub struct CreateBusinessInfomation {
+pub struct CreateBusinessInformation {
   pub rpps_number: String,
   pub adeli_number: Option<String>,
   pub siret_number: String,
   pub profession: String,
 }
 
-impl CreateBusinessInfomation {
+impl CreateBusinessInformation {
   pub fn profession_enum(&self) -> Result<Profession, DbErr> {
     Profession::try_from_value(&self.profession)
       .map_err(|_| DbErr::Custom(format!("Invalid profession value: {}", self.profession)))
@@ -57,7 +57,7 @@ impl Model {}
 impl ActiveModel {
   pub async fn create<T: ConnectionTrait>(
     db: &T,
-    params: &CreateBusinessInfomation,
+    params: &CreateBusinessInformation,
     concerned_user_id: &i32,
   ) -> Result<Model, DbErr> {
     Ok(

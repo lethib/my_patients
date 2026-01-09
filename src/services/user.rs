@@ -4,12 +4,12 @@ use crate::{
 use sea_orm::{ActiveModelTrait, ActiveValue::Set, DbErr, IntoActiveModel, ModelTrait};
 
 use crate::models::{
-  _entities::user_business_informations, user_business_informations::CreateBusinessInfomation,
+  _entities::user_business_informations, user_business_informations::CreateBusinessInformation,
   users,
 };
 
 pub async fn save_business_information(
-  params: &CreateBusinessInfomation,
+  params: &CreateBusinessInformation,
   concerned_user: &users::Model,
 ) -> Result<(), DbErr> {
   let services = get_services();
