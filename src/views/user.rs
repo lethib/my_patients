@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
-
 use crate::models::_entities::user_business_informations;
+use sea_orm::ActiveEnum;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct BusinessInformation {
@@ -8,6 +8,7 @@ pub struct BusinessInformation {
   pub siret_number: String,
   pub adeli_number: Option<String>,
   pub signature_filename: Option<String>,
+  pub profession: String,
 }
 
 impl BusinessInformation {
@@ -22,6 +23,7 @@ impl BusinessInformation {
         .filter(|s| !s.is_empty())
         .cloned(),
       signature_filename: business_information.signature_file_name.clone(),
+      profession: business_information.profession.to_value(),
     }
   }
 }

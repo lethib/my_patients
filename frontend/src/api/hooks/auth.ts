@@ -1,4 +1,5 @@
 import { mutationEndpoint, queryEndpoint } from "../endpointGenerator";
+import type { Profession } from "../types/profession";
 
 type LoginParams = {
   email: string;
@@ -29,6 +30,7 @@ export type MeResponse = {
     siret_number: string;
     adeli_number: string | null;
     signature_filename: string | null;
+    profession: Profession;
   } | null;
 };
 

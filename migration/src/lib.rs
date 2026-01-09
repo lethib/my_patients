@@ -24,6 +24,7 @@ mod m20251129_135113_add_default_timestamps_to_medical_appointments;
 mod m20251201_220702_drop_patient_user_table;
 mod m20251208_221001_add_access_key_to_user;
 mod m20251220_215546_make_signature_filename_nullable;
+mod m20260107_075701_add_profession_to_user_information;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -52,6 +53,7 @@ impl MigratorTrait for Migrator {
       Box::new(m20251201_220702_drop_patient_user_table::Migration),
       Box::new(m20251208_221001_add_access_key_to_user::Migration),
       Box::new(m20251220_215546_make_signature_filename_nullable::Migration),
+      Box::new(m20260107_075701_add_profession_to_user_information::Migration),
     ]
   }
 }

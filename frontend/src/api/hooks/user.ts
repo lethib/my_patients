@@ -2,12 +2,14 @@ import { useMutation } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { APIClient, type APIError } from "../api";
 import { mutationEndpoint, queryEndpoint } from "../endpointGenerator";
+import type { Profession } from "../types/profession";
 import type { PractitionerOffice } from "./practitioner_office";
 
 type SaveBusinessInformation = {
   rpps_number: string;
   siret_number: string;
   adeli_number?: string;
+  profession: Profession;
 };
 
 export const userSchema = {

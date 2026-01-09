@@ -1,14 +1,23 @@
 use super::_entities::user_business_informations::{ActiveModel, Entity, Model};
+use crate::models::_entities::sea_orm_active_enums::Profession;
 use crate::models::user_business_informations;
 use crate::validators::business_information::{validate_rpps_number, validate_siret_number};
-use sea_orm::{entity::prelude::*, ActiveValue};
+use sea_orm::{entity::prelude::*, ActiveEnum, ActiveValue};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
-pub struct CreateBusinessInfomation {
+pub struct CreateBusinessInformation {
   pub rpps_number: String,
   pub adeli_number: Option<String>,
   pub siret_number: String,
+  pub profession: String,
+}
+
+impl CreateBusinessInformation {
+  pub fn profession_enum(&self) -> Result<Profession, DbErr> {
+    Profession::try_from_value(&self.profession)
+      .map_err(|_| DbErr::Custom(format!("Invalid profession value: {}", self.profession)))
+  }
 }
 
 #[async_trait::async_trait]
@@ -48,7 +57,7 @@ impl Model {}
 impl ActiveModel {
   pub async fn create<T: ConnectionTrait>(
     db: &T,
-    params: &CreateBusinessInfomation,
+    params: &CreateBusinessInformation,
     concerned_user_id: &i32,
   ) -> Result<Model, DbErr> {
     Ok(
@@ -57,6 +66,7 @@ impl ActiveModel {
         rpps_number: ActiveValue::Set(params.rpps_number.clone()),
         siret_number: ActiveValue::Set(params.siret_number.clone()),
         adeli_number: ActiveValue::Set(params.adeli_number.clone()),
+        profession: ActiveValue::Set(params.profession_enum()?),
         ..Default::default()
       }
       .insert(db)

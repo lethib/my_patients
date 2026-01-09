@@ -10,6 +10,7 @@ import { type SearchPatientResponse } from "@/api/hooks/patient";
 import { FormDatePicker } from "@/components/form/FormDatePicker";
 import { FormInput } from "@/components/form/FormInput";
 import { FormProvider } from "@/components/form/FormProvider";
+import { FormSelect } from "@/components/form/FormSelect";
 import { FormSwitch } from "@/components/form/FormSwitch";
 import {
   Button,
@@ -20,15 +21,6 @@ import {
   DialogTitle,
   Label,
 } from "@/components/ui";
-import { FormControl, FormField, FormItem } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import type { LocalInvoiceFile } from "./InvoiceModal";
 
@@ -189,36 +181,15 @@ export const GenerateInvoiceContent = ({
           <Label htmlFor="office" className="text-sm font-medium">
             {t("invoice.modal.office")}
           </Label>
-          <FormField
+          <FormSelect
             name="practitionerOfficeId"
-            render={({ field }) => (
-              <FormItem>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue
-                        placeholder={t("patients.form.officePlaceholder")}
-                      />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectGroup>
-                      {myOfficesQuery.data?.map((office) => (
-                        <SelectItem
-                          value={office.id.toString()}
-                          key={office.id}
-                        >
-                          {office.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
+            placeholder={t("patients.form.officePlaceholder")}
+            options={
+              myOfficesQuery.data?.map((office) => ({
+                value: office.id.toString(),
+                label: office.name,
+              })) || []
+            }
           />
         </div>
 

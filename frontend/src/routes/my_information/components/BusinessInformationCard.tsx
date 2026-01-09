@@ -7,8 +7,10 @@ import { useTranslation } from "react-i18next";
 import z from "zod";
 import { queryClient } from "@/api/api";
 import { APIHooks } from "@/api/hooks";
+import { PROFESSIONS } from "@/api/types/profession";
 import { FormInput } from "@/components/form/FormInput";
 import { FormProvider } from "@/components/form/FormProvider";
+import { FormSelect } from "@/components/form/FormSelect";
 import {
   Button,
   Card,
@@ -32,6 +34,7 @@ export const BusinessInformationCard = () => {
     rpps_number: z.string().trim().length(11),
     siret_number: z.string().trim().length(14),
     adeli_number: z.string().trim().optional(),
+    profession: z.enum(PROFESSIONS),
   });
 
   const businessForm = useForm({
@@ -40,6 +43,7 @@ export const BusinessInformationCard = () => {
       rpps_number: "",
       siret_number: "",
       adeli_number: "",
+      profession: undefined,
     },
   });
 
@@ -49,6 +53,7 @@ export const BusinessInformationCard = () => {
         rpps_number: currentUser.business_information.rpps_number || "",
         siret_number: currentUser.business_information.siret_number || "",
         adeli_number: currentUser.business_information.adeli_number || "",
+        profession: currentUser.business_information.profession,
       });
     }
   }, [currentUser]);
@@ -119,6 +124,22 @@ export const BusinessInformationCard = () => {
               className="pl-10 h-11"
               icon={
                 <FileText className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="profession" className="text-sm font-medium">
+              {t("businessInfo.profession")}
+            </Label>
+            <FormSelect
+              name="profession"
+              placeholder={t("businessInfo.professionPlaceholder")}
+              options={
+                PROFESSIONS.map((profession) => ({
+                  value: profession,
+                  label: t(`businessInfo.professionOptions.${profession}`),
+                })) || []
               }
             />
           </div>
