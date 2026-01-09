@@ -46,8 +46,7 @@ lettre = { version = "0.11", features = [
     "builder",             # Email builder API
     "hostname"             # Hostname resolution
 ] }
-# Using printpdf for native Rust PDF generation
-printpdf = "0.7"
+oxidize-pdf = "1.6"
 # HTTP client for Supabase storage
 reqwest = { version = "0.12", features = ["json", "stream"] }
 # Image processing for signature embedding
