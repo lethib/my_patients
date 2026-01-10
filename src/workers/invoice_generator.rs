@@ -226,7 +226,11 @@ fn create_modern_invoice_pdf(
 
   // === HEADER SECTION ===
   // Practitioner name with title on same line, separated by dash
-  let full_name = format!("{} – OSTEOPATHE D.O", &user.full_name());
+  let full_name = format!(
+    "{} – {}",
+    &user.full_name(),
+    business_info.profession.to_french()
+  );
   page
     .text()
     .set_font(Font::HelveticaBold, 14.0)
