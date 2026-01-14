@@ -130,6 +130,14 @@ pub async fn generate_invoice(
   Path(patient_id): Path<i32>,
   Json(params): Json<GenerateInvoiceParams>,
 ) -> Result<Json<serde_json::Value>, MyErrors> {
+  if params.amount <= 0.0 {
+    return Err(ApplicationError::UNPROCESSABLE_ENTITY());
+  }
+
+  if params.amount > (i32::MAX as f32 / 100.0) {
+    return Err(ApplicationError::UNPROCESSABLE_ENTITY());
+  }
+
   let invoice_generated =
     services::invoice::generate_patient_invoice(&patient_id, &params, &user).await?;
 
