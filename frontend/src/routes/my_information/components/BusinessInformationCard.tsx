@@ -62,7 +62,7 @@ export const BusinessInformationCard = () => {
     saveBusinessInformationMutation.mutateAsync(values).then(() => {
       queryClient.invalidateQueries({ queryKey: ["/auth/me"] });
       alert(t("businessInfo.successMessage"));
-      navigate({ to: "/search" });
+      navigate({ to: "/patients" });
     });
   });
   return (

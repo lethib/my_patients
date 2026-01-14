@@ -23,5 +23,5 @@ function RootNavigate() {
     return <Navigate to="/login" replace />;
   }
 
-  return <Navigate to="/search" replace />;
+  return <Navigate to="/patients" replace />;
 }
