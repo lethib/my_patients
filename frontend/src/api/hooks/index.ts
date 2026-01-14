@@ -1,3 +1,4 @@
+import { appointmentSchema } from "./appointment";
 import { authSchema } from "./auth";
 import { patientSchema } from "./patient";
 import { practitionerOfficeSchema } from "./practitioner_office";
@@ -8,4 +9,5 @@ export const APIHooks = {
   patient: patientSchema,
   user: userSchema,
   office: practitionerOfficeSchema,
+  appointment: appointmentSchema,
 };
