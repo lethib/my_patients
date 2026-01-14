@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct GenerateInvoiceParams {
-  pub amount: String,
+  pub amount: f32,
   pub invoice_date: String,
   pub should_be_sent_by_email: bool,
   pub practitioner_office_id: i32,
@@ -101,6 +101,7 @@ pub async fn generate_patient_invoice(
     patient_id: *patient_id,
     practitioner_office_id: params.practitioner_office_id,
     date: invoice_date,
+    price_in_cents: (params.amount * 100.0).round() as i32,
   };
 
   let created_medical_appointment =
@@ -115,7 +116,7 @@ pub async fn generate_patient_invoice(
   let args = InvoiceGeneratorArgs {
     patient: patient.clone(),
     user: current_user.clone(),
-    amount: params.amount.clone(),
+    amount: params.amount,
     invoice_date,
     practitioner_office,
   };

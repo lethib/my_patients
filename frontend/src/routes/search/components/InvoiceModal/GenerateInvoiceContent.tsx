@@ -46,13 +46,14 @@ export const GenerateInvoiceContent = ({
     APIHooks.patient.generateInvoice.useMutation();
 
   const invoiceFormSchema = z.object({
-    amount: z
-      .string()
+    amount: z.coerce
+      .number<number>()
       .min(1, t("invoice.errors.invalidAmount"))
       .refine(
         (val) => {
-          const num = parseFloat(val);
-          return !isNaN(num) && num > 0;
+          // Check if the number has at most 2 decimal places
+          // by multiplying by 100 and checking if it's an integer
+          return Math.round(val * 100) === val * 100;
         },
         { message: t("invoice.errors.invalidAmount") },
       ),
@@ -68,7 +69,7 @@ export const GenerateInvoiceContent = ({
   const invoiceForm = useForm<InvoiceFormData>({
     resolver: zodResolver(invoiceFormSchema),
     defaultValues: {
-      amount: "",
+      amount: undefined,
       date: new Date(),
       shouldSendInvoiceByEmail: false,
       practitionerOfficeId: "",
@@ -92,8 +93,6 @@ export const GenerateInvoiceContent = ({
   };
 
   const onSubmit = invoiceForm.handleSubmit(async (data) => {
-    const numericAmount = parseFloat(data.amount);
-
     // Format date as YYYY-MM-DD using local timezone (not UTC)
     const year = data.date.getFullYear();
     const month = String(data.date.getMonth() + 1).padStart(2, "0");
@@ -102,7 +101,7 @@ export const GenerateInvoiceContent = ({
     generateInvoiceMutation
       .mutateAsync({
         patientId: patient.id,
-        amount: `${numericAmount}€`,
+        amount: data.amount,
         invoice_date: `${year}-${month}-${day}`,
         should_be_sent_by_email: data.shouldSendInvoiceByEmail,
         practitioner_office_id: +data.practitionerOfficeId,

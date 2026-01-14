@@ -24,7 +24,7 @@ fn mm(value: f64) -> f64 {
 pub struct InvoiceGeneratorArgs {
   pub patient: patients::Model,
   pub user: users::Model,
-  pub amount: String,
+  pub amount: f32,
   pub invoice_date: Date,
   pub practitioner_office: practitioner_offices::Model,
 }
@@ -207,7 +207,7 @@ fn create_modern_invoice_pdf(
   business_info: &user_business_informations::Model,
   patient: &patients::Model,
   patient_ssn: &str,
-  amount: &str,
+  amount: &f32,
   invoice_date: &Date,
   practitioner_office: &practitioner_offices::Model,
   signature_data: Option<&[u8]>,
@@ -389,10 +389,7 @@ fn create_modern_invoice_pdf(
 
   y_position -= mm(18.0);
 
-  // Amount with underline style
-  let amount_replaced = amount.replace("€", "");
-  let amount_clean = amount_replaced.trim();
-  let full_text = format!("Honoraire : {}€", amount_clean);
+  let full_text = format!("Honoraire : {:.2}€", amount);
 
   page
     .text()
