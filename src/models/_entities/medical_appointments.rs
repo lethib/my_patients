@@ -14,6 +14,7 @@ pub struct Model {
   pub date: Date,
   pub created_at: DateTimeWithTimeZone,
   pub updated_at: DateTimeWithTimeZone,
+  pub price_in_cents: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

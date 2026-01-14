@@ -9,6 +9,7 @@ pub struct CreateMedicalAppointmentParams {
   pub patient_id: i32,
   pub practitioner_office_id: i32,
   pub date: Date,
+  pub price_in_cents: i32,
 }
 
 #[async_trait::async_trait]
@@ -41,6 +42,7 @@ impl ActiveModel {
       patient_id: ActiveValue::Set(params.patient_id),
       practitioner_office_id: ActiveValue::Set(params.practitioner_office_id),
       date: ActiveValue::Set(params.date),
+      price_in_cents: ActiveValue::Set(params.price_in_cents),
       ..Default::default()
     }
     .insert(db)

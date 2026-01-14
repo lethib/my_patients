@@ -81,7 +81,7 @@ export const patientSchema = {
           practitioner_office_id,
         }: {
           patientId: number;
-          amount: string;
+          amount: number;
           invoice_date: string;
           should_be_sent_by_email: boolean;
           practitioner_office_id: number;
