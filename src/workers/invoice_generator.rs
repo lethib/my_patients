@@ -389,7 +389,7 @@ fn create_modern_invoice_pdf(
 
   y_position -= mm(18.0);
 
-  let full_text = format!("Honoraire : {}€", amount);
+  let full_text = format!("Honoraire : {:.2}€", amount);
 
   page
     .text()

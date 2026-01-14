@@ -101,7 +101,7 @@ pub async fn generate_patient_invoice(
     patient_id: *patient_id,
     practitioner_office_id: params.practitioner_office_id,
     date: invoice_date,
-    price_in_cents: (params.amount * 100.0) as i32,
+    price_in_cents: (params.amount * 100.0).round() as i32,
   };
 
   let created_medical_appointment =
