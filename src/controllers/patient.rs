@@ -5,7 +5,7 @@ use axum::{
   Json,
 };
 use base64::Engine;
-use sea_orm::{ColumnTrait, EntityTrait, ModelTrait, QueryFilter};
+use sea_orm::{ColumnTrait, EntityTrait, ModelTrait, QueryFilter, QueryOrder};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -22,12 +22,12 @@ pub struct SearchParams {
 use crate::{
   app_state::{AppState, CurrentUserExt},
   models::{
-    _entities::patients,
-    my_errors::{application_error::ApplicationError, MyErrors},
+    _entities::{medical_appointments, patients, practitioner_offices},
+    my_errors::{application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors},
     patients::{CreatePatientParams, Model},
   },
   services::{self, invoice::GenerateInvoiceParams},
-  views::patient::PatientResponse,
+  views::{medical_appointments::MedicalAppointmentResponse, patient::PatientResponse},
 };
 
 #[debug_handler]
@@ -164,4 +164,29 @@ pub async fn generate_invoice(
     "pdf_data": base64::prelude::BASE64_STANDARD.encode(&invoice_generated.pdf_data),
     "filename": invoice_generated.filename
   })))
+}
+
+#[debug_handler]
+pub async fn get_medical_appointments(
+  State(state): State<AppState>,
+  CurrentUserExt(current_user, _): CurrentUserExt,
+  Path(patient_id): Path<i32>,
+) -> Result<Json<Vec<MedicalAppointmentResponse>>, MyErrors> {
+  let temp = medical_appointments::Entity::find()
+    .filter(medical_appointments::Column::PatientId.eq(patient_id))
+    .filter(medical_appointments::Column::UserId.eq(current_user.id))
+    .order_by_desc(medical_appointments::Column::Date)
+    .find_also_related(practitioner_offices::Entity)
+    .all(&state.db)
+    .await?
+    .into_iter()
+    .map(|appointment| {
+      Ok(MedicalAppointmentResponse::new(
+        &appointment.0,
+        &appointment.1.ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())?,
+      ))
+    })
+    .collect::<Result<Vec<_>, MyErrors>>()?;
+
+  Ok(Json(temp))
 }

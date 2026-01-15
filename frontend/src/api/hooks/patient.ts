@@ -6,6 +6,7 @@ import {
   type Paginated,
   queryEndpoint,
 } from "../endpointGenerator";
+import type { PractitionerOffice } from "./practitioner_office";
 
 export type SavePatientParams = {
   pid?: string;
@@ -49,6 +50,13 @@ export type SearchPatientResponse = {
   address_country: string;
 };
 
+export type MedicalAppointment = {
+  id: number;
+  date: string;
+  price_in_cents: number;
+  office: PractitionerOffice;
+};
+
 export const patientSchema = {
   createPatient: mutationEndpoint<SavePatientParams, { success: boolean }>({
     type: "POST",
@@ -58,6 +66,11 @@ export const patientSchema = {
     queryEndpoint<null, SearchPatientResponse>({
       type: "GET",
       path: `/patient/${patientId}`,
+    }),
+  getMedicalAppointments: (patientId: number) =>
+    queryEndpoint<null, MedicalAppointment[]>({
+      type: "GET",
+      path: `/patient/${patientId}/medical_appointments`,
     }),
   updatePatient: mutationEndpoint<SavePatientParams, { success: boolean }>({
     type: "PUT",
