@@ -20,11 +20,11 @@ import { logout } from "@/lib/authUtils";
 import { PatientModal } from "./components/PatientModal/PatientModal";
 import { PatientsTable } from "./components/PatientsTable/PatientsTable";
 
-export const Route = createFileRoute("/search/")({
-  component: Search,
+export const Route = createFileRoute("/patients/")({
+  component: Patients,
 });
 
-function Search() {
+function Patients() {
   const { t } = useTranslation();
   const [isAddPatientModalOpened, setIsAddPatientModalOpened] = useState(false);
   const [selectedPatient, setSelectedPatient] =
