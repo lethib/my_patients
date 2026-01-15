@@ -9,14 +9,9 @@ import { PatientRow } from "./PatientRow";
 interface Props {
   patientsList: SearchPatientResponse[] | undefined;
   isDataFetching: boolean;
-  onClickRow: (patient: SearchPatientResponse) => void;
 }
 
-export const PatientList = ({
-  patientsList,
-  isDataFetching,
-  onClickRow,
-}: Props) => {
+export const PatientList = ({ patientsList, isDataFetching }: Props) => {
   const [patientToUpdate, setPatientToUpdate] =
     useState<SearchPatientResponse | null>(null);
   const [patientToDelete, setPatientToDelete] =
@@ -71,7 +66,6 @@ export const PatientList = ({
             key={patient.id}
             onGenerateInvoice={handleGenerateInvoice}
             onDeletePatient={handleDeletePatient}
-            onClickRow={onClickRow}
           />
         ))}
       </TableBody>

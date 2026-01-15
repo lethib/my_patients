@@ -54,6 +54,11 @@ export const patientSchema = {
     type: "POST",
     path: "/patient/create",
   }),
+  getPatient: (patientId: number) =>
+    queryEndpoint<null, SearchPatientResponse>({
+      type: "GET",
+      path: `/patient/${patientId}`,
+    }),
   updatePatient: mutationEndpoint<SavePatientParams, { success: boolean }>({
     type: "PUT",
     path: "/patient/{patient_id}",
