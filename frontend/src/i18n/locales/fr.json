@@ -282,6 +282,15 @@
     "uploadSuccess": "Signature téléchargée avec succès !",
     "uploadError": "Erreur lors du téléchargement de la signature. Veuillez réessayer."
   },
+  "appointments": {
+    "title": "Rendez-vous",
+    "subtitle": "Gérer les rendez-vous médicaux de ce patient",
+    "table": {
+      "date": "Date",
+      "office": "Cabinet",
+      "price": "Prix"
+    }
+  },
   "common": {
     "save": "Enregistrer",
     "cancel": "Annuler",
