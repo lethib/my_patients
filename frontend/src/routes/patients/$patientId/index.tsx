@@ -22,7 +22,7 @@ function PatientPage() {
           className="flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          {t("common.backToPatients", "Retour aux patients")}
+          {t("common.backToPatients")}
         </Button>
         <PatientInformationCard patientId={+patientId} />
       </div>
