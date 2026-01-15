@@ -3,7 +3,7 @@ import { LogOut, Plus, Search as SearchIcon, UserCog } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { APIHooks } from "@/api/hooks";
-import type { SearchPatientResponse } from "@/api/hooks/patient";
+import { PatientModal } from "@/components/PatientModal/PatientModal";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,7 +17,6 @@ import { Input } from "@/components/ui/input";
 import { H2 } from "@/components/ui/typography/h2";
 import { useDebounce } from "@/hooks/useDebounce";
 import { logout } from "@/lib/authUtils";
-import { PatientModal } from "./components/PatientModal/PatientModal";
 import { PatientsTable } from "./components/PatientsTable/PatientsTable";
 
 export const Route = createFileRoute("/patients/")({
@@ -27,25 +26,14 @@ export const Route = createFileRoute("/patients/")({
 function Patients() {
   const { t } = useTranslation();
   const [isAddPatientModalOpened, setIsAddPatientModalOpened] = useState(false);
-  const [selectedPatient, setSelectedPatient] =
-    useState<SearchPatientResponse | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 700);
   const navigate = useNavigate();
 
   const addPatientMutation = APIHooks.patient.createPatient.useMutation();
-  const updatePatientMutation = APIHooks.patient.updatePatient.useMutation(
-    selectedPatient ? { patient_id: selectedPatient.id } : undefined,
-  );
-
-  const handleOnClickRow = (patient: SearchPatientResponse) => {
-    setSelectedPatient(patient);
-    setIsAddPatientModalOpened(true);
-  };
 
   const handleOnOpenChange = (value: boolean) => {
     setIsAddPatientModalOpened(value);
-    if (value == false) setSelectedPatient(null);
   };
 
   return (
@@ -106,22 +94,14 @@ function Patients() {
             />
           </div>
 
-          <PatientsTable
-            searchQuery={debouncedSearchQuery}
-            onClickRow={handleOnClickRow}
-          />
+          <PatientsTable searchQuery={debouncedSearchQuery} />
         </div>
       </div>
 
       <PatientModal
         open={isAddPatientModalOpened}
-        asyncMutation={
-          selectedPatient
-            ? updatePatientMutation.mutateAsync
-            : addPatientMutation.mutateAsync
-        }
+        asyncMutation={addPatientMutation.mutateAsync}
         onOpenChange={handleOnOpenChange}
-        selectedPatient={selectedPatient || undefined}
       />
     </>
   );

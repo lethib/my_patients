@@ -29,6 +29,7 @@ pub fn create_router(state: AppState) -> Router {
     .route("/api/auth/me", get(controllers::auth::me))
     // Patient routes
     .route("/api/patient/create", post(controllers::patient::create))
+    .route("/api/patient/{patient_id}", get(controllers::patient::get))
     .route(
       "/api/patient/{patient_id}",
       put(controllers::patient::update),

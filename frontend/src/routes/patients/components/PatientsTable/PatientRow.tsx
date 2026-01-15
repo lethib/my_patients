@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { FileText, Trash2, User } from "lucide-react";
 import type { SearchPatientResponse } from "@/api/hooks/patient";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,6 @@ interface Props {
   index: number;
   onGenerateInvoice: (patient: SearchPatientResponse) => void;
   onDeletePatient: (patient: SearchPatientResponse) => void;
-  onClickRow: (patient: SearchPatientResponse) => void;
 }
 
 export const PatientRow = ({
@@ -16,8 +16,8 @@ export const PatientRow = ({
   index,
   onGenerateInvoice,
   onDeletePatient,
-  onClickRow,
 }: Props) => {
+  const navigate = useNavigate();
   const formattedSSN = `${patient.ssn[0]} ${patient.ssn.slice(1, 3)} ${patient.ssn.slice(3, 5)} ${patient.ssn.slice(5, 7)} ${patient.ssn.slice(7, 10)} ${patient.ssn.slice(10, 13)} ${patient.ssn.slice(13, 15)}`;
 
   return (
@@ -25,7 +25,12 @@ export const PatientRow = ({
       className={`cursor-pointer transition-colors hover:bg-muted/30 ${
         index % 2 === 0 ? "bg-background" : "bg-muted/10"
       }`}
-      onClick={() => onClickRow(patient)}
+      onClick={() =>
+        navigate({
+          to: "/patients/$patientId",
+          params: { patientId: patient.id.toString() },
+        })
+      }
     >
       <TableCell className="px-6 py-4">
         <div className="flex items-center gap-3">

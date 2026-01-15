@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { APIHooks } from "@/api/hooks";
-import type { SearchPatientResponse } from "@/api/hooks/patient";
 import {
   Table,
   TableCell,
@@ -15,10 +14,9 @@ import { PatientList } from "./PatientsList";
 
 interface Props {
   searchQuery: string;
-  onClickRow: (patient: SearchPatientResponse) => void;
 }
 
-export const PatientsTable = ({ searchQuery, onClickRow }: Props) => {
+export const PatientsTable = ({ searchQuery }: Props) => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const prevSearchQueryRef = useRef(searchQuery);
@@ -68,7 +66,6 @@ export const PatientsTable = ({ searchQuery, onClickRow }: Props) => {
           <PatientList
             patientsList={searchPatientsQuery.data?.paginated_data}
             isDataFetching={searchPatientsQuery.isFetching}
-            onClickRow={onClickRow}
           />
 
           <TableFooter>

@@ -141,6 +141,9 @@ export const PatientModal = ({
     })
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ["/patient/_search"] });
+        queryClient.invalidateQueries({
+          queryKey: [`/patient/${currentPatient?.id}`, null],
+        });
         handleOnClose();
       })
       .catch((error) => alert(error.message));

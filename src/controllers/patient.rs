@@ -31,6 +31,21 @@ use crate::{
 };
 
 #[debug_handler]
+pub async fn get(
+  State(state): State<AppState>,
+  CurrentUserExt(current_user, _): CurrentUserExt,
+  Path(patient_id): Path<i32>,
+) -> Result<Json<PatientResponse>, MyErrors> {
+  let patient = patients::Entity::find_by_id(patient_id)
+    .filter(patients::Column::UserId.eq(current_user.id))
+    .one(&state.db)
+    .await?
+    .ok_or(ApplicationError::NOT_FOUND())?;
+
+  Ok(Json(PatientResponse::new(&patient)))
+}
+
+#[debug_handler]
 pub async fn create(
   State(_state): State<AppState>,
   CurrentUserExt(user, _): CurrentUserExt,
