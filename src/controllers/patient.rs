@@ -172,7 +172,7 @@ pub async fn get_medical_appointments(
   CurrentUserExt(current_user, _): CurrentUserExt,
   Path(patient_id): Path<i32>,
 ) -> Result<Json<Vec<MedicalAppointmentResponse>>, MyErrors> {
-  let temp = medical_appointments::Entity::find()
+  let medical_appointments = medical_appointments::Entity::find()
     .filter(medical_appointments::Column::PatientId.eq(patient_id))
     .filter(medical_appointments::Column::UserId.eq(current_user.id))
     .order_by_desc(medical_appointments::Column::Date)
@@ -188,5 +188,5 @@ pub async fn get_medical_appointments(
     })
     .collect::<Result<Vec<_>, MyErrors>>()?;
 
-  Ok(Json(temp))
+  Ok(Json(medical_appointments))
 }

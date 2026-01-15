@@ -42,7 +42,7 @@ export const AppointmentsList = ({ patientId }: Props) => {
           </TableCell>
           <TableCell className="px-4 py-4">
             <span className="font-mono font-medium">
-              {appointment.price_in_cents / 100} €
+              {(appointment.price_in_cents / 100).toFixed(2)} €
             </span>
           </TableCell>
         </TableRow>
