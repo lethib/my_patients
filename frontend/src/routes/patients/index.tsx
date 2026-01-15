@@ -21,10 +21,10 @@ import { PatientModal } from "./components/PatientModal/PatientModal";
 import { PatientsTable } from "./components/PatientsTable/PatientsTable";
 
 export const Route = createFileRoute("/patients/")({
-  component: Search,
+  component: Patients,
 });
 
-function Search() {
+function Patients() {
   const { t } = useTranslation();
   const [isAddPatientModalOpened, setIsAddPatientModalOpened] = useState(false);
   const [selectedPatient, setSelectedPatient] =
