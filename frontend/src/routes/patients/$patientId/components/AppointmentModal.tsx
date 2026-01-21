@@ -81,12 +81,6 @@ export const AppointmentModal = ({ open, onOpenChange, patientId }: Props) => {
   };
 
   const onSubmit = form.handleSubmit(async (data) => {
-    // // Format date as YYYY-MM-DD
-    // const year = data.date.getFullYear();
-    // const month = String(data.date.getMonth() + 1).padStart(2, "0");
-    // const day = String(data.date.getDate()).padStart(2, "0");
-    // const dateString = `${year}-${month}-${day}`;
-
     createAppointmentMutation
       .mutateAsync({
         practitioner_office_id: Number(data.practitioner_office_id),
