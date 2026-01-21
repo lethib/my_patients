@@ -4,7 +4,7 @@ use axum::{
   http::status,
   Json,
 };
-use chrono::NaiveDate;
+use chrono::DateTime;
 use serde::Deserialize;
 
 use crate::{
@@ -29,8 +29,12 @@ pub async fn create(
   Path(patient_id): Path<i32>,
   Json(params): Json<CreateMedicalAppointmentPayload>,
 ) -> Result<status::StatusCode, MyErrors> {
+  let appointment_date = DateTime::parse_from_rfc3339(&params.date)?
+    .naive_utc()
+    .date();
+
   let medical_appointments_params = CreateMedicalAppointmentParams {
-    date: NaiveDate::parse_from_str(&params.date, "%Y-%m-%dT%H:%M:%S%.3fZ")?,
+    date: appointment_date,
     practitioner_office_id: params.practitioner_office_id,
     price_in_cents: params.price_in_cents,
     user_id: current_user.id,

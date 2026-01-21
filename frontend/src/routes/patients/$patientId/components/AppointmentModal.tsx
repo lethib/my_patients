@@ -61,7 +61,6 @@ export const AppointmentModal = ({ open, onOpenChange, patientId }: Props) => {
     defaultValues: {
       date: new Date(),
       practitioner_office_id: "",
-      price: 0,
     },
   });
 
