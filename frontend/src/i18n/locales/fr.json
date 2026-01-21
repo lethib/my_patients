@@ -285,10 +285,28 @@
   "appointments": {
     "title": "Rendez-vous",
     "subtitle": "Gérer les rendez-vous médicaux de ce patient",
+    "addAppointment": "Ajouter un rendez-vous",
     "table": {
       "date": "Date",
       "office": "Cabinet",
       "price": "Prix"
+    },
+    "form": {
+      "title": {
+        "create": "Nouveau rendez-vous"
+      },
+      "description": "Enregistrer les détails du rendez-vous médical",
+      "date": "Date du rendez-vous",
+      "office": "Cabinet",
+      "selectOffice": "Sélectionner un cabinet",
+      "price": "Prix",
+      "submit": {
+        "create": "Créer le rendez-vous"
+      },
+      "validation": {
+        "dateRequired": "La date est requise",
+        "officeRequired": "Le cabinet est requis"
+      }
     }
   },
   "common": {
