@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui";
 import { CenteredSpineer } from "@/components/ui/spinner";
+import { formatSSN } from "@/lib/utils";
 
 interface Props {
   patientId: number;
@@ -29,10 +30,6 @@ export const PatientInformationCard = ({ patientId }: Props) => {
     return <CenteredSpineer />;
   }
 
-  const formattedSSN = patient.ssn
-    ? `${patient.ssn.slice(0, 3)}-${patient.ssn.slice(3, 6)}-${patient.ssn.slice(6)}`
-    : "";
-
   return (
     <>
       <Card>
@@ -47,7 +44,7 @@ export const PatientInformationCard = ({ patientId }: Props) => {
                   {patient.first_name} {patient.last_name}
                 </CardTitle>
                 <CardDescription className="flex flex-col gap-1 mt-2">
-                  <span>SSN: {formattedSSN}</span>
+                  <span>SSN: {formatSSN(patient.ssn)}</span>
                   <span>
                     {patient.address_line_1}, {patient.address_zip_code}{" "}
                     {patient.address_city}
