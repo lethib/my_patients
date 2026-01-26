@@ -2,7 +2,10 @@ use crate::{
   app_state::{AppState, WorkerJob},
   initializers::get_services,
   models::{
-    _entities::{patients, practitioner_offices::Entity as PractitionerOffices, users},
+    _entities::{
+      patients, practitioner_offices::Entity as PractitionerOffices, user_business_informations,
+      users,
+    },
     medical_appointments::{ActiveModel as MedicalAppointments, CreateMedicalAppointmentParams},
     my_errors::{application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors},
     patients as PatientModel,
@@ -35,6 +38,7 @@ pub async fn send_invoice(
   state: &AppState,
   generated_invoice: &GenerateInvoiceResponse,
   current_user: &users::Model,
+  user_business_informations: &user_business_informations::Model,
 ) -> Result<(), MyErrors> {
   if generated_invoice.patient_email == PatientModel::DEFAULT_EMAIL {
     return Err(ApplicationError::UNPROCESSABLE_ENTITY());
@@ -55,8 +59,12 @@ pub async fn send_invoice(
     generated_invoice.patient_email.clone(),
     format!("Note d'honoraires {}", invoice_date),
     format!(
-      "Vous trouverez ci-joint votre facture pour la consultation du {}\n\n{} {}\nOSTEOPATHE D.O.\n{}",
-      invoice_date, current_user.last_name, current_user.first_name, current_user.phone_number
+      "Vous trouverez ci-joint votre facture pour la consultation du {}\n\n{} {}\n{}\n{}",
+      invoice_date,
+      current_user.last_name,
+      current_user.first_name,
+      user_business_informations.profession.to_french(),
+      current_user.phone_number
     ),
   )
   .with_attachment(attachment)
