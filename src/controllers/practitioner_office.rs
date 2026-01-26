@@ -3,15 +3,14 @@ use axum::{
   extract::{Path, State},
   Json,
 };
-use sea_orm::{
-  ActiveModelTrait, ActiveValue::Set, ColumnTrait, EntityTrait, IntoActiveModel, ModelTrait,
-  QueryFilter,
-};
+use sea_orm::{ActiveModelTrait, ActiveValue::Set, EntityTrait, IntoActiveModel, ModelTrait};
 
 use crate::{
-  app_state::{AppState, CurrentUserExt},
+  app_state::AppState,
+  auth::statement::AuthStatement,
+  middleware::auth::AuthenticatedUser,
   models::{
-    _entities::{practitioner_offices, user_practitioner_offices},
+    _entities::practitioner_offices,
     my_errors::{application_error::ApplicationError, MyErrors},
     practitioner_offices::PractitionerOfficeParams,
   },
@@ -21,10 +20,10 @@ use crate::{
 #[debug_handler]
 pub async fn create(
   State(_state): State<AppState>,
-  CurrentUserExt(user, _): CurrentUserExt,
+  AuthenticatedUser(current_user, _): AuthenticatedUser,
   Json(params): Json<PractitionerOfficeParams>,
 ) -> Result<Json<serde_json::Value>, MyErrors> {
-  services::practitioner_office::create(&params, &user).await?;
+  services::practitioner_office::create(&params, &current_user).await?;
 
   Ok(Json(serde_json::json!({ "success": true })))
 }
@@ -32,16 +31,16 @@ pub async fn create(
 #[debug_handler]
 pub async fn update(
   State(state): State<AppState>,
-  CurrentUserExt(user, _): CurrentUserExt,
+  authorize: AuthStatement,
   Path(office_id): Path<i32>,
   Json(params): Json<PractitionerOfficeParams>,
 ) -> Result<Json<serde_json::Value>, MyErrors> {
   let office = practitioner_offices::Entity::find_by_id(office_id)
-    .inner_join(user_practitioner_offices::Entity)
-    .filter(user_practitioner_offices::Column::UserId.eq(user.id))
     .one(&state.db)
     .await?
     .ok_or(ApplicationError::NOT_FOUND())?;
+
+  authorize.is_owning_resource(&office).await.run_complete()?;
 
   let mut office = office.clone().into_active_model();
   office.name = Set(params.name.trim().to_string());
@@ -57,15 +56,15 @@ pub async fn update(
 #[debug_handler]
 pub async fn destroy(
   State(state): State<AppState>,
-  CurrentUserExt(user, _): CurrentUserExt,
+  authorize: AuthStatement,
   Path(office_id): Path<i32>,
 ) -> Result<Json<serde_json::Value>, MyErrors> {
   let office = practitioner_offices::Entity::find_by_id(office_id)
-    .inner_join(user_practitioner_offices::Entity)
-    .filter(user_practitioner_offices::Column::UserId.eq(user.id))
     .one(&state.db)
     .await?
     .ok_or(ApplicationError::NOT_FOUND())?;
+
+  authorize.is_owning_resource(&office).await.run_complete()?;
 
   office.clone().delete(&state.db).await?;
 

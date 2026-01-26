@@ -1,5 +1,6 @@
 use crate::{
-  app_state::{AppState, CurrentUserExt},
+  app_state::AppState,
+  middleware::auth::AuthenticatedUser,
   models::{
     _entities::prelude::UserBusinessInformations,
     my_errors::{application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors},
@@ -20,10 +21,10 @@ use sea_orm::{ActiveModelTrait, ActiveValue, IntoActiveModel, ModelTrait};
 #[debug_handler]
 pub async fn save_business_info(
   State(_state): State<AppState>,
-  CurrentUserExt(user, _): CurrentUserExt,
+  AuthenticatedUser(current_user, _): AuthenticatedUser,
   Json(business_information): Json<CreateBusinessInformation>,
 ) -> Result<Json<serde_json::Value>, MyErrors> {
-  services::user::save_business_information(&business_information, &user).await?;
+  services::user::save_business_information(&business_information, &current_user).await?;
 
   Ok(Json(serde_json::json!({ "success": true })))
 }
@@ -31,9 +32,9 @@ pub async fn save_business_info(
 #[debug_handler]
 pub async fn my_offices(
   State(state): State<AppState>,
-  CurrentUserExt(user, _): CurrentUserExt,
+  AuthenticatedUser(current_user, _): AuthenticatedUser,
 ) -> Result<Json<Vec<PractitionerOffice>>, MyErrors> {
-  let my_offices = user.get_my_offices(&state.db).await?;
+  let my_offices = current_user.get_my_offices(&state.db).await?;
 
   let serialized_offices: Vec<PractitionerOffice> = my_offices
     .iter()
@@ -46,7 +47,7 @@ pub async fn my_offices(
 #[debug_handler]
 pub async fn get_signature_url(
   State(_state): State<AppState>,
-  CurrentUserExt(_user, user_bi): CurrentUserExt,
+  AuthenticatedUser(_current_user, user_bi): AuthenticatedUser,
 ) -> Result<String, MyErrors> {
   let storage = StorageService::new()?;
   let signature_filename = user_bi
@@ -60,7 +61,7 @@ pub async fn get_signature_url(
 #[debug_handler]
 pub async fn upload_signature(
   State(state): State<AppState>,
-  CurrentUserExt(user, _): CurrentUserExt,
+  AuthenticatedUser(current_user, _): AuthenticatedUser,
   mut multipart: Multipart,
 ) -> Result<status::StatusCode, MyErrors> {
   let field = multipart
@@ -96,9 +97,9 @@ pub async fn upload_signature(
 
   let filename = format!(
     "{}_{}_{}",
-    &user.first_name.to_lowercase(),
-    &user.last_name.to_lowercase(),
-    &user.id.to_string()
+    &current_user.first_name.to_lowercase(),
+    &current_user.last_name.to_lowercase(),
+    &current_user.id.to_string()
   );
 
   let storage_service = services::storage::StorageService::new()?;
@@ -106,7 +107,7 @@ pub async fn upload_signature(
     .upload_signature(&png_bytes, &filename, "image/png")
     .await?;
 
-  let mut business_information = user
+  let mut business_information = current_user
     .find_related(UserBusinessInformations)
     .one(&state.db)
     .await?

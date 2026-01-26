@@ -1,4 +1,5 @@
 use crate::{
+  auth::resource::Resource,
   models::{
     _entities::patients,
     my_errors::{application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors},
@@ -146,3 +147,13 @@ impl ActiveModel {
 
 // implement your custom finders, selectors oriented logic here
 impl Entity {}
+
+impl Resource for Model {
+  async fn is_owned_by_user(&self, user_id: i32) -> bool {
+    self.user_id == user_id
+  }
+
+  fn resource_name(&self) -> String {
+    "patient".to_string()
+  }
+}

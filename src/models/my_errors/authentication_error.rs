@@ -42,4 +42,12 @@ impl AuthenticationError {
       msg: "access_key_not_verified".to_string(),
     }
   }
+
+  #[allow(non_snake_case)]
+  pub fn ACCESS_DENIED(to: Option<String>) -> MyErrors {
+    MyErrors {
+      code: StatusCode::FORBIDDEN,
+      msg: format!("access_denied_to_{}", to.unwrap_or("resource".to_string())),
+    }
+  }
 }

@@ -1,7 +1,9 @@
 pub use super::_entities::practitioner_offices::{ActiveModel, Entity, Model};
 use crate::{
+  auth::resource::Resource,
+  initializers,
   models::{
-    _entities::practitioner_offices,
+    _entities::{practitioner_offices, user_practitioner_offices},
     my_errors::{application_error::ApplicationError, MyErrors},
   },
   validators::address::is_address_valid,
@@ -63,3 +65,24 @@ impl ActiveModel {
 
 // implement your custom finders, selectors oriented logic here
 impl Entity {}
+
+impl Resource for Model {
+  async fn is_owned_by_user(&self, user_id: i32) -> bool {
+    let services = initializers::get_services();
+
+    let result = user_practitioner_offices::Entity::find()
+      .filter(user_practitioner_offices::Column::PractitionerOfficeId.eq(self.id))
+      .filter(user_practitioner_offices::Column::UserId.eq(user_id))
+      .one(&services.db)
+      .await;
+
+    match result {
+      Ok(association) => association.is_some(),
+      Err(_) => false,
+    }
+  }
+
+  fn resource_name(&self) -> String {
+    "practitioner_office".to_string()
+  }
+}

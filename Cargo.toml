@@ -20,7 +20,7 @@ axum = { version = "0.8", features = ["macros", "multipart"] }
 tracing = { version = "0.1" }
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 tower = "0.5"
-tower-http = { version = "0.6", features = ["fs", "cors", "trace"] }
+tower-http = { version = "0.6", features = ["fs", "cors", "trace", "catch-panic"] }
 config = "0.14"
 jsonwebtoken = "9.3"
 anyhow = "1.0"

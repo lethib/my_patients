@@ -1,11 +1,13 @@
-use crate::{app_state::AppState, controllers, middleware::auth::auth_middleware};
+use crate::{app_state::AppState, controllers, middleware::auth::authenticated_request};
 use axum::{
   http::{HeaderName, Method},
   middleware,
   routing::{delete, get, post, put},
   Router,
 };
+use tower::ServiceBuilder;
 use tower_http::{
+  catch_panic::CatchPanicLayer,
   cors::CorsLayer,
   services::{ServeDir, ServeFile},
   trace::TraceLayer,
@@ -82,7 +84,7 @@ pub fn create_router(state: AppState) -> Router {
     // Apply auth middleware to all protected routes
     .layer(middleware::from_fn_with_state(
       state.clone(),
-      auth_middleware,
+      authenticated_request,
     ));
 
   // Build CORS layer from configuration
@@ -125,6 +127,7 @@ pub fn create_router(state: AppState) -> Router {
     // HTTP request tracing middleware
     .layer(TraceLayer::new_for_http())
     .layer(cors_layer)
+    .layer(ServiceBuilder::new().layer(CatchPanicLayer::new()))
     .with_state(state);
 
   app
