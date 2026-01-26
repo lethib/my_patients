@@ -1,6 +1,8 @@
 use crate::{
   auth::{context::AuthContext, resource::Resource},
-  models::my_errors::{authentication_error::AuthenticationError, MyErrors},
+  models::my_errors::{
+    authentication_error::AuthenticationError, unexpected_error::UnexpectedError, MyErrors,
+  },
 };
 
 pub struct AuthStatement {
@@ -22,13 +24,13 @@ impl AuthStatement {
 
   pub fn run_complete(mut self) -> Result<(), MyErrors> {
     if self.is_empty {
-      panic!("invalid_authorize_statement: no checks performed")
+      return Err(UnexpectedError::SHOULD_NOT_HAPPEN());
     }
 
     if self.ok_so_far {
-      self.auth_context.authorized();
+      self.auth_context.authorized()?;
     } else {
-      self.auth_context.not_authorized(self.error.take());
+      self.auth_context.not_authorized(self.error.take())?;
     }
 
     self.auth_context.complete()
@@ -68,7 +70,8 @@ impl AuthStatement {
       return self;
     }
 
-    // checks needs to be fresh here (a successfull check can happen after a failed one)
+    // Reset state for OR operation: if previous checks failed,
+    // give this branch a clean slate to succeed
     self.ok_so_far = true;
     self.error = None;
 

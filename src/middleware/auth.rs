@@ -60,11 +60,15 @@ impl FromRequestParts<AppState> for AuthenticatedUser {
       .get("Authorization")
       .and_then(|h| h.to_str().ok());
 
-    let current_user = AuthContext::new(auth_headers, state).await.current_user;
+    let auth_context = AuthContext::new(auth_headers, state).await;
 
-    match current_user {
+    match auth_context.current_user {
       Some(user) => Ok(AuthenticatedUser(user.0, user.1)),
-      None => Err(AuthenticationError::MISSING_TOKEN()),
+      None => Err(
+        auth_context
+          .error
+          .unwrap_or(AuthenticationError::INVALID_CLAIMS()),
+      ),
     }
   }
 }

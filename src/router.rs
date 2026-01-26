@@ -5,9 +5,7 @@ use axum::{
   routing::{delete, get, post, put},
   Router,
 };
-use tower::ServiceBuilder;
 use tower_http::{
-  catch_panic::CatchPanicLayer,
   cors::CorsLayer,
   services::{ServeDir, ServeFile},
   trace::TraceLayer,
@@ -127,7 +125,6 @@ pub fn create_router(state: AppState) -> Router {
     // HTTP request tracing middleware
     .layer(TraceLayer::new_for_http())
     .layer(cors_layer)
-    .layer(ServiceBuilder::new().layer(CatchPanicLayer::new()))
     .with_state(state);
 
   app

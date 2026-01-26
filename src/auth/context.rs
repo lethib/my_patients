@@ -6,7 +6,9 @@ use crate::{
   },
   models::{
     _entities::user_business_informations,
-    my_errors::{authentication_error::AuthenticationError, MyErrors},
+    my_errors::{
+      authentication_error::AuthenticationError, unexpected_error::UnexpectedError, MyErrors,
+    },
     users,
   },
 };
@@ -15,7 +17,7 @@ pub struct AuthContext {
   pub current_user: Option<(users::Model, Option<user_business_informations::Model>)>,
   authorized: bool,
   complete: bool,
-  error: Option<MyErrors>,
+  pub error: Option<MyErrors>,
 }
 
 impl AuthContext {
@@ -37,22 +39,25 @@ impl AuthContext {
     AuthStatement::new(self)
   }
 
-  pub(super) fn authorized(&mut self) {
-    self.panic_if_already_completed();
+  pub(super) fn authorized(&mut self) -> Result<(), MyErrors> {
+    self.ensure_not_completed()?;
     self.authorized = true;
+    Ok(())
   }
 
-  pub(super) fn not_authorized(&mut self, error: Option<MyErrors>) {
-    self.panic_if_already_completed();
+  pub(super) fn not_authorized(&mut self, error: Option<MyErrors>) -> Result<(), MyErrors> {
+    self.ensure_not_completed()?;
     self.authorized = false;
 
     if self.error.is_none() {
       self.error = error;
     }
+
+    Ok(())
   }
 
   pub(super) fn complete(&mut self) -> Result<(), MyErrors> {
-    self.panic_if_already_completed();
+    self.ensure_not_completed()?;
     self.complete = true;
 
     if !self.authorized {
@@ -93,18 +98,16 @@ impl AuthContext {
     };
 
     if !user_result.0.is_access_key_verified {
-      return (
-        Some(user_result),
-        Some(AuthenticationError::ACCESS_KEY_NOT_VERIFIED()),
-      );
+      return (None, Some(AuthenticationError::ACCESS_KEY_NOT_VERIFIED()));
     }
 
     (Some(user_result), None)
   }
 
-  fn panic_if_already_completed(&self) {
+  fn ensure_not_completed(&self) -> Result<(), MyErrors> {
     if self.complete {
-      panic!("auth_context_already_completed")
+      return Err(UnexpectedError::SHOULD_NOT_HAPPEN());
     }
+    Ok(())
   }
 }
