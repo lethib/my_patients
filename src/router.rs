@@ -1,4 +1,4 @@
-use crate::{app_state::AppState, controllers, middleware::auth::auth_middleware};
+use crate::{app_state::AppState, controllers, middleware::auth::authenticated_request};
 use axum::{
   http::{HeaderName, Method},
   middleware,
@@ -82,7 +82,7 @@ pub fn create_router(state: AppState) -> Router {
     // Apply auth middleware to all protected routes
     .layer(middleware::from_fn_with_state(
       state.clone(),
-      auth_middleware,
+      authenticated_request,
     ));
 
   // Build CORS layer from configuration

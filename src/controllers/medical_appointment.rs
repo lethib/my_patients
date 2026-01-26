@@ -8,7 +8,9 @@ use chrono::DateTime;
 use serde::Deserialize;
 
 use crate::{
-  app_state::{AppState, CurrentUserExt},
+  app_state::AppState,
+  auth::statement::AuthStatement,
+  middleware::auth::AuthenticatedUser,
   models::{
     _entities::medical_appointments, medical_appointments::CreateMedicalAppointmentParams,
     my_errors::MyErrors,
@@ -25,10 +27,13 @@ pub struct CreateMedicalAppointmentPayload {
 #[debug_handler]
 pub async fn create(
   State(state): State<AppState>,
-  CurrentUserExt(current_user, _): CurrentUserExt,
+  authorize: AuthStatement,
+  AuthenticatedUser(current_user, _): AuthenticatedUser,
   Path(patient_id): Path<i32>,
   Json(params): Json<CreateMedicalAppointmentPayload>,
 ) -> Result<status::StatusCode, MyErrors> {
+  authorize.authenticated_user().run_complete()?;
+
   let appointment_date = DateTime::parse_from_rfc3339(&params.date)?
     .naive_utc()
     .date();

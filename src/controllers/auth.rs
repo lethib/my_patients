@@ -1,6 +1,10 @@
 use crate::{
-  app_state::{AppState, CurrentUserExt, WorkerJob},
-  auth::jwt::{JwtService, TOKEN_TYPE_AUTH, TOKEN_TYPE_PASSWORD_RESET},
+  app_state::{AppState, WorkerJob},
+  auth::{
+    jwt::{JwtService, TOKEN_TYPE_AUTH, TOKEN_TYPE_PASSWORD_RESET},
+    statement::AuthStatement,
+  },
+  middleware::auth::AuthenticatedUser,
   models::{
     _entities::users,
     my_errors::{
@@ -36,17 +40,24 @@ pub struct ResetParams {
 #[debug_handler]
 pub async fn register(
   State(state): State<AppState>,
+  authorize: AuthStatement,
   Json(params): Json<RegisterParams>,
 ) -> Result<Json<()>, MyErrors> {
+  authorize.non_authenticated_user().run_complete()?;
+
   users::Model::create_with_password(&state.db, &params).await?;
+
   Ok(Json(()))
 }
 
 #[debug_handler]
 pub async fn forgot(
   State(state): State<AppState>,
+  authorize: AuthStatement,
   Json(params): Json<ForgotParams>,
 ) -> Result<http::StatusCode, MyErrors> {
+  authorize.non_authenticated_user().run_complete()?;
+
   let Ok(user) = users::Model::find_by_email(&state.db, &params.email).await else {
     return Ok(http::StatusCode::NO_CONTENT);
   };
@@ -81,8 +92,11 @@ pub async fn forgot(
 #[debug_handler]
 pub async fn reset(
   State(state): State<AppState>,
+  authorize: AuthStatement,
   Json(params): Json<ResetParams>,
 ) -> Result<Json<()>, MyErrors> {
+  authorize.non_authenticated_user().run_complete()?;
+
   let jwt_service = JwtService::new(&state.config.jwt.secret);
   let claims = jwt_service
     .validate_token(&params.token)
@@ -109,8 +123,11 @@ pub async fn reset(
 #[debug_handler]
 pub async fn login(
   State(state): State<AppState>,
+  authorize: AuthStatement,
   Json(params): Json<LoginParams>,
 ) -> Result<Json<LoginResponse>, MyErrors> {
+  authorize.non_authenticated_user().run_complete()?;
+
   let user = users::Model::find_by_email(&state.db, &params.email)
     .await
     .map_err(|_| AuthenticationError::INVALID_CREDENTIALS())?;
@@ -146,9 +163,10 @@ pub async fn login(
 /// Get current authenticated user
 #[debug_handler]
 pub async fn me(
-  CurrentUserExt(user, business_info): CurrentUserExt,
+  State(_state): State<AppState>,
+  AuthenticatedUser(current_user, business_info): AuthenticatedUser,
 ) -> Result<Json<CurrentResponse>, MyErrors> {
-  Ok(Json(CurrentResponse::new(&(user, business_info))))
+  Ok(Json(CurrentResponse::new(&(current_user, business_info))))
 }
 
 #[derive(Deserialize)]
@@ -160,8 +178,11 @@ pub struct CheckAccessKeyParams {
 #[debug_handler]
 pub async fn check_access_key(
   State(state): State<AppState>,
+  authorize: AuthStatement,
   Json(params): Json<CheckAccessKeyParams>,
 ) -> Result<Json<serde_json::Value>, MyErrors> {
+  authorize.non_authenticated_user().run_complete()?;
+
   let user = users::Model::find_by_email(&state.db, &params.user_email)
     .await
     .map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN())?;
