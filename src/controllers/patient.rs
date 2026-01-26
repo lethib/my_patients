@@ -156,7 +156,7 @@ pub async fn search(
 #[debug_handler]
 pub async fn generate_invoice(
   State(state): State<AppState>,
-  AuthenticatedUser(current_user, _): AuthenticatedUser,
+  AuthenticatedUser(current_user, user_bi): AuthenticatedUser,
   Path(patient_id): Path<i32>,
   Json(params): Json<GenerateInvoiceParams>,
 ) -> Result<Json<serde_json::Value>, MyErrors> {
@@ -172,7 +172,18 @@ pub async fn generate_invoice(
     services::invoice::generate_patient_invoice(&patient_id, &params, &current_user).await?;
 
   if params.should_be_sent_by_email {
-    services::invoice::send_invoice(&state, &invoice_generated, &current_user).await?;
+    match &user_bi {
+      Some(business_information) => {
+        services::invoice::send_invoice(
+          &state,
+          &invoice_generated,
+          &current_user,
+          business_information,
+        )
+        .await?
+      }
+      None => return Err(ApplicationError::UNPROCESSABLE_ENTITY()),
+    }
   }
 
   Ok(Json(serde_json::json!({
