@@ -3,6 +3,7 @@ import { FileText, Trash2, User } from "lucide-react";
 import type { SearchPatientResponse } from "@/api/hooks/patient";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { formatSSN } from "@/lib/utils";
 
 interface Props {
   patient: SearchPatientResponse;
@@ -18,7 +19,6 @@ export const PatientRow = ({
   onDeletePatient,
 }: Props) => {
   const navigate = useNavigate();
-  const formattedSSN = `${patient.ssn[0]} ${patient.ssn.slice(1, 3)} ${patient.ssn.slice(3, 5)} ${patient.ssn.slice(5, 7)} ${patient.ssn.slice(7, 10)} ${patient.ssn.slice(10, 13)} ${patient.ssn.slice(13, 15)}`;
 
   return (
     <TableRow
@@ -48,7 +48,9 @@ export const PatientRow = ({
         </div>
       </TableCell>
       <TableCell className="px-4 py-4">
-        <span className="font-mono text-sm font-medium">{formattedSSN}</span>
+        <span className="font-mono text-sm font-medium">
+          {formatSSN(patient.ssn)}
+        </span>
       </TableCell>
       <TableCell className="px-4 py-4 text-muted-foreground">
         {patient.address_line_1}

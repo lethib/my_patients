@@ -12,3 +12,6 @@ export function formatAccessKey(accessKey: string): string {
     .slice(0, 15)
     .toUpperCase();
 }
+
+export const formatSSN = (ssn: string): string =>
+  `${ssn[0]} ${ssn.slice(1, 3)} ${ssn.slice(3, 5)} ${ssn.slice(5, 7)} ${ssn.slice(7, 10)} ${ssn.slice(10, 13)} ${ssn.slice(13, 15)}`;
