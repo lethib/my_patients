@@ -57,9 +57,13 @@ jobs:
             --image=${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ github.ref_name }} \
             --region=${{ env.GCP_REGION }} \
             --command=/app/migrate \
+            --set-env-vars="ENVIRONMENT=production" \
             --set-secrets="APP__DATABASE__URL=APP__DATABASE__URL:latest" \
-            --max-retries=1 \
-            --task-timeout=300 \
+            --max-retries=3 \
+            --task-timeout=30 \
+            --memory=512Mi \
+            --cpu=1 \
+            --execution-environment=gen2 \
             --project=${{ env.GCP_PROJECT_ID }}
 
       - name: Execute migration job
