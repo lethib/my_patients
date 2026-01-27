@@ -1,0 +1,47 @@
+# Configuration file for production environment
+# This uses the config crate (not Loco) for configuration management
+# IMPORTANT: Override sensitive values using environment variables with APP__ prefix
+# Example: APP__JWT__SECRET=your-secret APP__DATABASE__URL=postgres://...
+
+# Logging configuration
+logger:
+  enable: true
+  level: info
+  format: json
+
+# Server configuration
+server:
+  host: http://0.0.0.0
+  port: 8080
+  binding: 0.0.0.0
+
+app:
+  base_url: https://my-patients-64695224709.europe-west9.run.app
+
+# Database configuration
+# IMPORTANT: Set via APP__DATABASE__URL environment variable (configured in Cloud Run secrets)
+database:
+  url: postgres://placeholder@localhost:5432/placeholder
+  enable_logging: false
+
+# JWT authentication configuration
+# IMPORTANT: Set APP__JWT__SECRET environment variable in production (configured in Cloud Run secrets)
+jwt:
+  secret: placeholder-will-be-overridden-by-env-var
+  expiration: 43200  # 12 hours in seconds
+
+# CORS configuration (production restricts to specific origin)
+cors:
+  enable: true
+  allow_origins:
+    - "https://my-patients-64695224709.europe-west9.run.app"
+  allow_headers:
+    - "Authorization"
+    - "Content-Type"
+    - "Accept"
+  allow_methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+    - "OPTIONS"
