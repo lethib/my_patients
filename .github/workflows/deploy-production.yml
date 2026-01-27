@@ -57,7 +57,7 @@ jobs:
             --image=${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ github.ref_name }} \
             --region=${{ env.GCP_REGION }} \
             --command=/app/migrate \
-            --set-secrets="APP__DATABASE__URL=app-database-url:latest" \
+            --set-secrets="APP__DATABASE__URL=APP__DATABASE__URL:latest" \
             --max-retries=1 \
             --task-timeout=300 \
             --project=${{ env.GCP_PROJECT_ID }}
@@ -108,17 +108,17 @@ jobs:
             --allow-unauthenticated \
             --port=8080 \
             --set-env-vars="ENVIRONMENT=production,\
-            SUPABASE_SIGNATURE_BUCKET=signatures, \
-            SUPABASE_URL=${{ secrets.SUPABASE_URL }},\
-            SMTP_SERVER_HOST=${{ secrets.SMTP_SERVER_HOST }},\
-            SMTP_SERVER_PORT=${{ secrets.SMTP_SERVER_PORT }},\
-            SMTP_AUTH_USER=${{ vars.SMTP_AUTH_USER }},\
-            APP__JWT__SECRET=${{ secrets.APP__JWT__SECRET }}"\
+          SUPABASE_SIGNATURE_BUCKET=signatures,\
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }},\
+          SMTP_SERVER_HOST=${{ secrets.SMTP_SERVER_HOST }},\
+          SMTP_SERVER_PORT=${{ secrets.SMTP_SERVER_PORT }},\
+          SMTP_AUTH_USER=${{ vars.SMTP_AUTH_USER }},\
+          APP__JWT__SECRET=${{ secrets.APP__JWT__SECRET }}" \
             --set-secrets="APP__DATABASE__URL=APP__DATABASE__URL:latest,\
           SSN_SALT_KEY=SSN_SALT_KEY:latest,\
           SSN_ENCRYPTION_KEY=SSN_ENCRYPTION_KEY:latest,\
           SUPABASE_SERVICE_ROLE_KEY=SUPABASE_SERVICE_ROLE_KEY:latest,\
-          SMTP_AUTH_PASSWORD=SMTP_AUTH_PASSWORD:latest"\
+          SMTP_AUTH_PASSWORD=SMTP_AUTH_PASSWORD:latest" \
             --memory=512Mi \
             --cpu=1 \
             --min-instances=0 \
