@@ -1,0 +1,141 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+
+env:
+  GCP_PROJECT_ID: my-patients-management
+  GCP_REGION: europe-west9
+  DOCKERHUB_USERNAME: lethib
+  DOCKERHUB_IMAGE: my_patients
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ github.ref_name }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+      - name: Deploy migration job
+        id: deploy-migration
+        run: |
+          # Deploy Cloud Run Job for migrations
+          gcloud run jobs deploy my-patients-db-migrate \
+            --image=${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ github.ref_name }} \
+            --region=${{ env.GCP_REGION }} \
+            --command=/app/migrate \
+            --set-secrets="APP__DATABASE__URL=APP__DATABASE__URL:latest" \
+            --max-retries=1 \
+            --task-timeout=300 \
+            --project=${{ env.GCP_PROJECT_ID }}
+
+      - name: Execute migration job
+        run: |
+          # Execute the migration job and wait for completion
+          EXECUTION_NAME=$(gcloud run jobs execute my-patients-db-migrate \
+            --region=${{ env.GCP_REGION }} \
+            --project=${{ env.GCP_PROJECT_ID }} \
+            --format='value(metadata.name)')
+
+          echo "Migration execution: $EXECUTION_NAME"
+
+          # Wait for migration to complete
+          for i in {1..60}; do
+            STATUS=$(gcloud run jobs executions describe $EXECUTION_NAME \
+              --region=${{ env.GCP_REGION }} \
+              --project=${{ env.GCP_PROJECT_ID }} \
+              --format='value(status.conditions[0].type)')
+
+            if [ "$STATUS" = "Completed" ]; then
+              echo "Migration completed successfully"
+              break
+            elif [ "$STATUS" = "Failed" ]; then
+              echo "Migration failed"
+              exit 1
+            fi
+
+            echo "Waiting for migration... (${i}/60)"
+            sleep 5
+          done
+
+          if [ "$STATUS" != "Completed" ]; then
+            echo "Migration timed out after 5 minutes"
+            exit 1
+          fi
+
+      - name: Deploy main service
+        run: |
+          # Extract version for tag (e.g., v1.4.3 -> v1-4-3)
+          VERSION_TAG=$(echo "${{ github.ref_name }}" | sed 's/\./-/g')
+
+          gcloud run deploy my-patients \
+            --image=${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ github.ref_name }} \
+            --region=${{ env.GCP_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --port=8080 \
+            --set-env-vars="ENVIRONMENT=production,\
+          SUPABASE_SIGNATURE_BUCKET=signatures,\
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }},\
+          SMTP_SERVER_HOST=${{ secrets.SMTP_SERVER_HOST }},\
+          SMTP_SERVER_PORT=${{ secrets.SMTP_SERVER_PORT }},\
+          SMTP_AUTH_USER=${{ vars.SMTP_AUTH_USER }},\
+          APP__JWT__SECRET=${{ secrets.APP__JWT__SECRET }}" \
+            --set-secrets="APP__DATABASE__URL=APP__DATABASE__URL:latest,\
+          SSN_SALT_KEY=SSN_SALT_KEY:latest,\
+          SSN_ENCRYPTION_KEY=SSN_ENCRYPTION_KEY:latest,\
+          SUPABASE_SERVICE_ROLE_KEY=SUPABASE_SERVICE_ROLE_KEY:latest,\
+          SMTP_AUTH_PASSWORD=SMTP_AUTH_PASSWORD:latest" \
+            --memory=512Mi \
+            --cpu=1 \
+            --min-instances=0 \
+            --max-instances=5 \
+            --concurrency=20 \
+            --timeout=30 \
+            --tag=$VERSION_TAG \
+            --execution-environment=gen1 \
+            --cpu-boost \
+            --project=${{ env.GCP_PROJECT_ID }}
+
+      - name: Display deployment info
+        run: |
+          echo "✅ Deployment completed successfully!"
+          echo "Version: ${{ github.ref_name }}"
+          echo "Service URL:"
+          gcloud run services describe my-patients \
+            --region=${{ env.GCP_REGION }} \
+            --project=${{ env.GCP_PROJECT_ID }} \
+            --format='value(status.url)'
