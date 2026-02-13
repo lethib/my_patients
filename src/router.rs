@@ -54,7 +54,8 @@ pub fn create_router(state: AppState) -> Router {
     )
     .route(
       "/api/patient/{patient_id}/medical_appointments/{appointment_id}",
-      put(controllers::medical_appointment::update),
+      put(controllers::medical_appointment::update)
+        .delete(controllers::medical_appointment::delete),
     )
     // User routes
     .route(
