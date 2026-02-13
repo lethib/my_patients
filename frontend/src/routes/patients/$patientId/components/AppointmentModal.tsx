@@ -96,7 +96,7 @@ export const AppointmentModal = ({
         officesQuery.data[0].id.toString(),
       );
     }
-  }, [open, officesQuery.data, form, selectedAppointment]);
+  }, [open, officesQuery.data, selectedAppointment]);
 
   const handleClose = () => {
     form.reset();
@@ -104,9 +104,15 @@ export const AppointmentModal = ({
   };
 
   const onSubmit = form.handleSubmit(async (data) => {
+    // Format date as YYYY-MM-DD
+    const year = data.date.getFullYear();
+    const month = String(data.date.getMonth() + 1).padStart(2, "0");
+    const day = String(data.date.getDate()).padStart(2, "0");
+    const dateString = `${year}-${month}-${day}`;
+
     asyncMutation({
       practitioner_office_id: Number(data.practitioner_office_id),
-      date: data.date,
+      date: dateString,
       price_in_cents: Math.round(data.price * 100),
     }).then(() => {
       queryClient.invalidateQueries({
