@@ -1,8 +1,14 @@
 use sea_orm::{entity::prelude::*, ActiveValue};
 
-use crate::models::my_errors::MyErrors;
+use crate::{auth::resource::Resource, models::my_errors::MyErrors};
 
 pub use super::_entities::medical_appointments::{ActiveModel, Entity, Model};
+
+pub struct UpdateMedicalAppointmentParams {
+  pub date: Date,
+  pub price_in_cents: i32,
+  pub practitioner_office_id: i32,
+}
 
 pub struct CreateMedicalAppointmentParams {
   pub user_id: i32,
@@ -33,6 +39,20 @@ impl Model {}
 
 // implement your write-oriented logic here
 impl ActiveModel {
+  pub async fn update<T: ConnectionTrait>(
+    mut self,
+    db: &T,
+    params: &UpdateMedicalAppointmentParams,
+  ) -> Result<(), MyErrors> {
+    self.date = ActiveValue::Set(params.date);
+    self.practitioner_office_id = ActiveValue::Set(params.practitioner_office_id);
+    self.price_in_cents = ActiveValue::Set(params.price_in_cents);
+
+    self.save(db).await?;
+
+    Ok(())
+  }
+
   pub async fn create<T: ConnectionTrait>(
     db: &T,
     params: &CreateMedicalAppointmentParams,
@@ -54,3 +74,13 @@ impl ActiveModel {
 
 // implement your custom finders, selectors oriented logic here
 impl Entity {}
+
+impl Resource for Model {
+  async fn is_owned_by_user(&self, user_id: i32) -> bool {
+    self.user_id == user_id
+  }
+
+  fn resource_name(&self) -> String {
+    "medical_appointments".to_string()
+  }
+}

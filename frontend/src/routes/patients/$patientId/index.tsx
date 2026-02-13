@@ -7,6 +7,7 @@ import { H2 } from "@/components/ui/typography/h2";
 import { AppointmentModal } from "./components/AppointmentModal";
 import { AppointmentsTable } from "./components/AppointmentsTable/AppointmentsTable";
 import { PatientInformationCard } from "./components/PatientInformationCard";
+import { APIHooks } from "@/api/hooks";
 
 export const Route = createFileRoute("/patients/$patientId/")({
   component: PatientPage,
@@ -23,9 +24,13 @@ function PatientPage() {
     setIsAppointmentModalOpen(true);
   };
 
+  const createAppointmentMutation = APIHooks.patient
+    .createMedicalAppointment(+patientId)
+    .useMutation();
+
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20">
         <div className="container mx-auto px-4 py-8 space-y-6">
           <Button
             variant="link"
@@ -65,6 +70,7 @@ function PatientPage() {
 
       <AppointmentModal
         open={isAppointmentModalOpen}
+        asyncMutation={createAppointmentMutation.mutateAsync}
         onOpenChange={setIsAppointmentModalOpen}
         patientId={+patientId}
       />

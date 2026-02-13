@@ -57,7 +57,7 @@ export type MedicalAppointment = {
   office: PractitionerOffice;
 };
 
-export type CreateMedicalAppointmentParams = {
+export type MedicalAppointmentParams = {
   date: Date;
   price_in_cents: number;
   practitioner_office_id: number;
@@ -79,9 +79,13 @@ export const patientSchema = {
       path: `/patient/${patientId}/medical_appointments`,
     }),
   createMedicalAppointment: (patientId: number) =>
-    mutationEndpoint<CreateMedicalAppointmentParams, null>({
+    mutationEndpoint<MedicalAppointmentParams, null>({
       type: "POST",
       path: `/patient/${patientId}/medical_appointments`,
+    }),
+    updateMedicalAppointment: (patientId: number, appointmentId: number) => mutationEndpoint<MedicalAppointmentParams, null>({
+      type: "PUT",
+      path: `/patient/${patientId}/medical_appointments/${appointmentId}`
     }),
   updatePatient: mutationEndpoint<SavePatientParams, { success: boolean }>({
     type: "PUT",
