@@ -1,12 +1,19 @@
+import { Edit } from "lucide-react";
 import { APIHooks } from "@/api/hooks";
+import type { MedicalAppointment } from "@/api/hooks/patient";
+import { Button } from "@/components/ui";
 import { CenteredSpineer } from "@/components/ui/spinner";
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 interface Props {
   patientId: number;
+  onClickEditAppointment: (appointment: MedicalAppointment) => void;
 }
 
-export const AppointmentsList = ({ patientId }: Props) => {
+export const AppointmentsList = ({
+  patientId,
+  onClickEditAppointment,
+}: Props) => {
   const medicalAppointmentsQuery = APIHooks.patient
     .getMedicalAppointments(patientId)
     .useQuery(null);
@@ -44,6 +51,19 @@ export const AppointmentsList = ({ patientId }: Props) => {
             <span className="font-mono font-medium">
               {(appointment.price_in_cents / 100).toFixed(2)} €
             </span>
+          </TableCell>
+          <TableCell>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClickEditAppointment(appointment);
+              }}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
           </TableCell>
         </TableRow>
       ))}

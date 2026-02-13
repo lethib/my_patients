@@ -52,6 +52,10 @@ pub fn create_router(state: AppState) -> Router {
       get(controllers::patient::get_medical_appointments)
         .post(controllers::medical_appointment::create),
     )
+    .route(
+      "/api/patient/{patient_id}/medical_appointments/{appointment_id}",
+      put(controllers::medical_appointment::update),
+    )
     // User routes
     .route(
       "/api/user/_save_business_information",

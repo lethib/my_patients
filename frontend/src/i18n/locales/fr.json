@@ -293,7 +293,8 @@
     },
     "form": {
       "title": {
-        "create": "Nouveau rendez-vous"
+        "create": "Nouveau rendez-vous",
+        "edit": "Modifier le rendez-vous"
       },
       "description": "Enregistrer les détails du rendez-vous médical",
       "date": "Date du rendez-vous",
@@ -301,7 +302,8 @@
       "selectOffice": "Sélectionner un cabinet",
       "price": "Prix",
       "submit": {
-        "create": "Créer le rendez-vous"
+        "create": "Créer le rendez-vous",
+        "edit": "Modifier le rendez-vous"
       },
       "validation": {
         "dateRequired": "La date est requise",

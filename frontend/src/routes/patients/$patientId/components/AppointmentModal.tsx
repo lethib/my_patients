@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { MutationFunction } from "@tanstack/react-query";
 import { Calendar, Euro, MapPin } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -6,6 +7,10 @@ import { useTranslation } from "react-i18next";
 import z from "zod";
 import { queryClient } from "@/api/api";
 import { APIHooks } from "@/api/hooks";
+import type {
+  MedicalAppointment,
+  MedicalAppointmentParams,
+} from "@/api/hooks/patient";
 import { FormDatePicker } from "@/components/form/FormDatePicker";
 import { FormInput } from "@/components/form/FormInput";
 import { FormProvider } from "@/components/form/FormProvider";
@@ -22,19 +27,26 @@ import { Label } from "@/components/ui/label";
 
 interface Props {
   open: boolean;
+  asyncMutation: MutationFunction<null, MedicalAppointmentParams>;
+  selectedAppointment?: MedicalAppointment;
   onOpenChange: (open: boolean) => void;
   patientId: number;
 }
 
-export const AppointmentModal = ({ open, onOpenChange, patientId }: Props) => {
+export const AppointmentModal = ({
+  open,
+  asyncMutation,
+  selectedAppointment,
+  onOpenChange,
+  patientId,
+}: Props) => {
   const { t } = useTranslation();
 
   const officesQuery = APIHooks.user.getMyOffices.useQuery(null, {
     enabled: open,
   });
-  const createAppointmentMutation = APIHooks.patient
-    .createMedicalAppointment(patientId)
-    .useMutation();
+
+  const isEditMode = !!selectedAppointment;
 
   const appointmentSchema = z.object({
     date: z.date({
@@ -66,13 +78,23 @@ export const AppointmentModal = ({ open, onOpenChange, patientId }: Props) => {
 
   // Auto-select office if only one exists
   useEffect(() => {
+    if (selectedAppointment) {
+      form.setValue("date", new Date(selectedAppointment.date));
+      form.setValue(
+        "practitioner_office_id",
+        selectedAppointment.office.id.toString(),
+      );
+      form.setValue("price", selectedAppointment.price_in_cents / 100);
+      return;
+    }
+
     if (officesQuery.data?.length === 1) {
       form.setValue(
         "practitioner_office_id",
         officesQuery.data[0].id.toString(),
       );
     }
-  }, [officesQuery.data, form]);
+  }, [officesQuery.data, form, selectedAppointment]);
 
   const handleClose = () => {
     form.reset();
@@ -80,18 +102,16 @@ export const AppointmentModal = ({ open, onOpenChange, patientId }: Props) => {
   };
 
   const onSubmit = form.handleSubmit(async (data) => {
-    createAppointmentMutation
-      .mutateAsync({
-        practitioner_office_id: Number(data.practitioner_office_id),
-        date: data.date,
-        price_in_cents: Math.round(data.price * 100),
-      })
-      .then(() => {
-        queryClient.invalidateQueries({
-          queryKey: [`/patient/${patientId}/medical_appointments`, null],
-        });
-        handleClose();
+    asyncMutation({
+      practitioner_office_id: Number(data.practitioner_office_id),
+      date: data.date,
+      price_in_cents: Math.round(data.price * 100),
+    }).then(() => {
+      queryClient.invalidateQueries({
+        queryKey: [`/patient/${patientId}/medical_appointments`, null],
       });
+      handleClose();
+    });
   });
 
   return (
@@ -100,7 +120,9 @@ export const AppointmentModal = ({ open, onOpenChange, patientId }: Props) => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            {t("appointments.form.title.create")}
+            {isEditMode
+              ? t("appointments.form.title.edit")
+              : t("appointments.form.title.create")}
           </DialogTitle>
           <DialogDescription>
             {t("appointments.form.description")}
@@ -162,7 +184,9 @@ export const AppointmentModal = ({ open, onOpenChange, patientId }: Props) => {
               {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={form.formState.isSubmitting}>
-              {t("appointments.form.submit.create")}
+              {isEditMode
+                ? t("appointments.form.submit.edit")
+                : t("appointments.form.submit.create")}
             </Button>
           </div>
         </FormProvider>
