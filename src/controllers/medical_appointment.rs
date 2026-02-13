@@ -4,7 +4,7 @@ use axum::{
   http::status,
   Json,
 };
-use chrono::DateTime;
+use chrono::NaiveDate;
 use sea_orm::{ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter};
 use serde::Deserialize;
 
@@ -44,9 +44,8 @@ pub async fn update(
     .await
     .run_complete()?;
 
-  let appointment_date = DateTime::parse_from_rfc3339(&params.date)?
-    .naive_utc()
-    .date();
+  // Parse date string in YYYY-MM-DD format
+  let appointment_date = NaiveDate::parse_from_str(&params.date, "%Y-%m-%d")?;
 
   let medical_appointments_params = UpdateMedicalAppointmentParams {
     date: appointment_date,
@@ -72,9 +71,8 @@ pub async fn create(
 ) -> Result<status::StatusCode, MyErrors> {
   authorize.authenticated_user().run_complete()?;
 
-  let appointment_date = DateTime::parse_from_rfc3339(&params.date)?
-    .naive_utc()
-    .date();
+  // Parse date string in YYYY-MM-DD format
+  let appointment_date = NaiveDate::parse_from_str(&params.date, "%Y-%m-%d")?;
 
   let medical_appointments_params = CreateMedicalAppointmentParams {
     date: appointment_date,

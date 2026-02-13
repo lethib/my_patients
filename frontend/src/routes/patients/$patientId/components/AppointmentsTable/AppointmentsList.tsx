@@ -52,7 +52,7 @@ export const AppointmentsList = ({
               {(appointment.price_in_cents / 100).toFixed(2)} €
             </span>
           </TableCell>
-          <TableCell>
+          <TableCell align="right">
             <Button
               variant="outline"
               size="sm"
