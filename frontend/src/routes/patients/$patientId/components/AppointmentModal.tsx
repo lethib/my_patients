@@ -76,8 +76,10 @@ export const AppointmentModal = ({
     },
   });
 
-  // Auto-select office if only one exists
   useEffect(() => {
+    // Don't update form values when modal is closing
+    if (!open) return;
+
     if (selectedAppointment) {
       form.setValue("date", new Date(selectedAppointment.date));
       form.setValue(
@@ -94,7 +96,7 @@ export const AppointmentModal = ({
         officesQuery.data[0].id.toString(),
       );
     }
-  }, [officesQuery.data, form, selectedAppointment]);
+  }, [open, officesQuery.data, form, selectedAppointment]);
 
   const handleClose = () => {
     form.reset();
