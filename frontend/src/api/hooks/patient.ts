@@ -88,6 +88,11 @@ export const patientSchema = {
       type: "PUT",
       path: `/patient/${patientId}/medical_appointments/${appointmentId}`,
     }),
+  deleteMedicalAppointment: (patientId: number, appointmentId: number) =>
+    mutationEndpoint<null, null>({
+      type: "DELETE",
+      path: `/patient/${patientId}/medical_appointments/${appointmentId}`,
+    }),
   updatePatient: mutationEndpoint<SavePatientParams, { success: boolean }>({
     type: "PUT",
     path: "/patient/{patient_id}",

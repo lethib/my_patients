@@ -5,7 +5,7 @@ use axum::{
   Json,
 };
 use chrono::NaiveDate;
-use sea_orm::{ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter};
+use sea_orm::{ColumnTrait, EntityTrait, IntoActiveModel, ModelTrait, QueryFilter};
 use serde::Deserialize;
 
 use crate::{
@@ -24,6 +24,27 @@ pub struct MedicalAppointmentPayload {
   date: String,
   practitioner_office_id: i32,
   price_in_cents: i32,
+}
+
+pub async fn delete(
+  State(state): State<AppState>,
+  authorize: AuthStatement,
+  Path((patient_id, appointment_id)): Path<(i32, i32)>,
+) -> Result<status::StatusCode, MyErrors> {
+  let medical_appointment = medical_appointments::Entity::find_by_id(appointment_id)
+    .filter(medical_appointments::Column::PatientId.eq(patient_id))
+    .one(&state.db)
+    .await?
+    .ok_or(ApplicationError::NOT_FOUND())?;
+
+  authorize
+    .is_owning_resource(&medical_appointment)
+    .await
+    .run_complete()?;
+
+  medical_appointment.delete(&state.db).await?;
+
+  Ok(status::StatusCode::NO_CONTENT)
 }
 
 #[debug_handler]

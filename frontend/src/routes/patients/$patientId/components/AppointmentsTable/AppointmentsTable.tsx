@@ -6,6 +6,7 @@ import type { MedicalAppointment } from "@/api/hooks/patient";
 import { Table, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AppointmentModal } from "../AppointmentModal";
 import { AppointmentsList } from "./AppointmentsList";
+import { queryClient } from "@/api/api";
 
 interface Props {
   patientId: number;
@@ -22,9 +23,22 @@ export const AppointmentsTable = ({ patientId }: Props) => {
     .updateMedicalAppointment(patientId, selectedAppointment?.id ?? 0)
     .useMutation();
 
+  const deleteAppointmentMutation = APIHooks.patient
+    .deleteMedicalAppointment(patientId, selectedAppointment?.id ?? 0)
+    .useMutation();
+
   const handleOnClickEdit = (appointment: MedicalAppointment) => {
     setSelectedAppointment(appointment);
     setIsAppointmentModalOpen(true);
+  };
+
+  const handleOnClickDelete = (appointment: MedicalAppointment) => {
+    setSelectedAppointment(appointment);
+    deleteAppointmentMutation.mutateAsync(null).then(() => {
+      queryClient.invalidateQueries({
+        queryKey: [`/patient/${patientId}/medical_appointments`, null],
+      });
+    });
   };
 
   return (
@@ -58,6 +72,7 @@ export const AppointmentsTable = ({ patientId }: Props) => {
           <AppointmentsList
             patientId={patientId}
             onClickEditAppointment={handleOnClickEdit}
+            onClickDeleteAppointment={handleOnClickDelete}
           />
         </Table>
       </div>

@@ -1,4 +1,4 @@
-import { Edit } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { APIHooks } from "@/api/hooks";
 import type { MedicalAppointment } from "@/api/hooks/patient";
 import { Button } from "@/components/ui";
@@ -8,11 +8,13 @@ import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 interface Props {
   patientId: number;
   onClickEditAppointment: (appointment: MedicalAppointment) => void;
+  onClickDeleteAppointment: (appointment: MedicalAppointment) => void;
 }
 
 export const AppointmentsList = ({
   patientId,
   onClickEditAppointment,
+  onClickDeleteAppointment,
 }: Props) => {
   const medicalAppointmentsQuery = APIHooks.patient
     .getMedicalAppointments(patientId)
@@ -52,7 +54,7 @@ export const AppointmentsList = ({
               {(appointment.price_in_cents / 100).toFixed(2)} €
             </span>
           </TableCell>
-          <TableCell align="right">
+          <TableCell align="right" className="space-x-1">
             <Button
               variant="outline"
               size="sm"
@@ -63,6 +65,17 @@ export const AppointmentsList = ({
               }}
             >
               <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost_destructive"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClickDeleteAppointment(appointment);
+              }}
+            >
+              <Trash2 />
             </Button>
           </TableCell>
         </TableRow>
