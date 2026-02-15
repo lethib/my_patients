@@ -51,9 +51,9 @@ pub async fn get_signature_url(
 ) -> Result<String, MyErrors> {
   let storage = StorageService::new()?;
   let signature_filename = user_bi
-    .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())?
+    .ok_or(UnexpectedError::ShouldNotHappen)?
     .signature_file_name
-    .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())?;
+    .ok_or(UnexpectedError::ShouldNotHappen)?;
 
   Ok(storage.signature_url(&signature_filename))
 }
@@ -67,22 +67,22 @@ pub async fn upload_signature(
   let field = multipart
     .next_field()
     .await
-    .map_err(|_| ApplicationError::BAD_REQUEST())?
-    .ok_or(ApplicationError::BAD_REQUEST())?;
+    .map_err(|_| ApplicationError::BadRequest)?
+    .ok_or(ApplicationError::BadRequest)?;
 
-  let field_name = field.name().ok_or(ApplicationError::BAD_REQUEST())?;
+  let field_name = field.name().ok_or(ApplicationError::BadRequest)?;
   if field_name != "signature" {
-    return Err(ApplicationError::BAD_REQUEST());
+    return Err(ApplicationError::BadRequest.into());
   }
 
   let signature_data = field
     .bytes()
     .await
-    .map_err(|_| ApplicationError::UNPROCESSABLE_ENTITY())?;
+    .map_err(|_| ApplicationError::UnprocessableEntity)?;
 
   let img = image::load_from_memory(&signature_data).map_err(|e| {
     tracing::error!("Failed to load image: {}", e);
-    ApplicationError::UNPROCESSABLE_ENTITY()
+    ApplicationError::UnprocessableEntity
   })?;
 
   let resized = img.resize_exact(314, 156, FilterType::Lanczos3);
@@ -92,7 +92,7 @@ pub async fn upload_signature(
     .write_to(&mut std::io::Cursor::new(&mut png_bytes), ImageFormat::Png)
     .map_err(|e| {
       tracing::error!("Failed to encode image: {}", e);
-      ApplicationError::UNPROCESSABLE_ENTITY()
+      ApplicationError::UnprocessableEntity
     })?;
 
   let filename = format!(
@@ -111,7 +111,7 @@ pub async fn upload_signature(
     .find_related(UserBusinessInformations)
     .one(&state.db)
     .await?
-    .ok_or(ApplicationError::UNPROCESSABLE_ENTITY())?
+    .ok_or(ApplicationError::UnprocessableEntity)?
     .into_active_model();
 
   business_information.signature_file_name = ActiveValue::Set(Some(filename));

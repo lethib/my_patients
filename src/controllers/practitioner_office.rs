@@ -38,7 +38,7 @@ pub async fn update(
   let office = practitioner_offices::Entity::find_by_id(office_id)
     .one(&state.db)
     .await?
-    .ok_or(ApplicationError::NOT_FOUND())?;
+    .ok_or(ApplicationError::NotFound)?;
 
   authorize.is_owning_resource(&office).await.run_complete()?;
 
@@ -62,7 +62,7 @@ pub async fn destroy(
   let office = practitioner_offices::Entity::find_by_id(office_id)
     .one(&state.db)
     .await?
-    .ok_or(ApplicationError::NOT_FOUND())?;
+    .ok_or(ApplicationError::NotFound)?;
 
   authorize.is_owning_resource(&office).await.run_complete()?;
 

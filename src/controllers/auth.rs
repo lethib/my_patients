@@ -65,7 +65,7 @@ pub async fn forgot(
   let jwt_service = JwtService::new(&state.config.jwt.secret);
   let secured_token = jwt_service
     .generate_token(&user.pid.to_string(), TOKEN_TYPE_PASSWORD_RESET, 900)
-    .map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN())?;
+    .map_err(|_| UnexpectedError::ShouldNotHappen)?;
 
   let secured_url = format!(
     "{}/reset_password?access_token={}",
@@ -100,15 +100,15 @@ pub async fn reset(
   let jwt_service = JwtService::new(&state.config.jwt.secret);
   let claims = jwt_service
     .validate_token(&params.token)
-    .map_err(|_| AuthenticationError::INVALID_TOKEN())?;
+    .map_err(|_| AuthenticationError::InvalidToken)?;
 
   if claims.token_type != TOKEN_TYPE_PASSWORD_RESET {
-    return Err(AuthenticationError::INVALID_TOKEN());
+    return Err(AuthenticationError::InvalidToken.into());
   }
 
   let user = users::Model::find_by_pid(&state.db, &claims.pid)
     .await
-    .map_err(|_| AuthenticationError::INVALID_CLAIMS())?;
+    .map_err(|_| AuthenticationError::InvalidClaims)?;
 
   user
     .0
@@ -130,12 +130,12 @@ pub async fn login(
 
   let user = users::Model::find_by_email(&state.db, &params.email)
     .await
-    .map_err(|_| AuthenticationError::INVALID_CREDENTIALS())?;
+    .map_err(|_| AuthenticationError::InvalidCredentials)?;
 
   let valid = user.verify_password(&params.password);
 
   if !valid {
-    return Err(AuthenticationError::INVALID_CREDENTIALS());
+    return Err(AuthenticationError::InvalidCredentials.into());
   }
 
   if !user.is_access_key_verified {
@@ -185,7 +185,7 @@ pub async fn check_access_key(
 
   let user = users::Model::find_by_email(&state.db, &params.user_email)
     .await
-    .map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN())?;
+    .map_err(|_| UnexpectedError::ShouldNotHappen)?;
 
   if services::user::check_access_key(&user, params.access_key) {
     users::ActiveModel::enable_access(&mut user.clone().into_active_model(), &state.db).await?;
@@ -202,5 +202,5 @@ pub async fn check_access_key(
     return Ok(Json(serde_json::json!({ "token": token })));
   }
 
-  Err(ApplicationError::new("access_key_not_recognized".into()))
+  Err(ApplicationError::new("access_key_not_recognized".to_string()).into())
 }

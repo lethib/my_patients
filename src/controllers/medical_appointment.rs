@@ -35,7 +35,7 @@ pub async fn delete(
     .filter(medical_appointments::Column::PatientId.eq(patient_id))
     .one(&state.db)
     .await?
-    .ok_or(ApplicationError::NOT_FOUND())?;
+    .ok_or(ApplicationError::NotFound)?;
 
   authorize
     .is_owning_resource(&medical_appointment)
@@ -58,7 +58,7 @@ pub async fn update(
     .filter(medical_appointments::Column::PatientId.eq(patient_id))
     .one(&state.db)
     .await?
-    .ok_or(ApplicationError::NOT_FOUND())?;
+    .ok_or(ApplicationError::NotFound)?;
 
   authorize
     .is_owning_resource(&medical_appointment)

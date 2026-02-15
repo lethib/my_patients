@@ -22,7 +22,7 @@ pub async fn create(
       let pid = Uuid::parse_str(pid).map_err(|err| UnexpectedError::new(err.to_string()))?;
       PatientModel::search_by_pid(&services.db, pid)
         .await?
-        .ok_or(ApplicationError::NOT_FOUND())?
+        .ok_or(ApplicationError::NotFound)?
     }
     None => patients::ActiveModel::create(&services.db, patient_params, linked_to_user.id).await?,
   };

@@ -1,37 +1,33 @@
 use crate::models::my_errors::MyErrors;
 use axum::http::StatusCode;
 
-pub struct ApplicationError {}
+pub enum ApplicationError {
+  UnprocessableEntity,
+  NotFound,
+  BadRequest,
+  #[allow(non_camel_case_types)]
+  new(String),
+}
 
-impl ApplicationError {
-  #[allow(non_snake_case)]
-  pub fn UNPROCESSABLE_ENTITY() -> MyErrors {
-    MyErrors {
-      code: StatusCode::UNPROCESSABLE_ENTITY,
-      msg: "unprocessable_entity".into(),
-    }
-  }
-
-  #[allow(non_snake_case)]
-  pub fn NOT_FOUND() -> MyErrors {
-    MyErrors {
-      code: StatusCode::NOT_FOUND,
-      msg: "resource_not_found".into(),
-    }
-  }
-
-  #[allow(non_snake_case)]
-  pub fn BAD_REQUEST() -> MyErrors {
-    MyErrors {
-      code: StatusCode::BAD_REQUEST,
-      msg: "bad_request".into(),
-    }
-  }
-
-  pub fn new(msg: String) -> MyErrors {
-    MyErrors {
-      code: StatusCode::NOT_FOUND,
-      msg,
+impl From<ApplicationError> for MyErrors {
+  fn from(err: ApplicationError) -> Self {
+    match err {
+      ApplicationError::UnprocessableEntity => MyErrors {
+        code: StatusCode::UNPROCESSABLE_ENTITY,
+        msg: "unprocessable_entity".into(),
+      },
+      ApplicationError::NotFound => MyErrors {
+        code: StatusCode::NOT_FOUND,
+        msg: "resource_not_found".into(),
+      },
+      ApplicationError::BadRequest => MyErrors {
+        code: StatusCode::BAD_REQUEST,
+        msg: "bad_request".into(),
+      },
+      ApplicationError::new(msg) => MyErrors {
+        code: StatusCode::BAD_REQUEST,
+        msg,
+      },
     }
   }
 }

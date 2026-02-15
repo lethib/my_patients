@@ -19,7 +19,7 @@ impl Crypto {
     let key_string = std::env::var("SSN_ENCRYPTION_KEY")?;
 
     if key_string.len() != 32 {
-      return Err(UnexpectedError::SHOULD_NOT_HAPPEN());
+      return Err(UnexpectedError::ShouldNotHappen.into());
     }
 
     return Ok(Crypto {
@@ -51,7 +51,7 @@ impl Crypto {
       .map_err(|err| UnexpectedError::new(err.to_string()))?;
 
     if encrypted_data.len() < 12 {
-      return Err(UnexpectedError::SHOULD_NOT_HAPPEN());
+      return Err(UnexpectedError::ShouldNotHappen.into());
     }
 
     let (nonce_bytes, encrypted_data) = encrypted_data.split_at(12);
@@ -61,7 +61,7 @@ impl Crypto {
       .decrypt(&nonce, encrypted_data)
       .map_err(|err| UnexpectedError::new(err.to_string()))?;
 
-    String::from_utf8(decrypted_bytes).map_err(|err| UnexpectedError::new(err.to_string()))
+    String::from_utf8(decrypted_bytes).map_err(|err| UnexpectedError::new(err.to_string()).into())
   }
 
   pub fn hash(value: &str, salt: &String) -> Result<String, MyErrors> {

@@ -92,7 +92,7 @@ impl ActiveModel {
     linked_to_user_id: i32,
   ) -> Result<Model, MyErrors> {
     if !is_address_valid(&params.address_line_1, &params.address_zip_code) {
-      return Err(ApplicationError::UNPROCESSABLE_ENTITY());
+      return Err(ApplicationError::UnprocessableEntity.into());
     }
 
     let ssn_encrypted = Model::encrypt_ssn(&params.ssn)?;
@@ -129,7 +129,7 @@ impl ActiveModel {
       .into_active_model();
 
     if !is_address_valid(&params.address_line_1, &params.address_zip_code) {
-      return Err(ApplicationError::UNPROCESSABLE_ENTITY());
+      return Err(ApplicationError::UnprocessableEntity.into());
     }
 
     patient.first_name = ActiveValue::Set(params.first_name.trim().to_string());

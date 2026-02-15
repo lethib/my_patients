@@ -156,10 +156,13 @@ impl StorageService {
         "Failed to upload to Supabase storage ({}): {}",
         status, error_text
       );
-      Err(UnexpectedError::new(format!(
-        "Storage upload failed: {} - {}",
-        status, error_text
-      )))
+      Err(
+        UnexpectedError::new(format!(
+          "Storage upload failed: {} - {}",
+          status, error_text
+        ))
+        .into(),
+      )
     }
   }
 }
