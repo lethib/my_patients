@@ -34,7 +34,7 @@ impl From<AuthenticationError> for MyErrors {
         msg: "access_key_not_verified".to_string(),
       },
       AuthenticationError::AccessDenied(to) => MyErrors {
-        code: StatusCode::UNAUTHORIZED,
+        code: StatusCode::FORBIDDEN,
         msg: format!("access_denied_to_{}", to.unwrap_or("resource".to_string())),
       },
     }

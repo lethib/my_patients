@@ -98,7 +98,7 @@ impl AuthContext {
     };
 
     if !user_result.0.is_access_key_verified {
-      return (None, Some(AuthenticationError::AccessKeyNotVerified.into()));
+      return (None, Some(AuthenticationError::AccessKeyNotVerified));
     }
 
     (Some(user_result), None)
