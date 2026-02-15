@@ -67,7 +67,7 @@ impl FromRequestParts<AppState> for AuthenticatedUser {
       None => Err(
         auth_context
           .error
-          .unwrap_or(AuthenticationError::INVALID_CLAIMS()),
+          .unwrap_or(AuthenticationError::InvalidClaims.into()),
       ),
     }
   }

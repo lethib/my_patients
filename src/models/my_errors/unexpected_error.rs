@@ -1,21 +1,23 @@
 use crate::models::my_errors::MyErrors;
 use axum::http::StatusCode;
 
-pub struct UnexpectedError {}
+pub enum UnexpectedError {
+  ShouldNotHappen,
+  #[allow(non_camel_case_types)]
+  new(String),
+}
 
-impl UnexpectedError {
-  #[allow(non_snake_case)]
-  pub fn SHOULD_NOT_HAPPEN() -> MyErrors {
-    MyErrors {
-      code: StatusCode::INTERNAL_SERVER_ERROR,
-      msg: "should_not_happen".into(),
-    }
-  }
-
-  pub fn new(msg: String) -> MyErrors {
-    MyErrors {
-      code: StatusCode::INTERNAL_SERVER_ERROR,
-      msg: msg,
+impl From<UnexpectedError> for MyErrors {
+  fn from(err: UnexpectedError) -> Self {
+    match err {
+      UnexpectedError::ShouldNotHappen => MyErrors {
+        code: StatusCode::INTERNAL_SERVER_ERROR,
+        msg: "should_not_happen".to_string(),
+      },
+      UnexpectedError::new(msg) => MyErrors {
+        code: StatusCode::INTERNAL_SERVER_ERROR,
+        msg,
+      },
     }
   }
 }

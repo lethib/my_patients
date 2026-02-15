@@ -41,7 +41,7 @@ pub async fn send_invoice(
   user_business_informations: &user_business_informations::Model,
 ) -> Result<(), MyErrors> {
   if generated_invoice.patient_email == PatientModel::DEFAULT_EMAIL {
-    return Err(ApplicationError::UNPROCESSABLE_ENTITY());
+    return Err(ApplicationError::UnprocessableEntity.into());
   }
 
   let attachment = EmailAttachment::from_bytes(
@@ -75,7 +75,7 @@ pub async fn send_invoice(
     .worker_transmitter
     .send(WorkerJob::Email(args))
     .await
-    .map_err(|_| UnexpectedError::SHOULD_NOT_HAPPEN())?;
+    .map_err(|_| UnexpectedError::ShouldNotHappen)?;
 
   Ok(())
 }
@@ -91,7 +91,7 @@ pub async fn generate_patient_invoice(
     .filter(patients::Column::UserId.eq(current_user.id))
     .one(&services.db)
     .await?
-    .ok_or(ApplicationError::NOT_FOUND())?;
+    .ok_or(ApplicationError::NotFound)?;
 
   let invoice_date = chrono::NaiveDate::parse_from_str(&params.invoice_date, "%Y-%m-%d")?;
 
@@ -119,7 +119,7 @@ pub async fn generate_patient_invoice(
     PractitionerOffices::find_by_id(created_medical_appointment.practitioner_office_id)
       .one(&services.db)
       .await?
-      .ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())?;
+      .ok_or(UnexpectedError::ShouldNotHappen)?;
 
   let args = InvoiceGeneratorArgs {
     patient: patient.clone(),

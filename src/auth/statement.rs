@@ -24,7 +24,7 @@ impl AuthStatement {
 
   pub fn run_complete(mut self) -> Result<(), MyErrors> {
     if self.is_empty {
-      return Err(UnexpectedError::SHOULD_NOT_HAPPEN());
+      return Err(UnexpectedError::ShouldNotHappen.into());
     }
 
     if self.ok_so_far {
@@ -43,7 +43,7 @@ impl AuthStatement {
   pub fn authenticated_user(self) -> Self {
     self.check(
       |s| s.auth_context.current_user.is_some(),
-      Some(AuthenticationError::INVALID_CREDENTIALS()),
+      Some(AuthenticationError::InvalidCredentials.into()),
     )
   }
 
@@ -55,9 +55,7 @@ impl AuthStatement {
 
     self.check(
       |_| is_owned,
-      Some(AuthenticationError::ACCESS_DENIED(Some(
-        resource.resource_name(),
-      ))),
+      Some(AuthenticationError::AccessDenied(Some(resource.resource_name())).into()),
     )
   }
 

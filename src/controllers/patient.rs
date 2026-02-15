@@ -41,7 +41,7 @@ pub async fn get(
   let patient = patients::Entity::find_by_id(patient_id)
     .one(&state.db)
     .await?
-    .ok_or(ApplicationError::NOT_FOUND())?;
+    .ok_or(ApplicationError::NotFound)?;
 
   authorize
     .is_owning_resource(&patient)
@@ -72,7 +72,7 @@ pub async fn update(
   let patient = patients::Entity::find_by_id(patient_id)
     .one(&state.db)
     .await?
-    .ok_or(ApplicationError::NOT_FOUND())?;
+    .ok_or(ApplicationError::NotFound)?;
 
   authorize
     .is_owning_resource(&patient)
@@ -93,7 +93,7 @@ pub async fn delete(
   let patient = patients::Entity::find_by_id(patient_id)
     .one(&state.db)
     .await?
-    .ok_or(ApplicationError::NOT_FOUND())?;
+    .ok_or(ApplicationError::NotFound)?;
 
   authorize
     .is_owning_resource(&patient)
@@ -161,11 +161,11 @@ pub async fn generate_invoice(
   Json(params): Json<GenerateInvoiceParams>,
 ) -> Result<Json<serde_json::Value>, MyErrors> {
   if params.amount <= 0.0 {
-    return Err(ApplicationError::UNPROCESSABLE_ENTITY());
+    return Err(ApplicationError::UnprocessableEntity.into());
   }
 
   if params.amount > (i32::MAX as f32 / 100.0) {
-    return Err(ApplicationError::UNPROCESSABLE_ENTITY());
+    return Err(ApplicationError::UnprocessableEntity.into());
   }
 
   let invoice_generated =
@@ -182,7 +182,7 @@ pub async fn generate_invoice(
         )
         .await?
       }
-      None => return Err(ApplicationError::UNPROCESSABLE_ENTITY()),
+      None => return Err(ApplicationError::UnprocessableEntity.into()),
     }
   }
 
@@ -209,7 +209,7 @@ pub async fn get_medical_appointments(
     .map(|appointment| {
       Ok(MedicalAppointmentResponse::new(
         &appointment.0,
-        &appointment.1.ok_or(UnexpectedError::SHOULD_NOT_HAPPEN())?,
+        &appointment.1.ok_or(UnexpectedError::ShouldNotHappen)?,
       ))
     })
     .collect::<Result<Vec<_>, MyErrors>>()?;

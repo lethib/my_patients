@@ -31,7 +31,7 @@ impl AuthContext {
       current_user,
       authorized: false,
       complete: false,
-      error,
+      error: error.map(|e| e.into()),
     }
   }
 
@@ -63,7 +63,7 @@ impl AuthContext {
     if !self.authorized {
       match self.error.take() {
         Some(error) => return Err(error),
-        None => return Err(AuthenticationError::ACCESS_DENIED(None)),
+        None => return Err(AuthenticationError::AccessDenied(None).into()),
       }
     }
 
@@ -75,30 +75,30 @@ impl AuthContext {
     state: &AppState,
   ) -> (
     Option<(users::Model, Option<user_business_informations::Model>)>,
-    Option<MyErrors>,
+    Option<AuthenticationError>,
   ) {
     let token = match auth_header.strip_prefix("Bearer ") {
       Some(t) => t,
-      None => return (None, Some(AuthenticationError::MISSING_TOKEN())),
+      None => return (None, Some(AuthenticationError::MissingToken)),
     };
 
     let jwt_service = JwtService::new(&state.config.jwt.secret);
     let claims = match jwt_service.validate_token(token) {
       Ok(data) => data,
-      Err(_) => return (None, Some(AuthenticationError::INVALID_TOKEN())),
+      Err(_) => return (None, Some(AuthenticationError::InvalidToken)),
     };
 
     if claims.token_type != TOKEN_TYPE_AUTH {
-      return (None, Some(AuthenticationError::INVALID_TOKEN()));
+      return (None, Some(AuthenticationError::InvalidToken));
     }
 
     let user_result = match users::Model::find_by_pid(&state.db, &claims.pid).await {
       Ok(user) => user,
-      Err(_) => return (None, Some(AuthenticationError::INVALID_CLAIMS())),
+      Err(_) => return (None, Some(AuthenticationError::InvalidClaims)),
     };
 
     if !user_result.0.is_access_key_verified {
-      return (None, Some(AuthenticationError::ACCESS_KEY_NOT_VERIFIED()));
+      return (None, Some(AuthenticationError::AccessKeyNotVerified));
     }
 
     (Some(user_result), None)
@@ -106,7 +106,7 @@ impl AuthContext {
 
   fn ensure_not_completed(&self) -> Result<(), MyErrors> {
     if self.complete {
-      return Err(UnexpectedError::SHOULD_NOT_HAPPEN());
+      return Err(UnexpectedError::ShouldNotHappen.into());
     }
     Ok(())
   }

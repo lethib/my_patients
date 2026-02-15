@@ -1,53 +1,42 @@
 use crate::models::my_errors::MyErrors;
 use axum::http::StatusCode;
-pub struct AuthenticationError {}
 
-impl AuthenticationError {
-  #[allow(non_snake_case)]
-  pub fn INVALID_CREDENTIALS() -> MyErrors {
-    MyErrors {
-      code: StatusCode::UNAUTHORIZED,
-      msg: "invalid_credentials".to_string(),
-    }
-  }
+pub enum AuthenticationError {
+  InvalidCredentials,
+  MissingToken,
+  InvalidToken,
+  InvalidClaims,
+  AccessKeyNotVerified,
+  AccessDenied(Option<String>),
+}
 
-  #[allow(non_snake_case)]
-  pub fn MISSING_TOKEN() -> MyErrors {
-    MyErrors {
-      code: StatusCode::UNAUTHORIZED,
-      msg: "missing_token".to_string(),
-    }
-  }
-
-  #[allow(non_snake_case)]
-  pub fn INVALID_TOKEN() -> MyErrors {
-    MyErrors {
-      code: StatusCode::UNAUTHORIZED,
-      msg: "invalid_token".to_string(),
-    }
-  }
-
-  #[allow(non_snake_case)]
-  pub fn INVALID_CLAIMS() -> MyErrors {
-    MyErrors {
-      code: StatusCode::UNAUTHORIZED,
-      msg: "invalid_claims_inside_token".to_string(),
-    }
-  }
-
-  #[allow(non_snake_case)]
-  pub fn ACCESS_KEY_NOT_VERIFIED() -> MyErrors {
-    MyErrors {
-      code: StatusCode::UNAUTHORIZED,
-      msg: "access_key_not_verified".to_string(),
-    }
-  }
-
-  #[allow(non_snake_case)]
-  pub fn ACCESS_DENIED(to: Option<String>) -> MyErrors {
-    MyErrors {
-      code: StatusCode::FORBIDDEN,
-      msg: format!("access_denied_to_{}", to.unwrap_or("resource".to_string())),
+impl From<AuthenticationError> for MyErrors {
+  fn from(err: AuthenticationError) -> Self {
+    match err {
+      AuthenticationError::InvalidCredentials => MyErrors {
+        code: StatusCode::UNAUTHORIZED,
+        msg: "invalid_credentials".to_string(),
+      },
+      AuthenticationError::MissingToken => MyErrors {
+        code: StatusCode::UNAUTHORIZED,
+        msg: "missing_token".to_string(),
+      },
+      AuthenticationError::InvalidToken => MyErrors {
+        code: StatusCode::UNAUTHORIZED,
+        msg: "invalid_token".to_string(),
+      },
+      AuthenticationError::InvalidClaims => MyErrors {
+        code: StatusCode::UNAUTHORIZED,
+        msg: "invalid_claims".to_string(),
+      },
+      AuthenticationError::AccessKeyNotVerified => MyErrors {
+        code: StatusCode::UNAUTHORIZED,
+        msg: "access_key_not_verified".to_string(),
+      },
+      AuthenticationError::AccessDenied(to) => MyErrors {
+        code: StatusCode::FORBIDDEN,
+        msg: format!("access_denied_to_{}", to.unwrap_or("resource".to_string())),
+      },
     }
   }
 }
