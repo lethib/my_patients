@@ -17,7 +17,7 @@
 
 My Patients is a full-stack web application designed to help healthcare practitioners manage their patient records securely. Built with a focus on data privacy and security, it provides encrypted storage for sensitive patient information including social security numbers, along with automated invoice generation and delivery capabilities.
 
-Key capabilities include comprehensive patient management, multi-office support, professional PDF invoice generation, and automated email delivery through background job processing.
+Key capabilities include comprehensive patient management, medical appointment tracking with accounting exports, multi-office support, professional PDF invoice generation, and automated email delivery through background job processing.
 
 This is a personal project built to explore modern web technologies including Rust backend development, secure cryptographic practices, and asynchronous background job processing.
 
@@ -27,6 +27,11 @@ This is a personal project built to explore modern web technologies including Ru
 - **Secure Patient Records** - Store patient information with AES-GCM encryption for sensitive data
 - **SSN Protection** - Double-layer security with encrypted storage and hashed indexing for fast, secure lookups
 - **Multi-Office Support** - Manage patients across multiple practitioner offices
+
+### Appointment Management
+- **Medical Appointments** - Create, edit, and delete medical appointments with patients
+- **Appointment Tracking** - Track appointments with date, price, and office information
+- **Accounting Export** - Export appointments to Excel format for accounting purposes, organized by office with automatic email delivery
 
 ### Invoice Generation & Delivery
 - **PDF Invoices** - Generate professional PDF invoices with native Rust PDF generation
@@ -48,7 +53,8 @@ This is a personal project built to explore modern web technologies including Ru
 - **[SeaORM](https://www.sea-ql.org/SeaORM/)** - Async ORM for database operations
 - **PostgreSQL** - Primary database (SQLite supported for development)
 - **Background Workers** - Custom asynchronous job processing with Tokio channels for email delivery and long-running tasks
-- **SMTP Integration** - Email delivery system via Lettre for invoice distribution
+- **SMTP Integration** - Email delivery system via Lettre for invoice and appointment export distribution
+- **Excel Generation** - Native Rust Excel file generation with `rust_xlsxwriter` for accounting exports
 
 ### Frontend
 - **[TypeScript](https://www.typescriptlang.org/)** - Type-safe JavaScript
