@@ -122,7 +122,7 @@ function Patients() {
 
       <ExportAppointmentsModal
         open={isExportAppointmentsModalOpen}
-        onOpenChange={() => setIsExportAppointmentsModalOpen(false)}
+        onOpenChange={setIsExportAppointmentsModalOpen}
       />
     </>
   );

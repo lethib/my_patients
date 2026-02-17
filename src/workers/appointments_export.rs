@@ -4,7 +4,7 @@ use crate::{
     my_errors::{unexpected_error::UnexpectedError, MyErrors},
     users::users,
   },
-  services::accounting::{MedicalAppointmentExtractor, ToExcel},
+  services::appointments::{MedicalAppointmentExtractor, ToExcel},
   workers::mailer::{args::EmailArgs, attachment::EmailAttachment},
 };
 use chrono::NaiveDate;
@@ -46,6 +46,7 @@ async fn send_excel_by_mail(
   state: AppState,
 ) -> Result<(), MyErrors> {
   let wb_buffer = workbook.save_to_buffer()?;
+
   let workbook_attachment = EmailAttachment::from_bytes(
     format!(
       "appointments_from_{}_to_{}.xlsx",
@@ -58,8 +59,13 @@ async fn send_excel_by_mail(
 
   let email_args = EmailArgs::new_text(
     to,
-    "Votre comptabilité".to_string(),
-    format!("Bonjour,\n\nVoici votre comptabilité en pièce jointe"),
+    format!(
+      "Vos RDV du {} au {}",
+      start_date.format("%d/%m/%Y"),
+      end_date.format("%d/%m/%Y")
+    ),
+    "Bonjour,\n\nVous trouverez tous vos rendez-vous de la période sélectionnée en pièce jointe"
+      .to_string(),
   )
   .with_attachment(workbook_attachment);
 

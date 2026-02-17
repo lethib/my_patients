@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use crate::models::{
   _entities::{medical_appointments, patients, practitioner_offices},
-  my_errors::MyErrors,
+  my_errors::{unexpected_error::UnexpectedError, MyErrors},
   users,
 };
 
@@ -38,19 +38,38 @@ impl ToExcel for Vec<MedicalAppointmentDetail> {
 
     let mut workbook = Workbook::new();
     let date_format = Format::new().set_num_format("dd/mm/yyyy");
+    let header_format = Format::new()
+      .set_bold()
+      .set_background_color(Color::Green)
+      .set_font_color(Color::White);
+
+    let mut sorted_offices: Vec<_> = appointments_by_office.iter().collect();
+    sorted_offices.sort_by_key(|(name, _)| name.as_str());
 
     // Create a worksheet for each office
-    for (office_name, office_appointments) in appointments_by_office.iter() {
+    for (office_name, office_appointments) in sorted_offices {
       let worksheet = workbook.add_worksheet();
       worksheet.set_name(office_name)?;
 
+      worksheet.write_with_format(0, 0, "date", &header_format)?;
+      worksheet.set_column_width(0, 15)?;
+
+      worksheet.write_with_format(0, 1, "first_name", &header_format)?;
+      worksheet.set_column_width(1, 20)?;
+
+      worksheet.write_with_format(0, 2, "last_name", &header_format)?;
+      worksheet.set_column_width(2, 20)?;
+
+      worksheet.write_with_format(0, 3, "price_in_euros", &header_format)?;
+      worksheet.set_column_width(3, 20)?;
+
       for (i, (appointment, patient, _office)) in office_appointments.iter().enumerate() {
         let excel_date = ExcelDateTime::parse_from_str(&appointment.date.to_string())?;
-        worksheet.write_with_format(i as u32, 0, &excel_date, &date_format)?;
+        worksheet.write_with_format(i as u32 + 1, 0, &excel_date, &date_format)?;
 
-        worksheet.write(i as u32, 1, &patient.first_name)?;
-        worksheet.write(i as u32, 2, &patient.last_name)?;
-        worksheet.write(i as u32, 3, appointment.price_in_cents)?;
+        worksheet.write(i as u32 + 1, 1, &patient.first_name)?;
+        worksheet.write(i as u32 + 1, 2, &patient.last_name)?;
+        worksheet.write(i as u32 + 1, 3, appointment.price_in_cents as f64 / 100.0)?;
       }
     }
 
@@ -84,14 +103,14 @@ impl<'user> MedicalAppointmentExtractor<'user> {
 
     let results = appointments
       .into_iter()
-      .map(|(appointment, patient, office)| {
-        (
+      .map(|(appointment, patient, office)| -> Result<_, MyErrors> {
+        Ok((
           appointment,
-          patient.expect("patient should be define"),
-          office.expect("office should be define"),
-        )
+          patient.ok_or(UnexpectedError::new("patient_should_be_define".to_string()))?,
+          office.ok_or(UnexpectedError::new("office_should_be_define".to_string()))?,
+        ))
       })
-      .collect();
+      .collect::<Result<Vec<_>, MyErrors>>()?;
 
     Ok(results)
   }
