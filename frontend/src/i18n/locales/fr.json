@@ -286,6 +286,7 @@
     "title": "Rendez-vous",
     "subtitle": "Gérer les rendez-vous médicaux de ce patient",
     "addAppointment": "Ajouter un rendez-vous",
+    "exportAppointments": "Exporter mes RDV",
     "table": {
       "date": "Date",
       "office": "Cabinet",
@@ -309,6 +310,21 @@
         "dateRequired": "La date est requise",
         "officeRequired": "Le cabinet est requis"
       }
+    },
+    "export": {
+      "title": "Exporter mes rendez-vous",
+      "description": "Veuillez indiquer les dates de début et de fin pour l'export de vos rendez-vous. Vous recevrez ensuite un email accompagné d'un fichier contenant la liste de vos rendez-vous.",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "submit": "Exporter",
+      "validation": {
+        "startDateRequired": "La date de début est requise",
+        "endDateRequired": "La date de fin est requise"
+      },
+      "success": {
+        "title": "Export réussi !",
+        "description": "Votre export des rendez-vous a été traité avec succès. Vous allez recevoir un email avec le fichier contenant la liste de vos rendez-vous pour la période sélectionnée."
+      }
     }
   },
   "common": {
@@ -330,7 +346,10 @@
     "submit": "Soumettre",
     "reset": "Réinitialiser",
     "optional": "optionnel",
-    "required": "requis"
+    "required": "requis",
+    "errors": {
+      "start_date_before_end_date": "La date de début doit être antérieure à la date de fin"
+    }
   },
   "errors": {
     "generic": "Une erreur s'est produite",

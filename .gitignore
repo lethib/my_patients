@@ -7,6 +7,7 @@ debug/
 target/
 
 .claude/
+.zed/
 
 # include cargo lock
 !Cargo.lock

@@ -1,5 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { LogOut, Plus, Search as SearchIcon, UserCog } from "lucide-react";
+import {
+  FileDown,
+  LogOut,
+  Plus,
+  Search as SearchIcon,
+  UserCog,
+} from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { APIHooks } from "@/api/hooks";
@@ -17,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import { H2 } from "@/components/ui/typography/h2";
 import { useDebounce } from "@/hooks/useDebounce";
 import { logout } from "@/lib/authUtils";
+import { ExportAppointmentsModal } from "./components/ExportAppointmentsModal";
 import { PatientsTable } from "./components/PatientsTable/PatientsTable";
 
 export const Route = createFileRoute("/patients/")({
@@ -26,6 +33,8 @@ export const Route = createFileRoute("/patients/")({
 function Patients() {
   const { t } = useTranslation();
   const [isAddPatientModalOpened, setIsAddPatientModalOpened] = useState(false);
+  const [isExportAppointmentsModalOpen, setIsExportAppointmentsModalOpen] =
+    useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 700);
   const navigate = useNavigate();
@@ -47,6 +56,13 @@ function Patients() {
               <p className="text-muted-foreground">{t("patients.subtitle")}</p>
             </div>
             <div className="flex gap-4">
+              <Button
+                variant="outline"
+                onClick={() => setIsExportAppointmentsModalOpen(true)}
+              >
+                <FileDown />
+                {t("appointments.exportAppointments")}
+              </Button>
               <Button
                 onClick={() => setIsAddPatientModalOpened(true)}
                 className="flex items-center gap-2"
@@ -102,6 +118,11 @@ function Patients() {
         open={isAddPatientModalOpened}
         asyncMutation={addPatientMutation.mutateAsync}
         onOpenChange={handleOnOpenChange}
+      />
+
+      <ExportAppointmentsModal
+        open={isExportAppointmentsModalOpen}
+        onOpenChange={() => setIsExportAppointmentsModalOpen(false)}
       />
     </>
   );

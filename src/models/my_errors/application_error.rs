@@ -6,7 +6,7 @@ pub enum ApplicationError {
   NotFound,
   BadRequest,
   #[allow(non_camel_case_types)]
-  new(String),
+  new(&'static str),
 }
 
 impl From<ApplicationError> for MyErrors {
@@ -26,7 +26,7 @@ impl From<ApplicationError> for MyErrors {
       },
       ApplicationError::new(msg) => MyErrors {
         code: StatusCode::BAD_REQUEST,
-        msg,
+        msg: msg.to_string(),
       },
     }
   }

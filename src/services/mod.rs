@@ -1,3 +1,4 @@
+pub mod accounting;
 pub mod crypto;
 pub mod invoice;
 pub mod patients;
