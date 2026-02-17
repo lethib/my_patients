@@ -2230,7 +2230,6 @@ name = "my_patients"
 version = "1.4.1"
 dependencies = [
  "aes-gcm",
- "anyhow",
  "argon2",
  "async-trait",
  "axum",
