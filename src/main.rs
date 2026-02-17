@@ -17,8 +17,10 @@ mod workers;
 use app_state::AppState;
 use config::Config;
 
+use crate::models::my_errors::MyErrors;
+
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
+async fn main() -> Result<(), MyErrors> {
   dotenvy::from_filename(".env.local").ok();
 
   let environment = std::env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
