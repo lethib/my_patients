@@ -2,6 +2,7 @@ use crate::{app_state::WorkerJob, config::Config};
 use std::sync::Arc;
 use tokio::sync::mpsc;
 
+pub mod appointments_export;
 pub mod downloader;
 pub mod invoice_generator;
 pub mod mailer;
@@ -26,6 +27,9 @@ pub async fn start_worker_pool(mut rx: mpsc::Receiver<WorkerJob>, config: Arc<Co
 
         let result = match job {
           WorkerJob::Email(args) => mailer::worker::process_email(args, &config_clone).await,
+          WorkerJob::AccountingReport(args, state) => {
+            appointments_export::process_appointment_extraction(args, state).await
+          }
         };
 
         if let Err(e) = result {

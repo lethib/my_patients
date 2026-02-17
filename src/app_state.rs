@@ -2,7 +2,7 @@ use crate::config::Config;
 use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct AppState {
   pub db: DatabaseConnection,
   pub config: Arc<Config>,
@@ -27,4 +27,5 @@ impl AppState {
 #[derive(Debug, Clone)]
 pub enum WorkerJob {
   Email(crate::workers::mailer::args::EmailArgs),
+  AccountingReport(crate::workers::appointments_export::Args, AppState),
 }

@@ -13,7 +13,7 @@ use crate::{
     },
     users::{LoginParams, RegisterParams},
   },
-  services,
+  services::{self},
   views::auth::{CurrentResponse, LoginResponse},
   workers::mailer::args::EmailArgs,
 };
@@ -202,5 +202,5 @@ pub async fn check_access_key(
     return Ok(Json(serde_json::json!({ "token": token })));
   }
 
-  Err(ApplicationError::new("access_key_not_recognized".to_string()).into())
+  Err(ApplicationError::new("access_key_not_recognized").into())
 }

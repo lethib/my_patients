@@ -1,5 +1,5 @@
 use crate::{
-  app_state::AppState,
+  app_state::{AppState, WorkerJob},
   middleware::auth::AuthenticatedUser,
   models::{
     _entities::prelude::UserBusinessInformations,
@@ -8,6 +8,7 @@ use crate::{
   },
   services::{self, storage::StorageService},
   views::practitioner_office::PractitionerOffice,
+  workers::appointments_export,
 };
 use axum::{
   debug_handler,
@@ -15,8 +16,16 @@ use axum::{
   http::status,
   Json,
 };
+use chrono::NaiveDate;
 use image::{imageops::FilterType, ImageFormat};
 use sea_orm::{ActiveModelTrait, ActiveValue, IntoActiveModel, ModelTrait};
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+pub struct ExtractMedicalAppointmentsParams {
+  start_date: String,
+  end_date: String,
+}
 
 #[debug_handler]
 pub async fn save_business_info(
@@ -42,6 +51,33 @@ pub async fn my_offices(
     .collect();
 
   Ok(Json(serialized_offices))
+}
+
+#[debug_handler]
+pub async fn extract_medical_appointments(
+  State(state): State<AppState>,
+  AuthenticatedUser(current_user, _): AuthenticatedUser,
+  Json(params): Json<ExtractMedicalAppointmentsParams>,
+) -> Result<status::StatusCode, MyErrors> {
+  let start_date = NaiveDate::parse_from_str(params.start_date.as_str(), "%Y-%m-%d")?;
+  let end_date = NaiveDate::parse_from_str(params.end_date.as_str(), "%Y-%m-%d")?;
+
+  if start_date >= end_date {
+    return Err(ApplicationError::new("start_date_before_end_date").into());
+  }
+
+  let args = appointments_export::Args {
+    user: current_user,
+    start_date: start_date,
+    end_date: end_date,
+  };
+
+  state
+    .worker_transmitter
+    .send(WorkerJob::AccountingReport(args, state.clone()))
+    .await?;
+
+  Ok(status::StatusCode::NO_CONTENT)
 }
 
 #[debug_handler]

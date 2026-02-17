@@ -16,7 +16,7 @@ export const FormDatePicker: React.FC<Props> = ({ name, label, disabled }) => {
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className="flex-1">
           <FormControl>
             <DatePicker
               label={label}

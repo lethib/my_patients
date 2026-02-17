@@ -1,3 +1,4 @@
+pub mod appointments;
 pub mod crypto;
 pub mod invoice;
 pub mod patients;

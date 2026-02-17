@@ -43,7 +43,7 @@ impl AuthStatement {
   pub fn authenticated_user(self) -> Self {
     self.check(
       |s| s.auth_context.current_user.is_some(),
-      Some(AuthenticationError::InvalidCredentials.into()),
+      Some(AuthenticationError::InvalidToken.into()),
     )
   }
 
