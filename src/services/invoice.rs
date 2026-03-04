@@ -3,8 +3,8 @@ use crate::{
   initializers::get_services,
   models::{
     _entities::{
-      patients, practitioner_offices::Entity as PractitionerOffices, user_business_informations,
-      users,
+      patients, practitioner_offices::Entity as PractitionerOffices,
+      sea_orm_active_enums::PaymentMethod, user_business_informations, users,
     },
     medical_appointments::{ActiveModel as MedicalAppointments, CreateMedicalAppointmentParams},
     my_errors::{application_error::ApplicationError, unexpected_error::UnexpectedError, MyErrors},
@@ -25,6 +25,7 @@ pub struct GenerateInvoiceParams {
   pub invoice_date: String,
   pub should_be_sent_by_email: bool,
   pub practitioner_office_id: i32,
+  pub payment_method: Option<PaymentMethod>,
 }
 
 pub struct GenerateInvoiceResponse {
@@ -108,6 +109,7 @@ pub async fn generate_patient_invoice(
     user_id: current_user.id,
     patient_id: *patient_id,
     practitioner_office_id: params.practitioner_office_id,
+    payment_method: params.payment_method.clone(),
     date: invoice_date,
     price_in_cents: (params.amount * 100.0).round() as i32,
   };

@@ -214,7 +214,8 @@
       "sendInvoiceByEmail": "Envoi de la facture par email",
       "emailSentConfirmation": "La facture a été envoyée par email avec succès",
       "missingInformationAlert": "Vous devez compléter vos informations professionnelles avant de pouvoir générer une facture",
-      "missingPatientAddressMail": "Le patient n'a pas d'adresse mail. Veuillez mettre à jour les informations du patient pour pouvoir envoyer la facture par mail."
+      "missingPatientAddressMail": "Le patient n'a pas d'adresse mail. Veuillez mettre à jour les informations du patient pour pouvoir envoyer la facture par mail.",
+      "paymentMethodHint": "Le mode de paiement n'apparaîtra pas sur la facture"
     },
     "errors": {
       "invalidAmount": "Veuillez entrer un montant valide supérieur à 0",
@@ -282,6 +283,12 @@
     "uploadSuccess": "Signature téléchargée avec succès !",
     "uploadError": "Erreur lors du téléchargement de la signature. Veuillez réessayer."
   },
+  "paymentMethods": {
+    "Cash": "Espèces",
+    "Card": "Carte bancaire",
+    "Check": "Chèque",
+    "Transfer": "Virement"
+  },
   "appointments": {
     "title": "Rendez-vous",
     "subtitle": "Gérer les rendez-vous médicaux de ce patient",
@@ -290,9 +297,12 @@
     "table": {
       "date": "Date",
       "office": "Cabinet",
-      "price": "Prix"
+      "price": "Prix",
+      "paymentMethod": "Mode de paiement"
     },
     "form": {
+      "paymentMethod": "Moyen de paiement",
+      "selectPaymentMethod": "Sélectionnez un moyen de paiement",
       "title": {
         "create": "Nouveau rendez-vous",
         "edit": "Modifier le rendez-vous"
@@ -347,6 +357,7 @@
     "reset": "Réinitialiser",
     "optional": "optionnel",
     "required": "requis",
+    "unspecified": "Non spécifié",
     "errors": {
       "start_date_before_end_date": "La date de début doit être antérieure à la date de fin"
     }

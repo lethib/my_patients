@@ -1,12 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "@tanstack/react-router";
-import { CircleAlert, FileText, Loader2 } from "lucide-react";
+import { CircleAlert, FileText, HandCoins, Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
 import { APIHooks } from "@/api/hooks";
-import { type SearchPatientResponse } from "@/api/hooks/patient";
+import {
+  PAYMENT_METHODS,
+  type SearchPatientResponse,
+} from "@/api/hooks/patient";
 import { FormDatePicker } from "@/components/form/FormDatePicker";
 import { FormInput } from "@/components/form/FormInput";
 import { FormProvider } from "@/components/form/FormProvider";
@@ -62,6 +65,7 @@ export const GenerateInvoiceContent = ({
     practitionerOfficeId: z
       .string()
       .min(1, t("invoice.errors.officeMustBeSelected")),
+    paymentMethod: z.enum(PAYMENT_METHODS).optional(),
   });
 
   type InvoiceFormData = z.infer<typeof invoiceFormSchema>;
@@ -105,6 +109,7 @@ export const GenerateInvoiceContent = ({
         invoice_date: `${year}-${month}-${day}`,
         should_be_sent_by_email: data.shouldSendInvoiceByEmail,
         practitioner_office_id: +data.practitionerOfficeId,
+        payment_method: data.paymentMethod ?? null,
       })
       .then(({ blob, filename }) => {
         setGeneratedInvoice({ blob, filename });
@@ -189,6 +194,28 @@ export const GenerateInvoiceContent = ({
                 label: office.name,
               })) || []
             }
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="office">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <HandCoins className="h-4 w-4" />
+                {t("appointments.form.paymentMethod")}
+              </div>
+              <small className="text-xs italic text-muted-foreground">
+                {t("invoice.modal.paymentMethodHint")}
+              </small>
+            </div>
+          </Label>
+          <FormSelect
+            name="paymentMethod"
+            placeholder={t("appointments.form.selectPaymentMethod")}
+            options={PAYMENT_METHODS.map((method) => ({
+              value: method,
+              label: t(`paymentMethods.${method}`),
+            }))}
           />
         </div>
 

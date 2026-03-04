@@ -54,13 +54,18 @@ export type MedicalAppointment = {
   id: number;
   date: string;
   price_in_cents: number;
+  payment_method: PaymentMethod | null;
   office: PractitionerOffice;
 };
+
+export const PAYMENT_METHODS = ["Cash", "Card", "Check", "Transfer"] as const;
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
 export type MedicalAppointmentParams = {
   date: string;
   price_in_cents: number;
   practitioner_office_id: number;
+  payment_method: PaymentMethod | null;
 };
 
 export const patientSchema = {
@@ -118,12 +123,14 @@ export const patientSchema = {
           invoice_date,
           should_be_sent_by_email,
           practitioner_office_id,
+          payment_method,
         }: {
           patientId: number;
           amount: number;
           invoice_date: string;
           should_be_sent_by_email: boolean;
           practitioner_office_id: number;
+          payment_method: PaymentMethod | null;
         }) => {
           const response = await APIClient.client.post<{
             pdf_data: string;
@@ -133,6 +140,7 @@ export const patientSchema = {
             invoice_date,
             should_be_sent_by_email,
             practitioner_office_id,
+            payment_method,
           });
 
           // Decode base64 PDF data to blob

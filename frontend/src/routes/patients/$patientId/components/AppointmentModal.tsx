@@ -1,15 +1,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { MutationFunction } from "@tanstack/react-query";
-import { Calendar, Euro, MapPin } from "lucide-react";
+import { Calendar, Euro, HandCoins, MapPin } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
 import { queryClient } from "@/api/api";
 import { APIHooks } from "@/api/hooks";
-import type {
-  MedicalAppointment,
-  MedicalAppointmentParams,
+import {
+  type MedicalAppointment,
+  type MedicalAppointmentParams,
+  PAYMENT_METHODS,
 } from "@/api/hooks/patient";
 import { FormDatePicker } from "@/components/form/FormDatePicker";
 import { FormInput } from "@/components/form/FormInput";
@@ -66,6 +67,7 @@ export const AppointmentModal = ({
         },
         { message: t("invoice.errors.invalidAmount") },
       ),
+    payment_method: z.enum(PAYMENT_METHODS).optional(),
   });
 
   const form = useForm({
@@ -114,6 +116,7 @@ export const AppointmentModal = ({
       practitioner_office_id: Number(data.practitioner_office_id),
       date: dateString,
       price_in_cents: Math.round(data.price * 100),
+      payment_method: data.payment_method ?? null,
     }).then(() => {
       queryClient.invalidateQueries({
         queryKey: [`/patient/${patientId}/medical_appointments`, null],
@@ -180,6 +183,23 @@ export const AppointmentModal = ({
                 <span className="text-muted-foreground text-sm">€</span>
               </div>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="office">
+              <div className="flex items-center gap-2">
+                <HandCoins className="h-4 w-4" />
+                {t("appointments.form.paymentMethod")}
+              </div>
+            </Label>
+            <FormSelect
+              name="payment_method"
+              placeholder={t("appointments.form.selectPaymentMethod")}
+              options={PAYMENT_METHODS.map((method) => ({
+                value: method,
+                label: t(`paymentMethods.${method}`),
+              }))}
+            />
           </div>
 
           <div className="flex gap-2 justify-end pt-4">
