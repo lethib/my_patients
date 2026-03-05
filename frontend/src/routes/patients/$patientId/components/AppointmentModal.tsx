@@ -89,6 +89,10 @@ export const AppointmentModal = ({
         selectedAppointment.office.id.toString(),
       );
       form.setValue("price", selectedAppointment.price_in_cents / 100);
+      form.setValue(
+        "payment_method",
+        selectedAppointment.payment_method ?? undefined,
+      );
       return;
     }
 
@@ -186,7 +190,7 @@ export const AppointmentModal = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="office">
+            <Label htmlFor="payment_method">
               <div className="flex items-center gap-2">
                 <HandCoins className="h-4 w-4" />
                 {t("appointments.form.paymentMethod")}

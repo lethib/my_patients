@@ -198,7 +198,7 @@ export const GenerateInvoiceContent = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="office">
+          <Label htmlFor="paymentMethod">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <HandCoins className="h-4 w-4" />
