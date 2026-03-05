@@ -1,6 +1,6 @@
 use chrono::NaiveDate;
 use rust_xlsxwriter::*;
-use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, QueryOrder};
+use sea_orm::{ActiveEnum, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, QueryOrder};
 use std::collections::HashMap;
 
 use crate::models::{
@@ -60,8 +60,11 @@ impl ToExcel for Vec<MedicalAppointmentDetail> {
       worksheet.write_with_format(0, 2, "last_name", &header_format)?;
       worksheet.set_column_width(2, 20)?;
 
-      worksheet.write_with_format(0, 3, "price_in_euros", &header_format)?;
-      worksheet.set_column_width(3, 20)?;
+      worksheet.write_with_format(0, 3, "payment_method", &header_format)?;
+      worksheet.set_column_width(3, 15)?;
+
+      worksheet.write_with_format(0, 4, "price_in_euros", &header_format)?;
+      worksheet.set_column_width(4, 20)?;
 
       for (i, (appointment, patient, _office)) in office_appointments.iter().enumerate() {
         let excel_date = ExcelDateTime::parse_from_str(&appointment.date.to_string())?;
@@ -69,7 +72,12 @@ impl ToExcel for Vec<MedicalAppointmentDetail> {
 
         worksheet.write(i as u32 + 1, 1, &patient.first_name)?;
         worksheet.write(i as u32 + 1, 2, &patient.last_name)?;
-        worksheet.write(i as u32 + 1, 3, appointment.price_in_cents as f64 / 100.0)?;
+        worksheet.write(
+          i as u32 + 1,
+          3,
+          appointment.payment_method.clone().map(|p| p.to_value()),
+        )?;
+        worksheet.write(i as u32 + 1, 4, appointment.price_in_cents as f64 / 100.0)?;
       }
     }
 
