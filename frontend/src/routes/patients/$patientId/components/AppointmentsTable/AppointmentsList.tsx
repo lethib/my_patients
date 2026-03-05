@@ -1,4 +1,5 @@
 import { Edit, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { APIHooks } from "@/api/hooks";
 import type { MedicalAppointment } from "@/api/hooks/patient";
 import { Button } from "@/components/ui";
@@ -16,6 +17,7 @@ export const AppointmentsList = ({
   onClickEditAppointment,
   onClickDeleteAppointment,
 }: Props) => {
+  const { t } = useTranslation();
   const medicalAppointmentsQuery = APIHooks.patient
     .getMedicalAppointments(patientId)
     .useQuery(null);
@@ -52,6 +54,13 @@ export const AppointmentsList = ({
           <TableCell className="px-4 py-4">
             <span className="font-mono font-medium">
               {(appointment.price_in_cents / 100).toFixed(2)} €
+            </span>
+          </TableCell>
+          <TableCell align="center" className="px-4 py-4">
+            <span className="font-medium">
+              {appointment.payment_method
+                ? t(`paymentMethods.${appointment.payment_method}`)
+                : t("common.unspecified")}
             </span>
           </TableCell>
           <TableCell align="right" className="space-x-1">

@@ -13,7 +13,7 @@ use crate::{
   auth::statement::AuthStatement,
   middleware::auth::AuthenticatedUser,
   models::{
-    _entities::medical_appointments,
+    _entities::{medical_appointments, sea_orm_active_enums::PaymentMethod},
     medical_appointments::{CreateMedicalAppointmentParams, UpdateMedicalAppointmentParams},
     my_errors::{application_error::ApplicationError, MyErrors},
   },
@@ -24,6 +24,7 @@ pub struct MedicalAppointmentPayload {
   date: String,
   practitioner_office_id: i32,
   price_in_cents: i32,
+  payment_method: Option<PaymentMethod>,
 }
 
 pub async fn delete(
@@ -72,6 +73,7 @@ pub async fn update(
     date: appointment_date,
     practitioner_office_id: params.practitioner_office_id,
     price_in_cents: params.price_in_cents,
+    payment_method: params.payment_method,
   };
 
   medical_appointment
@@ -101,6 +103,7 @@ pub async fn create(
     price_in_cents: params.price_in_cents,
     user_id: current_user.id,
     patient_id: patient_id,
+    payment_method: params.payment_method,
   };
 
   medical_appointments::ActiveModel::create(&state.db, &medical_appointments_params).await?;

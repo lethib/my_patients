@@ -1,6 +1,9 @@
 use sea_orm::{entity::prelude::*, ActiveValue};
 
-use crate::{auth::resource::Resource, models::my_errors::MyErrors};
+use crate::{
+  auth::resource::Resource,
+  models::{_entities::sea_orm_active_enums::PaymentMethod, my_errors::MyErrors},
+};
 
 pub use super::_entities::medical_appointments::{ActiveModel, Entity, Model};
 
@@ -8,6 +11,7 @@ pub struct UpdateMedicalAppointmentParams {
   pub date: Date,
   pub price_in_cents: i32,
   pub practitioner_office_id: i32,
+  pub payment_method: Option<PaymentMethod>,
 }
 
 pub struct CreateMedicalAppointmentParams {
@@ -16,6 +20,7 @@ pub struct CreateMedicalAppointmentParams {
   pub practitioner_office_id: i32,
   pub date: Date,
   pub price_in_cents: i32,
+  pub payment_method: Option<PaymentMethod>,
 }
 
 #[async_trait::async_trait]
@@ -47,6 +52,7 @@ impl ActiveModel {
     self.date = ActiveValue::Set(params.date);
     self.practitioner_office_id = ActiveValue::Set(params.practitioner_office_id);
     self.price_in_cents = ActiveValue::Set(params.price_in_cents);
+    self.payment_method = ActiveValue::Set(params.payment_method.clone());
 
     self.save(db).await?;
 
@@ -63,6 +69,7 @@ impl ActiveModel {
       practitioner_office_id: ActiveValue::Set(params.practitioner_office_id),
       date: ActiveValue::Set(params.date),
       price_in_cents: ActiveValue::Set(params.price_in_cents),
+      payment_method: ActiveValue::Set(params.payment_method.clone()),
       ..Default::default()
     }
     .insert(db)

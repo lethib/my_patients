@@ -1,12 +1,12 @@
-import { Calendar, Euro, MapPin } from "lucide-react";
+import { Calendar, Euro, HandCoins, MapPin } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { queryClient } from "@/api/api";
 import { APIHooks } from "@/api/hooks";
 import type { MedicalAppointment } from "@/api/hooks/patient";
 import { Table, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AppointmentModal } from "../AppointmentModal";
 import { AppointmentsList } from "./AppointmentsList";
-import { queryClient } from "@/api/api";
 
 interface Props {
   patientId: number;
@@ -63,6 +63,12 @@ export const AppointmentsTable = ({ patientId }: Props) => {
                 <div className="flex items-center gap-2">
                   <Euro className="h-4 w-4" />
                   {t("appointments.table.price")}
+                </div>
+              </TableHead>
+              <TableHead className="h-12 px-4 font-semibold text-foreground text-center">
+                <div className="flex items-center justify-center gap-2">
+                  <HandCoins className="h-4 w-4" />
+                  {t("appointments.table.paymentMethod")}
                 </div>
               </TableHead>
               <TableHead className="h-12 px-4 font-semibold text-foreground"></TableHead>
