@@ -110,6 +110,7 @@ COPY --from=rust-deps /app/target target
 COPY Cargo.toml Cargo.lock ./
 COPY migration/ migration/
 COPY src/ src/
+RUN mkdir -p tests && touch tests/bdd.rs
 
 # Build application with optimizations
 # Using explicit target for consistent builds across architectures
