@@ -45,10 +45,8 @@ pub async fn my_offices(
 ) -> Result<Json<Vec<PractitionerOffice>>, MyErrors> {
   let my_offices = current_user.get_my_offices(&state.db).await?;
 
-  let serialized_offices: Vec<PractitionerOffice> = my_offices
-    .iter()
-    .map(|office| PractitionerOffice::new(office))
-    .collect();
+  let serialized_offices: Vec<PractitionerOffice> =
+    my_offices.iter().map(PractitionerOffice::new).collect();
 
   Ok(Json(serialized_offices))
 }
@@ -68,8 +66,8 @@ pub async fn extract_medical_appointments(
 
   let args = appointments_export::Args {
     user: current_user,
-    start_date: start_date,
-    end_date: end_date,
+    start_date,
+    end_date,
   };
 
   state

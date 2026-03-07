@@ -124,7 +124,7 @@ pub fn create_router(state: AppState) -> Router {
   cors_layer = cors_layer.allow_headers(headers);
 
   // Combine all routes
-  let app = Router::new()
+  Router::new()
     .merge(public_routes)
     .merge(protected_routes)
     // Serve static files for frontend
@@ -134,7 +134,5 @@ pub fn create_router(state: AppState) -> Router {
     // HTTP request tracing middleware
     .layer(TraceLayer::new_for_http())
     .layer(cors_layer)
-    .with_state(state);
-
-  app
+    .with_state(state)
 }

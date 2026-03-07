@@ -12,7 +12,7 @@ impl EmailAttachment {
     Self {
       filename,
       content_type,
-      data: base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &data),
+      data: base64::Engine::encode(&base64::engine::general_purpose::STANDARD, data),
     }
   }
 

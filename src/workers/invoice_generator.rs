@@ -202,6 +202,7 @@ fn embed_signature_image(
 }
 
 /// Create a simple invoice PDF matching the provided template
+#[allow(clippy::too_many_arguments)]
 fn create_modern_invoice_pdf(
   user: &users::Model,
   business_info: &user_business_informations::Model,

@@ -44,7 +44,7 @@ pub async fn get(
     .ok_or(ApplicationError::NotFound)?;
 
   authorize
-    .is_owning_resource(&patient)
+    .user_owning_resource(&patient)
     .await
     .run_complete()?;
 
@@ -75,7 +75,7 @@ pub async fn update(
     .ok_or(ApplicationError::NotFound)?;
 
   authorize
-    .is_owning_resource(&patient)
+    .user_owning_resource(&patient)
     .await
     .run_complete()?;
 
@@ -96,7 +96,7 @@ pub async fn delete(
     .ok_or(ApplicationError::NotFound)?;
 
   authorize
-    .is_owning_resource(&patient)
+    .user_owning_resource(&patient)
     .await
     .run_complete()?;
 
@@ -112,10 +112,8 @@ pub async fn search_by_ssn(
 ) -> Result<Json<Vec<PatientResponse>>, MyErrors> {
   let found_patients = Model::search_by_ssn(&state.db, &params.ssn).await?;
 
-  let serialized_patients: Vec<PatientResponse> = found_patients
-    .iter()
-    .map(|patient| PatientResponse::new(patient))
-    .collect();
+  let serialized_patients: Vec<PatientResponse> =
+    found_patients.iter().map(PatientResponse::new).collect();
 
   Ok(Json(serialized_patients))
 }
@@ -137,10 +135,8 @@ pub async fn search(
   let (patients, total_pages) =
     services::patients::search_paginated(query, page, &current_user).await?;
 
-  let patient_responses: Vec<PatientResponse> = patients
-    .iter()
-    .map(|p| PatientResponse::from_model(&p))
-    .collect();
+  let patient_responses: Vec<PatientResponse> =
+    patients.iter().map(PatientResponse::from_model).collect();
 
   Ok(Json(serde_json::json!({
     "paginated_data": patient_responses,

@@ -60,18 +60,16 @@ impl ActiveModel {
     params: &CreateBusinessInformation,
     concerned_user_id: &i32,
   ) -> Result<Model, DbErr> {
-    Ok(
-      user_business_informations::ActiveModel {
-        user_id: ActiveValue::Set(*concerned_user_id),
-        rpps_number: ActiveValue::Set(params.rpps_number.clone()),
-        siret_number: ActiveValue::Set(params.siret_number.clone()),
-        adeli_number: ActiveValue::Set(params.adeli_number.clone()),
-        profession: ActiveValue::Set(params.profession_enum()?),
-        ..Default::default()
-      }
-      .insert(db)
-      .await?,
-    )
+    user_business_informations::ActiveModel {
+      user_id: ActiveValue::Set(*concerned_user_id),
+      rpps_number: ActiveValue::Set(params.rpps_number.clone()),
+      siret_number: ActiveValue::Set(params.siret_number.clone()),
+      adeli_number: ActiveValue::Set(params.adeli_number.clone()),
+      profession: ActiveValue::Set(params.profession_enum()?),
+      ..Default::default()
+    }
+    .insert(db)
+    .await
   }
 }
 

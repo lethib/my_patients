@@ -47,7 +47,7 @@ impl AuthStatement {
     )
   }
 
-  pub async fn is_owning_resource<T: Resource>(self, resource: &T) -> Self {
+  pub async fn user_owning_resource<T: Resource>(self, resource: &T) -> Self {
     let is_owned = match &self.auth_context.current_user {
       Some(user) => resource.is_owned_by_user(user.0.id).await,
       None => false,
@@ -87,11 +87,11 @@ impl AuthStatement {
     }
 
     if predicate(&self) {
-      return self;
+      self
     } else {
       self.ok_so_far = false;
       self.error = error;
-      return self;
+      self
     }
   }
 }

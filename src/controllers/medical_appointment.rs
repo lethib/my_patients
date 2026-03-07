@@ -39,7 +39,7 @@ pub async fn delete(
     .ok_or(ApplicationError::NotFound)?;
 
   authorize
-    .is_owning_resource(&medical_appointment)
+    .user_owning_resource(&medical_appointment)
     .await
     .run_complete()?;
 
@@ -62,7 +62,7 @@ pub async fn update(
     .ok_or(ApplicationError::NotFound)?;
 
   authorize
-    .is_owning_resource(&medical_appointment)
+    .user_owning_resource(&medical_appointment)
     .await
     .run_complete()?;
 
@@ -102,7 +102,7 @@ pub async fn create(
     practitioner_office_id: params.practitioner_office_id,
     price_in_cents: params.price_in_cents,
     user_id: current_user.id,
-    patient_id: patient_id,
+    patient_id,
     payment_method: params.payment_method,
   };
 

@@ -40,7 +40,10 @@ pub async fn update(
     .await?
     .ok_or(ApplicationError::NotFound)?;
 
-  authorize.is_owning_resource(&office).await.run_complete()?;
+  authorize
+    .user_owning_resource(&office)
+    .await
+    .run_complete()?;
 
   let mut office = office.clone().into_active_model();
   office.name = Set(params.name.trim().to_string());
@@ -64,7 +67,10 @@ pub async fn destroy(
     .await?
     .ok_or(ApplicationError::NotFound)?;
 
-  authorize.is_owning_resource(&office).await.run_complete()?;
+  authorize
+    .user_owning_resource(&office)
+    .await
+    .run_complete()?;
 
   office.clone().delete(&state.db).await?;
 
