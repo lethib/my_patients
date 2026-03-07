@@ -44,7 +44,7 @@ export const ConfirmPatientDeleteModal = ({
           <DialogDescription>
             {t("patients.deleteModal.description", {
               firstName: patient.first_name,
-              lastName: patient.last_name
+              lastName: patient.last_name,
             })}
           </DialogDescription>
         </DialogHeader>
