@@ -57,7 +57,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   let addr = format!("{}:{}", config.server.binding, config.server.port);
   let listener = tokio::net::TcpListener::bind(&addr)
     .await
-    .expect(&format!("Failed to bind to address: {}", addr));
+    .unwrap_or_else(|_| panic!("Failed to bind to address: {}", addr));
 
   tracing::info!(
     "Server listening on {}:{}",

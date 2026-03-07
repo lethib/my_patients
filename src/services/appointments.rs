@@ -32,7 +32,7 @@ impl ToExcel for Vec<MedicalAppointmentDetail> {
       let office_name = appointment.2.name.clone();
       appointments_by_office
         .entry(office_name)
-        .or_insert_with(Vec::new)
+        .or_default()
         .push(appointment);
     }
 

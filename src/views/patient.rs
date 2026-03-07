@@ -21,7 +21,7 @@ impl PatientResponse {
   pub fn new(patient: &patients::Model) -> Self {
     Self {
       id: patient.id,
-      pid: patient.pid.clone(),
+      pid: patient.pid,
       first_name: patient.first_name.clone(),
       last_name: patient.last_name.clone(),
       email: (patient.email != patients::DEFAULT_EMAIL).then(|| patient.email.clone()),
@@ -39,7 +39,7 @@ impl PatientResponse {
   pub fn from_model(patient: &patients::Model) -> Self {
     Self {
       id: patient.id,
-      pid: patient.pid.clone(),
+      pid: patient.pid,
       first_name: patient.first_name.clone(),
       last_name: patient.last_name.clone(),
       email: (patient.email != patients::DEFAULT_EMAIL).then(|| patient.email.clone()),

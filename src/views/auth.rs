@@ -42,10 +42,7 @@ impl CurrentResponse {
       first_name: user.0.first_name.clone(),
       last_name: user.0.last_name.clone(),
       email: user.0.email.clone(),
-      business_information: user
-        .1
-        .as_ref()
-        .map(|business_information| BusinessInformation::new(&business_information)),
+      business_information: user.1.as_ref().map(BusinessInformation::new),
     }
   }
 }

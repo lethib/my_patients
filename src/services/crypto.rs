@@ -22,9 +22,9 @@ impl Crypto {
       return Err(UnexpectedError::ShouldNotHappen.into());
     }
 
-    return Ok(Crypto {
+    Ok(Crypto {
       encryption_key: *Key::<Aes256Gcm>::from_slice(key_string.as_bytes()),
-    });
+    })
   }
 
   pub fn encrypt(str_to_encrypt: &str) -> Result<String, MyErrors> {
@@ -58,7 +58,7 @@ impl Crypto {
     let nonce = Nonce::from_slice(nonce_bytes);
 
     let decrypted_bytes = cipher
-      .decrypt(&nonce, encrypted_data)
+      .decrypt(nonce, encrypted_data)
       .map_err(|err| UnexpectedError::new(err.to_string()))?;
 
     String::from_utf8(decrypted_bytes).map_err(|err| UnexpectedError::new(err.to_string()).into())
