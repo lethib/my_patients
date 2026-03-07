@@ -2,7 +2,6 @@ use my_patients::models::patients::{
   ActiveModel as PatientActiveModel, CreatePatientParams, Model as PatientModel,
 };
 use sea_orm::DatabaseConnection;
-use serde_json::json;
 
 pub struct PatientFactory {
   first_name: String,
@@ -44,17 +43,17 @@ impl PatientFactory {
   }
 
   pub async fn create(self, db: &DatabaseConnection, user_id: i32) -> PatientModel {
-    let params: CreatePatientParams = serde_json::from_value(json!({
-        "pid": null,
-        "first_name": self.first_name,
-        "last_name": self.last_name,
-        "ssn": self.ssn,
-        "address_line_1": self.address_line_1,
-        "address_zip_code": self.address_zip_code,
-        "address_city": self.address_city,
-        "email": self.email,
-    }))
-    .unwrap();
+    let params = CreatePatientParams {
+      first_name: self.first_name,
+      last_name: self.last_name,
+      ssn: self.ssn,
+      address_line_1: self.address_line_1,
+      address_zip_code: self.address_zip_code,
+      address_city: self.address_city,
+      email: self.email,
+      pid: None,
+    };
+
     PatientActiveModel::create(db, &params, user_id)
       .await
       .unwrap()

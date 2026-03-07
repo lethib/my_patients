@@ -21,9 +21,6 @@ pub struct AppWorld {
 
 impl AppWorld {
   async fn new() -> Self {
-    std::env::set_var("SSN_ENCRYPTION_KEY", "12345678901234567890123456789012");
-    std::env::set_var("SSN_SALT_KEY", "bdd_test_salt_key_for_patients!!");
-
     let db_url =
       std::env::var("TEST_DATABASE_URL").unwrap_or_else(|_| DEFAULT_TEST_DATABASE_URL.to_string());
 
@@ -66,7 +63,8 @@ pub struct AppointmentsState {
 
 #[tokio::main]
 async fn main() {
-  // Run migrations once before all scenarios
+  std::env::set_var("SSN_SALT_KEY", "bdd_test_salt_key_for_patients!!");
+
   let db_url =
     std::env::var("TEST_DATABASE_URL").unwrap_or_else(|_| DEFAULT_TEST_DATABASE_URL.to_string());
   let db = Database::connect(&db_url).await.unwrap();
