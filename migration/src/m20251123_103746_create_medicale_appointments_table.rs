@@ -49,11 +49,18 @@ impl MigrationTrait for Migration {
       )
       .await?;
 
-    // Using created_at::date as the date value for migrated records
+    // Copy existing data from patient_users if it exists.
+    // Uses a DO/EXCEPTION block because on a fresh DB the table won't exist,
+    // and in some environments practitioner_office_id was never added to patient_users.
     let copy_data_sql = r#"
-      INSERT INTO medical_appointments (user_id, patient_id, practitioner_office_id, date, created_at, updated_at)
-      SELECT user_id, patient_id, practitioner_office_id, created_at::date, created_at, updated_at
-      FROM patient_users
+      DO $$ BEGIN
+        INSERT INTO medical_appointments (user_id, patient_id, practitioner_office_id, date, created_at, updated_at)
+        SELECT user_id, patient_id, COALESCE(practitioner_office_id, 0), created_at::date, created_at, updated_at
+        FROM patient_users;
+      EXCEPTION
+        WHEN undefined_table THEN NULL;
+        WHEN undefined_column THEN NULL;
+      END $$;
     "#;
     let stmt = Statement::from_string(manager.get_database_backend(), copy_data_sql);
     manager.get_connection().execute(stmt).await?;

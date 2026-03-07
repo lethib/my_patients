@@ -6,11 +6,20 @@ services:
       POSTGRES_USER: loco
       POSTGRES_PASSWORD: loco
       POSTGRES_DB: main
-
     ports:
       - "5430:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  postgres-test:
+    container_name: db-test
+    image: postgres:15.8
+    environment:
+      POSTGRES_USER: loco
+      POSTGRES_PASSWORD: loco
+      POSTGRES_DB: my_patients_test
+    ports:
+      - "5431:5432"
 
 volumes:
   pgdata:
