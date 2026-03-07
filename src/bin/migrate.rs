@@ -66,6 +66,8 @@ fn generate_entities(database_url: &str) -> Result<(), Box<dyn Error>> {
       "entity",
       "--database-url",
       database_url,
+      "--with-serde",
+      "both",
       "-o",
       "./src/models/_entities/",
     ])
