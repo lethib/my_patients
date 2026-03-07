@@ -3,9 +3,6 @@ Feature: Sensitive data encryption and hashing
   I want to protect sensitive patient data
   In order to ensure medical confidentiality
 
-  Background:
-    Given a valid encryption key is configured
-
   Rule: AES-256-GCM encryption protects data and is reversible
 
     Scenario: Encrypting then decrypting retrieves the original value

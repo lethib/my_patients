@@ -63,6 +63,7 @@ pub struct AppointmentsState {
 
 #[tokio::main]
 async fn main() {
+  std::env::set_var("SSN_ENCRYPTION_KEY", "12345678901234567890123456789012");
   std::env::set_var("SSN_SALT_KEY", "bdd_test_salt_key_for_patients!!");
 
   let db_url =
