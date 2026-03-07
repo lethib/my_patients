@@ -8,6 +8,7 @@ enum PractitionerOffices {
   Table,
   Id,
   Name,
+  #[iden = "address_line_1"]
   AddressLine1,
   AddressZipCode,
   AddressCity,
@@ -115,25 +116,19 @@ impl MigrationTrait for Migration {
     let stmt = Statement::from_string(manager.get_database_backend(), drop_enum_sql);
     manager.get_connection().execute(stmt).await?;
 
-    // Add reference from patient_user to practitioner_offices
-    manager
-      .alter_table(
-        Table::alter()
-          .table(PatientUser::Table)
-          .add_column(ColumnDef::new(PatientUser::PractitionerOfficeId).integer().not_null())
-          .add_foreign_key(
-            TableForeignKey::new()
-              .name("fk-patient_user-practitioner_office_id")
-              .from_tbl(PatientUser::Table)
-              .from_col(PatientUser::PractitionerOfficeId)
-              .to_tbl(PractitionerOffices::Table)
-              .to_col(PractitionerOffices::Id)
-              .on_delete(ForeignKeyAction::Cascade)
-              .on_update(ForeignKeyAction::Cascade),
-          )
-          .to_owned(),
-      )
-      .await?;
+    // Add reference from patient_user to practitioner_offices.
+    // Uses a DO/EXCEPTION block because the table may have been created as
+    // "patient_users" (with 's') in earlier environments — it is dropped entirely
+    // in a later migration so this column is transient.
+    let sql = r#"
+      DO $$ BEGIN
+        ALTER TABLE patient_user
+          ADD COLUMN practitioner_office_id INTEGER NOT NULL DEFAULT 0;
+      EXCEPTION WHEN undefined_table THEN NULL;
+      END $$;
+    "#;
+    let stmt = Statement::from_string(manager.get_database_backend(), sql.to_string());
+    manager.get_connection().execute(stmt).await?;
 
     Ok(())
   }
