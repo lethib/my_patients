@@ -15,13 +15,13 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CreatePatientParams {
   pub pid: Option<String>,
-  first_name: String,
-  last_name: String,
+  pub first_name: String,
+  pub last_name: String,
   pub ssn: String,
-  address_line_1: String,
-  address_zip_code: String,
-  address_city: String,
-  email: String,
+  pub address_line_1: String,
+  pub address_zip_code: String,
+  pub address_city: String,
+  pub email: String,
 }
 
 pub const DEFAULT_EMAIL: &str = "default@mail.com";
