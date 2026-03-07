@@ -87,6 +87,9 @@ COPY --from=planner /app/recipe.json recipe.json
 COPY Cargo.toml Cargo.lock ./
 COPY migration/ migration/
 
+# Create stub test file required by Cargo.toml manifest validation
+RUN mkdir -p tests && touch tests/bdd.rs
+
 # Build dependencies with release optimizations and specific target
 # This layer will be cached unless dependencies change
 RUN cargo chef cook --release --target x86_64-unknown-linux-gnu --recipe-path recipe.json && \
