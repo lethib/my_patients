@@ -2,12 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Calendar, Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { APIHooks } from "@/api/hooks";
 import { Button } from "@/components/ui";
 import { H2 } from "@/components/ui/typography/h2";
 import { AppointmentModal } from "./components/AppointmentModal";
 import { AppointmentsTable } from "./components/AppointmentsTable/AppointmentsTable";
 import { PatientInformationCard } from "./components/PatientInformationCard";
-import { APIHooks } from "@/api/hooks";
 
 export const Route = createFileRoute("/patients/$patientId/")({
   component: PatientPage,

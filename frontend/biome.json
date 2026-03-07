@@ -4,7 +4,12 @@
   "files": {
     "ignoreUnknown": false
   },
-  "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2 },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "includes": ["**", "!dist"]
+  },
   "linter": {
     "enabled": true,
     "rules": { "recommended": false },
@@ -227,6 +232,7 @@
   ],
   "assist": {
     "enabled": true,
+    "includes": ["**", "!dist"],
     "actions": { "source": { "organizeImports": "on" } }
   }
 }

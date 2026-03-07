@@ -24,7 +24,10 @@ export const userSchema = {
     type: "GET",
     path: "/user/my_offices",
   }),
-  extractMedicalAppointment: mutationEndpoint<{ start_date: string, end_date: string }, null>({
+  extractMedicalAppointment: mutationEndpoint<
+    { start_date: string; end_date: string },
+    null
+  >({
     type: "POST",
     path: "/user/_extract_medical_appointments",
   }),

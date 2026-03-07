@@ -119,7 +119,6 @@ export const PatientModal = ({
     });
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: dependencies controlled manually
   useEffect(() => {
     if (open && currentPatient) {
       addPatientForm.reset({

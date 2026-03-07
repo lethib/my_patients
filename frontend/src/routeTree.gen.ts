@@ -8,170 +8,170 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as Reset_passwordRouteImport } from './routes/reset_password'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as PatientsIndexRouteImport } from './routes/patients/index'
-import { Route as OfficesIndexRouteImport } from './routes/offices/index'
-import { Route as My_informationIndexRouteImport } from './routes/my_information/index'
-import { Route as LoginIndexRouteImport } from './routes/login/index'
-import { Route as PatientsPatientIdIndexRouteImport } from './routes/patients/$patientId/index'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as LoginIndexRouteImport } from "./routes/login/index";
+import { Route as My_informationIndexRouteImport } from "./routes/my_information/index";
+import { Route as OfficesIndexRouteImport } from "./routes/offices/index";
+import { Route as PatientsPatientIdIndexRouteImport } from "./routes/patients/$patientId/index";
+import { Route as PatientsIndexRouteImport } from "./routes/patients/index";
+import { Route as Reset_passwordRouteImport } from "./routes/reset_password";
 
 const Reset_passwordRoute = Reset_passwordRouteImport.update({
-  id: '/reset_password',
-  path: '/reset_password',
+  id: "/reset_password",
+  path: "/reset_password",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const PatientsIndexRoute = PatientsIndexRouteImport.update({
-  id: '/patients/',
-  path: '/patients/',
+  id: "/patients/",
+  path: "/patients/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const OfficesIndexRoute = OfficesIndexRouteImport.update({
-  id: '/offices/',
-  path: '/offices/',
+  id: "/offices/",
+  path: "/offices/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const My_informationIndexRoute = My_informationIndexRouteImport.update({
-  id: '/my_information/',
-  path: '/my_information/',
+  id: "/my_information/",
+  path: "/my_information/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const LoginIndexRoute = LoginIndexRouteImport.update({
-  id: '/login/',
-  path: '/login/',
+  id: "/login/",
+  path: "/login/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const PatientsPatientIdIndexRoute = PatientsPatientIdIndexRouteImport.update({
-  id: '/patients/$patientId/',
-  path: '/patients/$patientId/',
+  id: "/patients/$patientId/",
+  path: "/patients/$patientId/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/reset_password': typeof Reset_passwordRoute
-  '/login': typeof LoginIndexRoute
-  '/my_information': typeof My_informationIndexRoute
-  '/offices': typeof OfficesIndexRoute
-  '/patients': typeof PatientsIndexRoute
-  '/patients/$patientId': typeof PatientsPatientIdIndexRoute
+  "/": typeof IndexRoute;
+  "/reset_password": typeof Reset_passwordRoute;
+  "/login": typeof LoginIndexRoute;
+  "/my_information": typeof My_informationIndexRoute;
+  "/offices": typeof OfficesIndexRoute;
+  "/patients": typeof PatientsIndexRoute;
+  "/patients/$patientId": typeof PatientsPatientIdIndexRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/reset_password': typeof Reset_passwordRoute
-  '/login': typeof LoginIndexRoute
-  '/my_information': typeof My_informationIndexRoute
-  '/offices': typeof OfficesIndexRoute
-  '/patients': typeof PatientsIndexRoute
-  '/patients/$patientId': typeof PatientsPatientIdIndexRoute
+  "/": typeof IndexRoute;
+  "/reset_password": typeof Reset_passwordRoute;
+  "/login": typeof LoginIndexRoute;
+  "/my_information": typeof My_informationIndexRoute;
+  "/offices": typeof OfficesIndexRoute;
+  "/patients": typeof PatientsIndexRoute;
+  "/patients/$patientId": typeof PatientsPatientIdIndexRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/reset_password': typeof Reset_passwordRoute
-  '/login/': typeof LoginIndexRoute
-  '/my_information/': typeof My_informationIndexRoute
-  '/offices/': typeof OfficesIndexRoute
-  '/patients/': typeof PatientsIndexRoute
-  '/patients/$patientId/': typeof PatientsPatientIdIndexRoute
+  __root__: typeof rootRouteImport;
+  "/": typeof IndexRoute;
+  "/reset_password": typeof Reset_passwordRoute;
+  "/login/": typeof LoginIndexRoute;
+  "/my_information/": typeof My_informationIndexRoute;
+  "/offices/": typeof OfficesIndexRoute;
+  "/patients/": typeof PatientsIndexRoute;
+  "/patients/$patientId/": typeof PatientsPatientIdIndexRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
-    | '/'
-    | '/reset_password'
-    | '/login'
-    | '/my_information'
-    | '/offices'
-    | '/patients'
-    | '/patients/$patientId'
-  fileRoutesByTo: FileRoutesByTo
+    | "/"
+    | "/reset_password"
+    | "/login"
+    | "/my_information"
+    | "/offices"
+    | "/patients"
+    | "/patients/$patientId";
+  fileRoutesByTo: FileRoutesByTo;
   to:
-    | '/'
-    | '/reset_password'
-    | '/login'
-    | '/my_information'
-    | '/offices'
-    | '/patients'
-    | '/patients/$patientId'
+    | "/"
+    | "/reset_password"
+    | "/login"
+    | "/my_information"
+    | "/offices"
+    | "/patients"
+    | "/patients/$patientId";
   id:
-    | '__root__'
-    | '/'
-    | '/reset_password'
-    | '/login/'
-    | '/my_information/'
-    | '/offices/'
-    | '/patients/'
-    | '/patients/$patientId/'
-  fileRoutesById: FileRoutesById
+    | "__root__"
+    | "/"
+    | "/reset_password"
+    | "/login/"
+    | "/my_information/"
+    | "/offices/"
+    | "/patients/"
+    | "/patients/$patientId/";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  Reset_passwordRoute: typeof Reset_passwordRoute
-  LoginIndexRoute: typeof LoginIndexRoute
-  My_informationIndexRoute: typeof My_informationIndexRoute
-  OfficesIndexRoute: typeof OfficesIndexRoute
-  PatientsIndexRoute: typeof PatientsIndexRoute
-  PatientsPatientIdIndexRoute: typeof PatientsPatientIdIndexRoute
+  IndexRoute: typeof IndexRoute;
+  Reset_passwordRoute: typeof Reset_passwordRoute;
+  LoginIndexRoute: typeof LoginIndexRoute;
+  My_informationIndexRoute: typeof My_informationIndexRoute;
+  OfficesIndexRoute: typeof OfficesIndexRoute;
+  PatientsIndexRoute: typeof PatientsIndexRoute;
+  PatientsPatientIdIndexRoute: typeof PatientsPatientIdIndexRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/reset_password': {
-      id: '/reset_password'
-      path: '/reset_password'
-      fullPath: '/reset_password'
-      preLoaderRoute: typeof Reset_passwordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/patients/': {
-      id: '/patients/'
-      path: '/patients'
-      fullPath: '/patients'
-      preLoaderRoute: typeof PatientsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/offices/': {
-      id: '/offices/'
-      path: '/offices'
-      fullPath: '/offices'
-      preLoaderRoute: typeof OfficesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/my_information/': {
-      id: '/my_information/'
-      path: '/my_information'
-      fullPath: '/my_information'
-      preLoaderRoute: typeof My_informationIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login/': {
-      id: '/login/'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/patients/$patientId/': {
-      id: '/patients/$patientId/'
-      path: '/patients/$patientId'
-      fullPath: '/patients/$patientId'
-      preLoaderRoute: typeof PatientsPatientIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+    "/reset_password": {
+      id: "/reset_password";
+      path: "/reset_password";
+      fullPath: "/reset_password";
+      preLoaderRoute: typeof Reset_passwordRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/patients/": {
+      id: "/patients/";
+      path: "/patients";
+      fullPath: "/patients";
+      preLoaderRoute: typeof PatientsIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/offices/": {
+      id: "/offices/";
+      path: "/offices";
+      fullPath: "/offices";
+      preLoaderRoute: typeof OfficesIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/my_information/": {
+      id: "/my_information/";
+      path: "/my_information";
+      fullPath: "/my_information";
+      preLoaderRoute: typeof My_informationIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/login/": {
+      id: "/login/";
+      path: "/login";
+      fullPath: "/login";
+      preLoaderRoute: typeof LoginIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/patients/$patientId/": {
+      id: "/patients/$patientId/";
+      path: "/patients/$patientId";
+      fullPath: "/patients/$patientId";
+      preLoaderRoute: typeof PatientsPatientIdIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
@@ -183,7 +183,7 @@ const rootRouteChildren: RootRouteChildren = {
   OfficesIndexRoute: OfficesIndexRoute,
   PatientsIndexRoute: PatientsIndexRoute,
   PatientsPatientIdIndexRoute: PatientsPatientIdIndexRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
