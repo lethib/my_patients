@@ -33,7 +33,7 @@ jobs:
 
   rust-checks:
     needs: changes
-    if: needs.changes.outputs.rust == 'true' || github.ref_name == 'main'
+    if: needs.changes.outputs.rust == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +54,7 @@ jobs:
 
   rust-tests:
     needs: changes
-    if: needs.changes.outputs.rust == 'true' || github.ref_name == 'main'
+    if: needs.changes.outputs.rust == 'true'
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -84,7 +84,7 @@ jobs:
 
   frontend:
     needs: changes
-    if: needs.changes.outputs.frontend == 'true' || github.ref_name == 'main'
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
