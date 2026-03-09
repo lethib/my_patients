@@ -68,6 +68,10 @@ pub async fn send_invoice(
       current_user.phone_number
     ),
   )
+  .set_from_name(format!(
+    "{} {}",
+    current_user.first_name, current_user.last_name
+  ))
   .with_attachment(attachment)
   .with_reply_to(current_user.email.to_string());
 

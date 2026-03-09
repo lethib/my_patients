@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EmailArgs {
   pub to: String,
+  pub from_name: Option<String>,
   pub to_name: Option<String>,
   pub subject: String,
   pub text_body: String,
@@ -16,12 +17,18 @@ impl EmailArgs {
   pub fn new_text(to: String, subject: String, text_body: String) -> Self {
     Self {
       to,
+      from_name: None,
       to_name: None,
       subject,
       text_body,
       attachments: Vec::new(),
       reply_to: None,
     }
+  }
+
+  pub fn set_from_name(mut self, from: String) -> Self {
+    self.from_name = Some(from);
+    self
   }
 
   pub fn with_attachment(mut self, attachment: EmailAttachment) -> Self {

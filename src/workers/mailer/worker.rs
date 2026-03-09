@@ -24,9 +24,10 @@ fn build_email(args: &EmailArgs, _config: &Arc<Config>) -> Result<Message, MyErr
   };
 
   let smtp_user = std::env::var("SMTP_AUTH_USER")?;
+  let from_name = args.from_name.clone().unwrap_or("My Patients".to_string());
 
   let mut message_builder = Message::builder()
-    .from(format!("{} <{}>", "My Patients", smtp_user).parse()?)
+    .from(format!("{} <{}>", from_name, smtp_user).parse()?)
     .to(to)
     .subject(&args.subject);
 
