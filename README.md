@@ -1,7 +1,5 @@
 <div align="center">
-  <img src="frontend/public/favicon/opencab-main.png" alt="OpenCab Logo" width="120" height="120">
-
-  # OpenCab
+  <img src="frontend/public/favicon/opencab-main.png" alt="OpenCab Logo" width="350">
 
   **A secure patient management system for healthcare practitioners**
 
