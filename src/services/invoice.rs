@@ -68,7 +68,7 @@ pub async fn send_invoice(
       current_user.phone_number
     ),
   )
-  .from_name(format!(
+  .set_from_name(format!(
     "{} {}",
     current_user.first_name, current_user.last_name
   ))

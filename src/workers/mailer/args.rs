@@ -26,7 +26,7 @@ impl EmailArgs {
     }
   }
 
-  pub fn from_name(mut self, from: String) -> Self {
+  pub fn set_from_name(mut self, from: String) -> Self {
     self.from_name = Some(from);
     self
   }
