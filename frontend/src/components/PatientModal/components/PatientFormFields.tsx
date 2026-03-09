@@ -10,22 +10,6 @@ export const PatientFormFields = () => {
     <>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="first_name" className="text-sm font-medium">
-            {t("patients.form.firstName")}
-          </Label>
-          <FormInput
-            id="first_name"
-            name="first_name"
-            type="text"
-            placeholder={t("patients.form.firstNamePlaceholder")}
-            className="pl-10 h-11"
-            icon={
-              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            }
-          />
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor="last_name" className="text-sm font-medium">
             {t("patients.form.lastName")}
           </Label>
@@ -34,6 +18,22 @@ export const PatientFormFields = () => {
             name="last_name"
             type="text"
             placeholder={t("patients.form.lastNamePlaceholder")}
+            className="pl-10 h-11"
+            icon={
+              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            }
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="first_name" className="text-sm font-medium">
+            {t("patients.form.firstName")}
+          </Label>
+          <FormInput
+            id="first_name"
+            name="first_name"
+            type="text"
+            placeholder={t("patients.form.firstNamePlaceholder")}
             className="pl-10 h-11"
             icon={
               <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
