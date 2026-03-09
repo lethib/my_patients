@@ -52,7 +52,7 @@ function Patients() {
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
-              <H2 className="text-3xl font-bold mb-2">My Patients</H2>
+              <img src="/favicon/opencab-text.png" width={200} />
               <p className="text-muted-foreground">{t("patients.subtitle")}</p>
             </div>
             <div className="flex gap-4">

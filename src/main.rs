@@ -27,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   setup_logging(&config.logger.level);
 
   tracing::info!(
-    "Starting my_patients application (environment: {})",
+    "Starting opencab application (environment: {})",
     environment
   );
 
@@ -78,7 +78,7 @@ fn setup_logging(level: &str) {
   tracing_subscriber::registry()
     .with(
       tracing_subscriber::EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| format!("my_patients={},tower_http={},sqlx=info", level, level).into()),
+        .unwrap_or_else(|_| format!("opencab={},tower_http={},sqlx=info", level, level).into()),
     )
     .with(tracing_subscriber::fmt::layer())
     .init();

@@ -1,6 +1,6 @@
 use base64::{engine::general_purpose::STANDARD, Engine};
 use cucumber::{then, when};
-use my_patients::services::crypto::Crypto;
+use opencab::services::crypto::Crypto;
 
 use crate::AppWorld;
 

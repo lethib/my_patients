@@ -9,13 +9,7 @@ import { APIClient } from "@/api/api";
 import { FormInput } from "@/components/form/FormInput";
 import { FormProvider } from "@/components/form/FormProvider";
 import { Button, Label } from "@/components/ui";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { login } from "@/lib/authUtils";
 import { AccessKeyModal } from "./components/AccessKeyModal";
@@ -76,19 +70,8 @@ function Login() {
     <>
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 px-4">
         <Card className="w-full max-w-md shadow-lg border-0 bg-card/50 backdrop-blur-sm">
-          <CardHeader className="flex flex-col items-center space-y-2 pb-6">
-            <img
-              src="/favicon/favicon.svg"
-              height={100}
-              width={100}
-              className="mb-4"
-            />
-            <CardTitle className="text-3xl font-bold tracking-tight">
-              {t("auth.login.title")}
-            </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              {t("auth.login.description")}
-            </CardDescription>
+          <CardHeader className="flex flex-col items-center space-y-2 pt-4 pb-2">
+            <img src="/favicon/opencab-main.png" width={300} />
           </CardHeader>
 
           <CardContent className="space-y-6">

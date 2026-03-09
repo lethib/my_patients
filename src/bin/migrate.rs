@@ -1,7 +1,7 @@
 use std::{env, error::Error, process::Command};
 
 use migration::MigratorTrait;
-use my_patients::config::Config;
+use opencab::config::Config;
 use sea_orm::Database;
 
 #[tokio::main]

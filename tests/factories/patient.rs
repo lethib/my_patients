@@ -1,4 +1,4 @@
-use my_patients::models::patients::{
+use opencab::models::patients::{
   ActiveModel as PatientActiveModel, CreatePatientParams, Model as PatientModel,
 };
 use sea_orm::DatabaseConnection;

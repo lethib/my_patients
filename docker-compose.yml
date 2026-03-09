@@ -17,7 +17,7 @@ services:
     environment:
       POSTGRES_USER: loco
       POSTGRES_PASSWORD: loco
-      POSTGRES_DB: my_patients_test
+      POSTGRES_DB: opencab_test
     ports:
       - "5431:5432"
 

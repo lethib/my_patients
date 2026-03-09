@@ -1,6 +1,6 @@
 use chrono::NaiveDate;
 use cucumber::{given, then, when};
-use my_patients::{
+use opencab::{
   models::{
     _entities::{medical_appointments, sea_orm_active_enums::PaymentMethod},
     medical_appointments::UpdateMedicalAppointmentParams,

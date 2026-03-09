@@ -1,4 +1,4 @@
-use my_patients::models::practitioner_offices::{
+use opencab::models::practitioner_offices::{
   ActiveModel as OfficeActiveModel, Model as OfficeModel, PractitionerOfficeParams,
 };
 use sea_orm::DatabaseConnection;

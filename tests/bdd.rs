@@ -3,13 +3,13 @@ mod steps;
 
 use cucumber::World;
 use migration::{Migrator, MigratorTrait};
-use my_patients::models::{
+use opencab::models::{
   medical_appointments::Model as AppointmentModel, patients::Model as PatientModel,
   practitioner_offices::Model as OfficeModel, users::Model as UserModel,
 };
 use sea_orm::{ConnectionTrait, Database, DatabaseConnection};
 
-const DEFAULT_TEST_DATABASE_URL: &str = "postgres://loco:loco@localhost:5431/my_patients_test";
+const DEFAULT_TEST_DATABASE_URL: &str = "postgres://loco:loco@localhost:5431/opencab_test";
 
 #[derive(Debug, World)]
 #[world(init = Self::new)]
