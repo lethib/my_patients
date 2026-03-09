@@ -1,5 +1,5 @@
 use chrono::NaiveDate;
-use my_patients::models::{
+use opencab::models::{
   _entities::sea_orm_active_enums::PaymentMethod,
   medical_appointments::{
     ActiveModel as AppointmentActiveModel, CreateMedicalAppointmentParams,

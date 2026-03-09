@@ -14,7 +14,7 @@ server:
 
 # Database configuration
 database:
-  url: postgres://loco:loco@localhost:5432/my_patients_test
+  url: postgres://loco:loco@localhost:5432/opencab_test
   enable_logging: false
   connect_timeout: 500
   idle_timeout: 500

@@ -7,7 +7,7 @@ env:
   GCP_PROJECT_ID: my-patients-management
   GCP_REGION: europe-west9
   DOCKERHUB_USERNAME: lethib
-  DOCKERHUB_IMAGE: my_patients
+  DOCKERHUB_IMAGE: opencab
 
 jobs:
   build-and-deploy:
@@ -54,7 +54,7 @@ jobs:
         id: deploy-migration
         run: |
           # Deploy Cloud Run Job for migrations
-          gcloud run jobs deploy my-patients-db-migrate \
+          gcloud run jobs deploy opencab-db-migrate \
             --image=${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ github.ref_name }} \
             --region=${{ env.GCP_REGION }} \
             --command=/app/migrate \
@@ -70,7 +70,7 @@ jobs:
       - name: Execute migration job
         run: |
           # Execute the migration job and wait for completion
-          EXECUTION_NAME=$(gcloud run jobs execute my-patients-db-migrate \
+          EXECUTION_NAME=$(gcloud run jobs execute opencab-db-migrate \
             --region=${{ env.GCP_REGION }} \
             --project=${{ env.GCP_PROJECT_ID }} \
             --format='value(metadata.name)')
@@ -106,7 +106,7 @@ jobs:
           # Extract version for tag (e.g., v1.4.3 -> v1-4-3)
           VERSION_TAG=$(echo "${{ github.ref_name }}" | sed 's/\./-/g')
 
-          gcloud run deploy my-patients \
+          gcloud run deploy opencab \
             --image=${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ github.ref_name }} \
             --region=${{ env.GCP_REGION }} \
             --platform=managed \
@@ -140,7 +140,7 @@ jobs:
           echo "✅ Deployment completed successfully!"
           echo "Version: ${{ github.ref_name }}"
           echo "Service URL:"
-          gcloud run services describe my-patients \
+          gcloud run services describe opencab \
             --region=${{ env.GCP_REGION }} \
             --project=${{ env.GCP_PROJECT_ID }} \
             --format='value(status.url)'

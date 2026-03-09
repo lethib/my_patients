@@ -2438,45 +2438,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "my_patients"
-version = "1.4.1"
-dependencies = [
- "aes-gcm",
- "argon2",
- "async-trait",
- "axum",
- "base64 0.22.1",
- "chrono",
- "config",
- "cucumber",
- "dotenvy",
- "image",
- "include_dir",
- "insta",
- "jsonwebtoken",
- "lettre",
- "migration",
- "once_cell",
- "oxidize-pdf",
- "rand 0.8.5",
- "regex",
- "reqwest",
- "rstest",
- "rust_xlsxwriter",
- "sea-orm",
- "serde",
- "serde_json",
- "serial_test",
- "tokio",
- "tower",
- "tower-http",
- "tracing",
- "tracing-subscriber",
- "uuid",
- "validator",
-]
-
-[[package]]
 name = "native-tls"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2664,6 +2625,45 @@ name = "opaque-debug"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08d65885ee38876c4f86fa503fb49d7b507c2b62552df7c70b2fce627e06381"
+
+[[package]]
+name = "opencab"
+version = "1.4.1"
+dependencies = [
+ "aes-gcm",
+ "argon2",
+ "async-trait",
+ "axum",
+ "base64 0.22.1",
+ "chrono",
+ "config",
+ "cucumber",
+ "dotenvy",
+ "image",
+ "include_dir",
+ "insta",
+ "jsonwebtoken",
+ "lettre",
+ "migration",
+ "once_cell",
+ "oxidize-pdf",
+ "rand 0.8.5",
+ "regex",
+ "reqwest",
+ "rstest",
+ "rust_xlsxwriter",
+ "sea-orm",
+ "serde",
+ "serde_json",
+ "serial_test",
+ "tokio",
+ "tower",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+ "validator",
+]
 
 [[package]]
 name = "openssl"

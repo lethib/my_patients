@@ -1,4 +1,4 @@
-use my_patients::models::users::{Model as UserModel, RegisterParams};
+use opencab::models::users::{Model as UserModel, RegisterParams};
 use sea_orm::DatabaseConnection;
 
 pub struct UserFactory {
