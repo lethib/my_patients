@@ -232,7 +232,7 @@
   ],
   "assist": {
     "enabled": true,
-    "includes": ["**", "!dist"],
+    "includes": ["**", "!dist", "!src/routeTree.gen.ts"],
     "actions": { "source": { "organizeImports": "on" } }
   }
 }
