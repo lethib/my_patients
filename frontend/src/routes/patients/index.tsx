@@ -20,7 +20,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { H2 } from "@/components/ui/typography/h2";
 import { useDebounce } from "@/hooks/useDebounce";
 import { logout } from "@/lib/authUtils";
 import { ExportAppointmentsModal } from "./components/ExportAppointmentsModal";

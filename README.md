@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="frontend/public/favicon/web-app-manifest-192x192.png" alt="My Patients Logo" width="120" height="120">
+  <img src="frontend/public/favicon/opencab-main.png" alt="OpenCab Logo" width="120" height="120">
 
-  # My Patients
+  # OpenCab
 
   **A secure patient management system for healthcare practitioners**
 
@@ -15,7 +15,7 @@
 
 ## 📖 About
 
-My Patients is a full-stack web application designed to help healthcare practitioners manage their patient records securely. Built with a focus on data privacy and security, it provides encrypted storage for sensitive patient information including social security numbers, along with automated invoice generation and delivery capabilities.
+OpenCab is a full-stack web application designed to help healthcare practitioners manage their patient records securely. Built with a focus on data privacy and security, it provides encrypted storage for sensitive patient information including social security numbers, along with automated invoice generation and delivery capabilities.
 
 Key capabilities include comprehensive patient management, medical appointment tracking with accounting exports, multi-office support, professional PDF invoice generation, and automated email delivery through background job processing.
 
@@ -90,7 +90,7 @@ Create a `.env.local` file in the root directory (or simply copy the `.env` file
 
 ```env
 # Database
-DATABASE_URL=postgres://user:password@localhost:5432/my_patients
+DATABASE_URL=postgres://user:password@localhost:5432/opencab
 
 # Encryption Keys (generate secure random keys)
 ENCRYPTION_KEY=your-32-byte-base64-encoded-key
@@ -115,8 +115,8 @@ SUPABASE_BUCKET=your-bucket-name
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/my_patients.git
-cd my_patients
+git clone https://github.com/yourusername/opencab.git
+cd opencab
 ```
 
 2. **Install backend dependencies**
@@ -154,7 +154,7 @@ The application will be available at `http://localhost:5173` (frontend) with API
 
 ### Project Structure
 ```
-my_patients/
+opencab/
 ├── src/
 │   ├── main.rs             # Application entry point & setup
 │   ├── app_state.rs        # Shared application state
@@ -225,10 +225,10 @@ The project includes an optimized multi-stage Dockerfile:
 
 ```bash
 # Build the image
-docker build -t my-patients .
+docker build -t opencab .
 
 # Run the container
-docker run -p 5150:5150 --env-file .env my-patients
+docker run -p 5150:5150 --env-file .env opencab
 ```
 
 The Dockerfile uses:
