@@ -3,7 +3,8 @@ use axum::{
   extract::{Path, State},
   Json,
 };
-use sea_orm::{ActiveModelTrait, ActiveValue::Set, EntityTrait, IntoActiveModel, ModelTrait};
+use sea_orm::{prelude::Decimal, EntityTrait, IntoActiveModel, ModelTrait};
+use serde::Deserialize;
 
 use crate::{
   app_state::AppState,
@@ -17,13 +18,24 @@ use crate::{
   services,
 };
 
+#[derive(Deserialize)]
+pub struct OfficeParams {
+  pub office: PractitionerOfficeParams,
+  pub revenue_share_percentage: Decimal,
+}
+
 #[debug_handler]
 pub async fn create(
   State(_state): State<AppState>,
   AuthenticatedUser(current_user, _): AuthenticatedUser,
-  Json(params): Json<PractitionerOfficeParams>,
+  Json(params): Json<OfficeParams>,
 ) -> Result<Json<serde_json::Value>, MyErrors> {
-  services::practitioner_office::create(&params, &current_user).await?;
+  services::practitioner_office::create(
+    &params.office,
+    &current_user,
+    params.revenue_share_percentage,
+  )
+  .await?;
 
   Ok(Json(serde_json::json!({ "success": true })))
 }
@@ -32,8 +44,9 @@ pub async fn create(
 pub async fn update(
   State(state): State<AppState>,
   authorize: AuthStatement,
+  AuthenticatedUser(current_user, _): AuthenticatedUser,
   Path(office_id): Path<i32>,
-  Json(params): Json<PractitionerOfficeParams>,
+  Json(params): Json<OfficeParams>,
 ) -> Result<Json<serde_json::Value>, MyErrors> {
   let office = practitioner_offices::Entity::find_by_id(office_id)
     .one(&state.db)
@@ -45,13 +58,13 @@ pub async fn update(
     .await
     .run_complete()?;
 
-  let mut office = office.clone().into_active_model();
-  office.name = Set(params.name.trim().to_string());
-  office.address_line_1 = Set(params.address_line_1.trim().to_string());
-  office.address_zip_code = Set(params.address_zip_code.trim().to_string());
-  office.address_city = Set(params.address_city.trim().to_string());
-
-  office.update(&state.db).await?;
+  services::practitioner_office::update(
+    office.into_active_model(),
+    &params.office,
+    &current_user,
+    params.revenue_share_percentage,
+  )
+  .await?;
 
   Ok(Json(serde_json::json!({ "success": true })))
 }

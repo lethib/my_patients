@@ -4,8 +4,11 @@ mod steps;
 use cucumber::World;
 use migration::{Migrator, MigratorTrait};
 use opencab::models::{
-  medical_appointments::Model as AppointmentModel, patients::Model as PatientModel,
-  practitioner_offices::Model as OfficeModel, users::Model as UserModel,
+  medical_appointments::Model as AppointmentModel,
+  my_errors::MyErrors,
+  patients::Model as PatientModel,
+  practitioner_offices::Model as OfficeModel,
+  users::Model as UserModel,
 };
 use sea_orm::{ConnectionTrait, Database, DatabaseConnection};
 
@@ -17,6 +20,7 @@ pub struct AppWorld {
   pub db: DatabaseConnection,
   pub crypto: CryptoState,
   pub appointments: AppointmentsState,
+  pub practitioner_office: PractitionerOfficeState,
 }
 
 impl AppWorld {
@@ -39,6 +43,7 @@ impl AppWorld {
       db,
       crypto: CryptoState::default(),
       appointments: AppointmentsState::default(),
+      practitioner_office: PractitionerOfficeState::default(),
     }
   }
 }
@@ -50,6 +55,13 @@ pub struct CryptoState {
   pub hashed: Option<String>,
   pub second_hashed: Option<String>,
   pub decrypt_failed: bool,
+}
+
+#[derive(Debug, Default)]
+pub struct PractitionerOfficeState {
+  pub user: Option<UserModel>,
+  pub office: Option<OfficeModel>,
+  pub last_error: Option<MyErrors>,
 }
 
 #[derive(Debug, Default)]

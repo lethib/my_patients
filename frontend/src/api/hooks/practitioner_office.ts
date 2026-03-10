@@ -6,13 +6,17 @@ export type PractitionerOffice = {
   address_line_1: string;
   address_zip_code: string;
   address_city: string;
+  revenue_share_percentage: number;
 };
 
 export type PractitionerOfficeParams = {
-  name: string;
-  address_line_1: string;
-  address_zip_code: string;
-  address_city: string;
+  office: {
+    name: string;
+    address_line_1: string;
+    address_zip_code: string;
+    address_city: string;
+  };
+  revenue_share_percentage: number;
 };
 
 export const practitionerOfficeSchema = {

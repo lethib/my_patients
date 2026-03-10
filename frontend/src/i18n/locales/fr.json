@@ -182,6 +182,8 @@
       "addressPlaceholder": "Numéro et nom de rue",
       "zipCode": "Code postal",
       "city": "Ville",
+      "revenueSharePercentage": "Rétrocession au cabinet (%)",
+      "revenueShareDisplay": "Titulaire: {{owner}} % | Vous: {{you}} %",
       "add": "Ajouter le cabinet",
       "update": "Modifier le cabinet",
       "validation": {

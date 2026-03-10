@@ -21,6 +21,7 @@ impl ActiveModelBehavior for ActiveModel {
 
 pub struct CreateLinkParams {
   pub user_id: i32,
+  pub revenue_share_percentage: Decimal,
   pub practitioner_office_id: i32,
 }
 
@@ -37,6 +38,7 @@ impl ActiveModel {
       user_practitioner_offices::ActiveModel {
         user_id: ActiveValue::Set(params.user_id),
         practitioner_office_id: ActiveValue::Set(params.practitioner_office_id),
+        revenue_share_percentage: ActiveValue::Set(params.revenue_share_percentage),
         ..Default::default()
       }
       .insert(db)
