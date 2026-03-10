@@ -5,8 +5,10 @@ use opencab::models::{
   practitioner_offices::PractitionerOfficeParams,
   user_practitioner_offices::CreateLinkParams,
 };
-use sea_orm::{prelude::Decimal, ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter};
 use sea_orm::ActiveValue::Set;
+use sea_orm::{
+  prelude::Decimal, ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter,
+};
 use std::str::FromStr;
 
 use crate::{factories::user::UserFactory, AppWorld};

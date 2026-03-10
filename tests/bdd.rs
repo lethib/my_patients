@@ -4,10 +4,8 @@ mod steps;
 use cucumber::World;
 use migration::{Migrator, MigratorTrait};
 use opencab::models::{
-  medical_appointments::Model as AppointmentModel,
-  my_errors::MyErrors,
-  patients::Model as PatientModel,
-  practitioner_offices::Model as OfficeModel,
+  medical_appointments::Model as AppointmentModel, my_errors::MyErrors,
+  patients::Model as PatientModel, practitioner_offices::Model as OfficeModel,
   users::Model as UserModel,
 };
 use sea_orm::{ConnectionTrait, Database, DatabaseConnection};
