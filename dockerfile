@@ -120,11 +120,11 @@ RUN cargo build --release --target x86_64-unknown-linux-gnu && \
     # Build send_access_token binary
     cargo build --release --bin send_access_token --target x86_64-unknown-linux-gnu && \
     # Strip binaries to reduce size (remove debug symbols)
-    strip target/x86_64-unknown-linux-gnu/release/my_patients && \
+    strip target/x86_64-unknown-linux-gnu/release/opencab && \
     strip target/x86_64-unknown-linux-gnu/release/migrate && \
     strip target/x86_64-unknown-linux-gnu/release/send_access_token && \
     # Verify binaries were built successfully
-    [ -f "target/x86_64-unknown-linux-gnu/release/my_patients" ] || \
+    [ -f "target/x86_64-unknown-linux-gnu/release/opencab" ] || \
         (echo "Rust build failed - binary not found" && exit 1) && \
     [ -f "target/x86_64-unknown-linux-gnu/release/migrate" ] || \
         (echo "Migrate binary build failed - binary not found" && exit 1) && \
@@ -140,7 +140,7 @@ FROM gcr.io/distroless/cc-debian12:nonroot AS runtime
 LABEL stage=runtime
 LABEL maintainer="DevOps Team"
 LABEL version="1.0"
-LABEL description="My Patients Application - Optimized Production Build"
+LABEL description="OpenCab Application - Optimized Production Build"
 
 # Set working directory
 WORKDIR /app
@@ -149,7 +149,7 @@ WORKDIR /app
 # The 'nonroot' user has UID 65532 and GID 65532
 COPY --from=frontend-builder --chown=65532:65532 /app/dist ./frontend/dist/
 COPY --from=rust-builder --chown=65532:65532 \
-    /app/target/x86_64-unknown-linux-gnu/release/my_patients ./my_patients
+    /app/target/x86_64-unknown-linux-gnu/release/opencab ./opencab
 COPY --from=rust-builder --chown=65532:65532 \
     /app/target/x86_64-unknown-linux-gnu/release/migrate ./migrate
 COPY --from=rust-builder --chown=65532:65532 \
@@ -161,4 +161,4 @@ ENV RUST_LOG=info
 ENV RUST_BACKTRACE=0
 
 EXPOSE 5150
-ENTRYPOINT ["/app/my_patients"]
+ENTRYPOINT ["/app/opencab"]
