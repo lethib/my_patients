@@ -32,7 +32,7 @@ async fn main() -> Result<(), MyErrors> {
 
   match user_to_invite.access_key {
     Some(access_key) => {
-      let email_args = EmailArgs::new_text(user_to_invite.email, "Votre code d'accès à OpenCab".to_string(), format!("Bonjour,\n\nVoici votre code d'accès à la plateforme OpenCab: {}\nVous pouvez l'utiliser juste après vous être connecté: https://my-patients-64695224709.europe-west9.run.app/login", access_key));
+      let email_args = EmailArgs::new_text(user_to_invite.email, "Votre code d'accès à OpenCab".to_string(), format!("Bonjour,\n\nVoici votre code d'accès à la plateforme OpenCab: {}\nVous pouvez l'utiliser juste après vous être connecté: https://opencab-64695224709.europe-west9.run.app/login", access_key));
 
       println!("Sending email...");
 
