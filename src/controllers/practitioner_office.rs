@@ -30,6 +30,12 @@ pub async fn create(
   AuthenticatedUser(current_user, _): AuthenticatedUser,
   Json(params): Json<OfficeParams>,
 ) -> Result<Json<serde_json::Value>, MyErrors> {
+  if params.revenue_share_percentage < Decimal::ZERO
+    || params.revenue_share_percentage > Decimal::ONE_HUNDRED
+  {
+    return Err(ApplicationError::BadRequest.into());
+  }
+
   services::practitioner_office::create(
     &params.office,
     &current_user,
@@ -57,6 +63,12 @@ pub async fn update(
     .user_owning_resource(&office)
     .await
     .run_complete()?;
+
+  if params.revenue_share_percentage < Decimal::ZERO
+    || params.revenue_share_percentage > Decimal::ONE_HUNDRED
+  {
+    return Err(ApplicationError::BadRequest.into());
+  }
 
   services::practitioner_office::update(
     office.into_active_model(),

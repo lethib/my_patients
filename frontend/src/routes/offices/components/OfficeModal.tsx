@@ -62,7 +62,7 @@ export const OfficeModal = ({
       .string()
       .trim()
       .min(1, t("offices.form.validation.cityRequired")),
-    revenue_share_percentage: z.number().default(0),
+    revenue_share_percentage: z.number().min(0).max(100).default(0),
   });
 
   const officeForm = useForm({

@@ -119,8 +119,7 @@ async fn update_office_name(world: &mut AppWorld, new_name: String) {
   world.practitioner_office.office = Some(updated);
 }
 
-#[then(expr = "the office is linked to the practitioner with a revenue share of {int}")]
-async fn office_linked_with_revenue_share(world: &mut AppWorld, expected: i64) {
+async fn assert_revenue_share(world: &AppWorld, expected: i64) {
   let user = world.practitioner_office.user.as_ref().unwrap();
   let office = world.practitioner_office.office.as_ref().unwrap();
 
@@ -138,23 +137,14 @@ async fn office_linked_with_revenue_share(world: &mut AppWorld, expected: i64) {
   );
 }
 
+#[then(expr = "the office is linked to the practitioner with a revenue share of {int}")]
+async fn office_linked_with_revenue_share(world: &mut AppWorld, expected: i64) {
+  assert_revenue_share(world, expected).await;
+}
+
 #[then(expr = "the office revenue share is {int}")]
 async fn office_revenue_share_is(world: &mut AppWorld, expected: i64) {
-  let user = world.practitioner_office.user.as_ref().unwrap();
-  let office = world.practitioner_office.office.as_ref().unwrap();
-
-  let link = user_practitioner_offices::Entity::find()
-    .filter(user_practitioner_offices::Column::PractitionerOfficeId.eq(office.id))
-    .filter(user_practitioner_offices::Column::UserId.eq(user.id))
-    .one(&world.db)
-    .await
-    .unwrap()
-    .expect("link should exist");
-
-  assert_eq!(
-    link.revenue_share_percentage,
-    Decimal::from_str(&expected.to_string()).unwrap()
-  );
+  assert_revenue_share(world, expected).await;
 }
 
 #[then(expr = "the office name is {string}")]
