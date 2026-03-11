@@ -1,13 +1,15 @@
 use chrono::NaiveDate;
 use cucumber::{given, then, when};
-use opencab::{
-  models::{
-    _entities::{medical_appointments, sea_orm_active_enums::PaymentMethod},
-    medical_appointments::UpdateMedicalAppointmentParams,
+use opencab::models::{
+  _entities::{
+    medical_appointments, practitioner_offices, sea_orm_active_enums::PaymentMethod,
+    user_practitioner_offices,
   },
-  services::appointments::MedicalAppointmentExtractor,
+  medical_appointments::UpdateMedicalAppointmentParams,
+  user_practitioner_offices::CreateLinkParams,
 };
-use sea_orm::{EntityTrait, IntoActiveModel};
+use opencab::services::appointments::MedicalAppointmentExtractor;
+use sea_orm::{prelude::Decimal, EntityTrait, IntoActiveModel};
 
 use crate::{
   factories::{
@@ -22,9 +24,36 @@ async fn practitioner_exists(world: &mut AppWorld) {
   world.appointments.user = Some(UserFactory::new().create(&world.db).await);
 }
 
-#[given(expr = "a practitioner office {string} exists")]
-async fn practitioner_office_exists(world: &mut AppWorld, name: String) {
-  world.appointments.office = Some(OfficeFactory::new().name(&name).create(&world.db).await);
+async fn create_office_with_revenue_share(
+  world: &mut AppWorld,
+  name: &str,
+  revenue_share: i64,
+) -> practitioner_offices::Model {
+  let user = world.appointments.user.as_ref().unwrap();
+  let office = OfficeFactory::new().name(name).create(&world.db).await;
+  user_practitioner_offices::ActiveModel::create(
+    &world.db,
+    &CreateLinkParams {
+      user_id: user.id,
+      practitioner_office_id: office.id,
+      revenue_share_percentage: Decimal::from(revenue_share),
+    },
+  )
+  .await
+  .unwrap();
+  office
+}
+
+#[given(expr = "a practitioner office {string} exists with revenue share {int}")]
+async fn practitioner_office_exists(world: &mut AppWorld, name: String, revenue_share: i64) {
+  let office = create_office_with_revenue_share(world, &name, revenue_share).await;
+  world.appointments.office = Some(office);
+}
+
+#[given(expr = "a second office {string} exists with revenue share {int}")]
+async fn second_office_exists(world: &mut AppWorld, name: String, revenue_share: i64) {
+  let office = create_office_with_revenue_share(world, &name, revenue_share).await;
+  world.appointments.second_office = Some(office);
 }
 
 #[given(expr = "a patient {string} {string} exists")]
@@ -55,6 +84,28 @@ async fn do_create_appointment(world: &mut AppWorld, date_str: &str, price: i32)
 #[given(expr = "an appointment on {string} at price {int}")]
 async fn given_appointment(world: &mut AppWorld, date_str: String, price: i32) {
   do_create_appointment(world, &date_str, price).await;
+}
+
+#[given(expr = "an appointment on {string} at price {int} at office {string}")]
+async fn given_appointment_at_office(
+  world: &mut AppWorld,
+  date_str: String,
+  price: i32,
+  office_name: String,
+) {
+  let user_id = world.appointments.user.as_ref().unwrap().id;
+  let patient_id = world.appointments.patient.as_ref().unwrap().id;
+  let office_id = world
+    .appointments
+    .all_offices()
+    .find(|o| o.name == office_name)
+    .unwrap_or_else(|| panic!("office '{}' not found", office_name))
+    .id;
+  AppointmentFactory::new()
+    .date(&date_str)
+    .price(price)
+    .create(&world.db, user_id, patient_id, office_id)
+    .await;
 }
 
 #[when(expr = "I create an appointment on {string} at price {int}")]
@@ -146,6 +197,24 @@ fn appointment_date(world: &mut AppWorld, date_str: String) {
 #[then(expr = "{int} appointments are returned")]
 fn appointments_count(world: &mut AppWorld, count: usize) {
   assert_eq!(world.appointments.extracted.len(), count);
+}
+
+#[then(expr = "the first extracted appointment has a revenue share of {float}")]
+fn first_appointment_revenue_share(world: &mut AppWorld, expected: f64) {
+  let (_, _, _, revenue_share) = &world.appointments.extracted[0];
+  assert_eq!(*revenue_share, expected);
+}
+
+#[then(expr = "the extracted appointment for office {string} has a revenue share of {float}")]
+fn appointment_revenue_share_for_office(world: &mut AppWorld, office_name: String, expected: f64) {
+  let (_, _, office, revenue_share) = world
+    .appointments
+    .extracted
+    .iter()
+    .find(|(_, _, o, _)| o.name == office_name)
+    .unwrap_or_else(|| panic!("no extracted appointment for office '{}'", office_name));
+  assert_eq!(office.name, office_name);
+  assert_eq!(*revenue_share, expected);
 }
 
 fn parse_payment_method(s: &str) -> PaymentMethod {

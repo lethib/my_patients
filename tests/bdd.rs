@@ -67,8 +67,15 @@ pub struct AppointmentsState {
   pub user: Option<UserModel>,
   pub patient: Option<PatientModel>,
   pub office: Option<OfficeModel>,
+  pub second_office: Option<OfficeModel>,
   pub appointment: Option<AppointmentModel>,
-  pub extracted: Vec<(AppointmentModel, PatientModel, OfficeModel)>,
+  pub extracted: Vec<(AppointmentModel, PatientModel, OfficeModel, f64)>,
+}
+
+impl AppointmentsState {
+  pub fn all_offices(&self) -> impl Iterator<Item = &OfficeModel> {
+    self.office.iter().chain(self.second_office.iter())
+  }
 }
 
 #[tokio::main]
