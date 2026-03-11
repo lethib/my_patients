@@ -39,6 +39,7 @@ impl ToExcel for Vec<MedicalAppointmentDetail> {
 
     let mut workbook = Workbook::new();
     let date_format = Format::new().set_num_format("dd/mm/yyyy");
+    let revenue_format = Format::new().set_num_format("0.00");
     let header_format = Format::new()
       .set_bold()
       .set_background_color(Color::Green)
@@ -91,8 +92,8 @@ impl ToExcel for Vec<MedicalAppointmentDetail> {
         )?;
 
         worksheet.write(i as u32 + 1, 4, price)?;
-        worksheet.write(i as u32 + 1, 5, format!("{:.2}", price - hand_back))?;
-        worksheet.write(i as u32 + 1, 6, format!("{:.2}", hand_back))?;
+        worksheet.write_with_format(i as u32 + 1, 5, price - hand_back, &revenue_format)?;
+        worksheet.write_with_format(i as u32 + 1, 6, hand_back, &revenue_format)?;
       }
     }
 
@@ -132,11 +133,7 @@ impl<'user> MedicalAppointmentExtractor<'user> {
     let revenue_share_by_office: HashMap<i32, f64> = user_offices
       .into_iter()
       .map(|uo| {
-        let pct = uo
-          .revenue_share_percentage
-          .to_string()
-          .parse::<f64>()
-          .unwrap_or(0.0);
+        let pct = uo.revenue_share_percentage.try_into().unwrap_or(0.0);
         (uo.practitioner_office_id, pct)
       })
       .collect();
@@ -144,16 +141,18 @@ impl<'user> MedicalAppointmentExtractor<'user> {
     let results = appointments
       .into_iter()
       .map(|(appointment, patient, office)| -> Result<_, MyErrors> {
-        let office = office.ok_or(UnexpectedError::new("office_should_be_define".to_string()))?;
+        let office = office.ok_or(UnexpectedError::new("office_should_be_defined".to_string()))?;
         let revenue_share_percentage =
           *revenue_share_by_office
             .get(&office.id)
             .ok_or(UnexpectedError::new(
-              "revenue_share_percentage_should_be_define".to_string(),
+              "revenue_share_percentage_should_be_defined".to_string(),
             ))?;
         Ok((
           appointment,
-          patient.ok_or(UnexpectedError::new("patient_should_be_define".to_string()))?,
+          patient.ok_or(UnexpectedError::new(
+            "patient_should_be_defined".to_string(),
+          ))?,
           office,
           revenue_share_percentage,
         ))
