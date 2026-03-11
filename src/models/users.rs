@@ -76,12 +76,20 @@ impl Model {
   pub async fn get_my_offices(
     &self,
     db: &DatabaseConnection,
-  ) -> ModelResult<Vec<practitioner_offices::Model>> {
-    let offices = practitioner_offices::Entity::find()
-      .inner_join(user_practitioner_offices::Entity)
+  ) -> ModelResult<
+    Vec<(
+      practitioner_offices::Model,
+      user_practitioner_offices::Model,
+    )>,
+  > {
+    let offices = user_practitioner_offices::Entity::find()
       .filter(user_practitioner_offices::Column::UserId.eq(self.id))
+      .find_also_related(practitioner_offices::Entity)
       .all(db)
-      .await?;
+      .await?
+      .into_iter()
+      .filter_map(|(upo, office)| office.map(|o| (o, upo)))
+      .collect();
 
     Ok(offices)
   }

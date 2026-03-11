@@ -12,6 +12,7 @@ import type {
 } from "@/api/hooks/practitioner_office";
 import { FormInput } from "@/components/form/FormInput";
 import { FormProvider } from "@/components/form/FormProvider";
+import { FormSlider } from "@/components/form/FormSlider";
 import {
   Button,
   Dialog,
@@ -61,6 +62,7 @@ export const OfficeModal = ({
       .string()
       .trim()
       .min(1, t("offices.form.validation.cityRequired")),
+    revenue_share_percentage: z.number().min(0).max(100).default(0),
   });
 
   const officeForm = useForm({
@@ -70,6 +72,7 @@ export const OfficeModal = ({
       address_line_1: "",
       address_zip_code: "",
       address_city: "",
+      revenue_share_percentage: 0,
     },
   });
 
@@ -80,6 +83,7 @@ export const OfficeModal = ({
         address_line_1: office.address_line_1,
         address_zip_code: office.address_zip_code,
         address_city: office.address_city,
+        revenue_share_percentage: office.revenue_share_percentage,
       });
     } else {
       officeForm.reset({
@@ -87,12 +91,21 @@ export const OfficeModal = ({
         address_line_1: "",
         address_zip_code: "",
         address_city: "",
+        revenue_share_percentage: 0,
       });
     }
   }, [office, officeForm]);
 
   const onSubmit = officeForm.handleSubmit(async (values) => {
-    asyncMutation(values)
+    asyncMutation({
+      office: {
+        name: values.name,
+        address_line_1: values.address_line_1,
+        address_zip_code: values.address_zip_code,
+        address_city: values.address_city,
+      },
+      revenue_share_percentage: values.revenue_share_percentage,
+    })
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ["/user/my_offices"] });
         setIsOpen(false);
@@ -100,6 +113,8 @@ export const OfficeModal = ({
       })
       .catch((error) => alert((error as Error).message));
   });
+
+  const { revenue_share_percentage } = officeForm.watch();
 
   return (
     <Dialog open={open} onOpenChange={setIsOpen}>
@@ -178,6 +193,29 @@ export const OfficeModal = ({
                 className="h-11"
               />
             </div>
+          </div>
+
+          <div className="space-y-2 py-4">
+            <div className="flex justify-between">
+              <Label
+                htmlFor="revenue_share_percentage"
+                className="text-sm font-medium"
+              >
+                {t("offices.form.revenueSharePercentage")}
+              </Label>
+              <span className="text-xs font-semibold text-gray-500">
+                {t("offices.form.revenueShareDisplay", {
+                  owner: (revenue_share_percentage ?? 0).toFixed(2),
+                  you: (100 - (revenue_share_percentage || 0)).toFixed(2),
+                })}
+              </span>
+            </div>
+            <FormSlider
+              name="revenue_share_percentage"
+              min={0}
+              max={100}
+              step={0.01}
+            />
           </div>
 
           <Button type="submit" className="w-full">

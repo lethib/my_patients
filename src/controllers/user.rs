@@ -45,8 +45,10 @@ pub async fn my_offices(
 ) -> Result<Json<Vec<PractitionerOffice>>, MyErrors> {
   let my_offices = current_user.get_my_offices(&state.db).await?;
 
-  let serialized_offices: Vec<PractitionerOffice> =
-    my_offices.iter().map(PractitionerOffice::new).collect();
+  let serialized_offices: Vec<PractitionerOffice> = my_offices
+    .iter()
+    .map(|(office, upo)| PractitionerOffice::new_with_upo(office, upo))
+    .collect();
 
   Ok(Json(serialized_offices))
 }

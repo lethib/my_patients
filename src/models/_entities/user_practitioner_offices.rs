@@ -12,6 +12,8 @@ pub struct Model {
   pub user_id: i32,
   #[sea_orm(primary_key, auto_increment = false)]
   pub practitioner_office_id: i32,
+  #[sea_orm(column_type = "Decimal(Some((5, 2)))")]
+  pub revenue_share_percentage: Decimal,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

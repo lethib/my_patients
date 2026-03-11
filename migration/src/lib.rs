@@ -28,6 +28,7 @@ mod m20260107_075701_add_profession_to_user_information;
 mod m20260113_223518_add_pricing_to_medical_appointments;
 mod m20260304_201910_add_payment_method_to_medical_appointment;
 mod m20260308_000001_fix_schema_drift;
+mod m20260310_175025_add_revenue_share_percentage_to_user_practitioner_office;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -60,6 +61,9 @@ impl MigratorTrait for Migrator {
       Box::new(m20260113_223518_add_pricing_to_medical_appointments::Migration),
       Box::new(m20260304_201910_add_payment_method_to_medical_appointment::Migration),
       Box::new(m20260308_000001_fix_schema_drift::Migration),
+      Box::new(
+        m20260310_175025_add_revenue_share_percentage_to_user_practitioner_office::Migration,
+      ),
     ]
   }
 }
