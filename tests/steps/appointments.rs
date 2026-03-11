@@ -2,7 +2,8 @@ use chrono::NaiveDate;
 use cucumber::{given, then, when};
 use opencab::models::{
   _entities::{
-    medical_appointments, sea_orm_active_enums::PaymentMethod, user_practitioner_offices,
+    medical_appointments, practitioner_offices, sea_orm_active_enums::PaymentMethod,
+    user_practitioner_offices,
   },
   medical_appointments::UpdateMedicalAppointmentParams,
   user_practitioner_offices::CreateLinkParams,
@@ -24,37 +25,35 @@ async fn practitioner_exists(world: &mut AppWorld) {
   world.appointments.user = Some(UserFactory::new().create(&world.db).await);
 }
 
-#[given(expr = "a practitioner office {string} exists with revenue share {int}")]
-async fn practitioner_office_exists(world: &mut AppWorld, name: String, revenue_share: i64) {
+async fn create_office_with_revenue_share(
+  world: &mut AppWorld,
+  name: &str,
+  revenue_share: i64,
+) -> practitioner_offices::Model {
   let user = world.appointments.user.as_ref().unwrap();
-  let office = OfficeFactory::new().name(&name).create(&world.db).await;
+  let office = OfficeFactory::new().name(name).create(&world.db).await;
   user_practitioner_offices::ActiveModel::create(
     &world.db,
     &CreateLinkParams {
       user_id: user.id,
       practitioner_office_id: office.id,
-      revenue_share_percentage: Decimal::from_str(&revenue_share.to_string()).unwrap(),
+      revenue_share_percentage: Decimal::from(revenue_share),
     },
   )
   .await
   .unwrap();
+  office
+}
+
+#[given(expr = "a practitioner office {string} exists with revenue share {int}")]
+async fn practitioner_office_exists(world: &mut AppWorld, name: String, revenue_share: i64) {
+  let office = create_office_with_revenue_share(world, &name, revenue_share).await;
   world.appointments.office = Some(office);
 }
 
 #[given(expr = "a second office {string} exists with revenue share {int}")]
 async fn second_office_exists(world: &mut AppWorld, name: String, revenue_share: i64) {
-  let user = world.appointments.user.as_ref().unwrap();
-  let office = OfficeFactory::new().name(&name).create(&world.db).await;
-  user_practitioner_offices::ActiveModel::create(
-    &world.db,
-    &CreateLinkParams {
-      user_id: user.id,
-      practitioner_office_id: office.id,
-      revenue_share_percentage: Decimal::from_str(&revenue_share.to_string()).unwrap(),
-    },
-  )
-  .await
-  .unwrap();
+  let office = create_office_with_revenue_share(world, &name, revenue_share).await;
   world.appointments.second_office = Some(office);
 }
 
