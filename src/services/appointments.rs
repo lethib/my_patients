@@ -4,7 +4,7 @@ use sea_orm::{ActiveEnum, ColumnTrait, DatabaseConnection, EntityTrait, QueryFil
 use std::collections::HashMap;
 
 use crate::models::{
-  _entities::{medical_appointments, patients, practitioner_offices},
+  _entities::{medical_appointments, patients, practitioner_offices, user_practitioner_offices},
   my_errors::{unexpected_error::UnexpectedError, MyErrors},
   users,
 };
@@ -17,6 +17,7 @@ type MedicalAppointmentDetail = (
   medical_appointments::Model,
   patients::Model,
   practitioner_offices::Model,
+  f64, // revenue_share_percentage
 );
 
 pub trait ToExcel {
@@ -66,8 +67,19 @@ impl ToExcel for Vec<MedicalAppointmentDetail> {
       worksheet.write_with_format(0, 4, "price_in_euros", &header_format)?;
       worksheet.set_column_width(4, 20)?;
 
-      for (i, (appointment, patient, _office)) in office_appointments.iter().enumerate() {
+      worksheet.write_with_format(0, 5, "your_revenue", &header_format)?;
+      worksheet.set_column_width(5, 20)?;
+
+      worksheet.write_with_format(0, 6, "hand_back", &header_format)?;
+      worksheet.set_column_width(6, 20)?;
+
+      for (i, (appointment, patient, _office, revenue_share_percentage)) in
+        office_appointments.iter().enumerate()
+      {
         let excel_date = ExcelDateTime::parse_from_str(&appointment.date.to_string())?;
+        let price = appointment.price_in_cents as f64 / 100.0;
+        let hand_back = price * revenue_share_percentage / 100.0;
+
         worksheet.write_with_format(i as u32 + 1, 0, &excel_date, &date_format)?;
 
         worksheet.write(i as u32 + 1, 1, &patient.first_name)?;
@@ -77,7 +89,10 @@ impl ToExcel for Vec<MedicalAppointmentDetail> {
           3,
           appointment.payment_method.clone().map(|p| p.to_value()),
         )?;
-        worksheet.write(i as u32 + 1, 4, appointment.price_in_cents as f64 / 100.0)?;
+
+        worksheet.write(i as u32 + 1, 4, price)?;
+        worksheet.write(i as u32 + 1, 5, format!("{:.2}", price - hand_back))?;
+        worksheet.write(i as u32 + 1, 6, format!("{:.2}", hand_back))?;
       }
     }
 
@@ -109,13 +124,38 @@ impl<'user> MedicalAppointmentExtractor<'user> {
       .all(db)
       .await?;
 
+    let user_offices = user_practitioner_offices::Entity::find()
+      .filter(user_practitioner_offices::Column::UserId.eq(self.user.id))
+      .all(db)
+      .await?;
+
+    let revenue_share_by_office: HashMap<i32, f64> = user_offices
+      .into_iter()
+      .map(|uo| {
+        let pct = uo
+          .revenue_share_percentage
+          .to_string()
+          .parse::<f64>()
+          .unwrap_or(0.0);
+        (uo.practitioner_office_id, pct)
+      })
+      .collect();
+
     let results = appointments
       .into_iter()
       .map(|(appointment, patient, office)| -> Result<_, MyErrors> {
+        let office = office.ok_or(UnexpectedError::new("office_should_be_define".to_string()))?;
+        let revenue_share_percentage =
+          *revenue_share_by_office
+            .get(&office.id)
+            .ok_or(UnexpectedError::new(
+              "revenue_share_percentage_should_be_define".to_string(),
+            ))?;
         Ok((
           appointment,
           patient.ok_or(UnexpectedError::new("patient_should_be_define".to_string()))?,
-          office.ok_or(UnexpectedError::new("office_should_be_define".to_string()))?,
+          office,
+          revenue_share_percentage,
         ))
       })
       .collect::<Result<Vec<_>, MyErrors>>()?;
