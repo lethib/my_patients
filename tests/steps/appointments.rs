@@ -10,7 +10,6 @@ use opencab::models::{
 };
 use opencab::services::appointments::MedicalAppointmentExtractor;
 use sea_orm::{prelude::Decimal, EntityTrait, IntoActiveModel};
-use std::str::FromStr;
 
 use crate::{
   factories::{
