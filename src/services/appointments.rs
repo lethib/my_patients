@@ -53,25 +53,25 @@ impl ToExcel for Vec<MedicalAppointmentDetail> {
       let worksheet = workbook.add_worksheet();
       worksheet.set_name(office_name)?;
 
-      worksheet.write_with_format(0, 0, "date", &header_format)?;
+      worksheet.write_with_format(0, 0, "Date", &header_format)?;
       worksheet.set_column_width(0, 15)?;
 
-      worksheet.write_with_format(0, 1, "first_name", &header_format)?;
+      worksheet.write_with_format(0, 1, "Nom", &header_format)?;
       worksheet.set_column_width(1, 20)?;
 
-      worksheet.write_with_format(0, 2, "last_name", &header_format)?;
+      worksheet.write_with_format(0, 2, "Prénom", &header_format)?;
       worksheet.set_column_width(2, 20)?;
 
-      worksheet.write_with_format(0, 3, "payment_method", &header_format)?;
+      worksheet.write_with_format(0, 3, "Mode de paiement", &header_format)?;
       worksheet.set_column_width(3, 15)?;
 
-      worksheet.write_with_format(0, 4, "price_in_euros", &header_format)?;
+      worksheet.write_with_format(0, 4, "Prix consultation (€)", &header_format)?;
       worksheet.set_column_width(4, 20)?;
 
-      worksheet.write_with_format(0, 5, "your_revenue", &header_format)?;
+      worksheet.write_with_format(0, 5, "Votre CA", &header_format)?;
       worksheet.set_column_width(5, 20)?;
 
-      worksheet.write_with_format(0, 6, "hand_back", &header_format)?;
+      worksheet.write_with_format(0, 6, "Rétrocession", &header_format)?;
       worksheet.set_column_width(6, 20)?;
 
       for (i, (appointment, patient, _office, revenue_share_percentage)) in
@@ -83,8 +83,8 @@ impl ToExcel for Vec<MedicalAppointmentDetail> {
 
         worksheet.write_with_format(i as u32 + 1, 0, &excel_date, &date_format)?;
 
-        worksheet.write(i as u32 + 1, 1, &patient.first_name)?;
-        worksheet.write(i as u32 + 1, 2, &patient.last_name)?;
+        worksheet.write(i as u32 + 1, 1, &patient.last_name)?;
+        worksheet.write(i as u32 + 1, 2, &patient.first_name)?;
         worksheet.write(
           i as u32 + 1,
           3,
